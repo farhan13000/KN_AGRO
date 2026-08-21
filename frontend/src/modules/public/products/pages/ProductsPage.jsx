@@ -430,24 +430,21 @@ function CatalogueProductCard({ product, viewMode }) {
   const isList = viewMode === "list";
   const imageClass =
     product.imageFit === "contain"
-      ? `${isList ? "max-h-48" : "max-h-40"} w-full object-contain drop-shadow-[0_10px_10px_rgba(23,76,43,0.10)] transition duration-500 group-hover:scale-105`
+      ? `${isList ? "max-h-44" : "max-h-[178px]"} w-full object-contain drop-shadow-[0_10px_8px_rgba(24,34,26,0.12)] transition duration-500 group-hover:scale-[1.03]`
       : "h-full w-full object-cover transition duration-500 group-hover:scale-105";
 
   return (
     <article
-      className={`group flex flex-col overflow-hidden rounded-2xl border border-forest/10 bg-white shadow-card transition hover:-translate-y-1 hover:border-leaf/35 hover:shadow-soft ${
+      className={`group flex flex-col overflow-hidden rounded-lg border border-forest/10 bg-white shadow-[0_8px_22px_rgba(24,34,26,0.055)] transition hover:-translate-y-0.5 hover:border-leaf/35 hover:shadow-card ${
         isList ? "md:flex-row md:items-stretch" : ""
       }`}
     >
       <Link
-        className={`relative flex items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_center,rgba(120,169,66,0.14),transparent_52%),linear-gradient(180deg,#f7fbf3_0%,#edf6e8_100%)] p-4 ${
-          isList ? "min-h-48 md:w-60 md:min-h-full md:shrink-0" : "min-h-48"
+        className={`flex items-center justify-center overflow-hidden bg-white px-4 pb-2 pt-5 ${
+          isList ? "min-h-52 md:w-64 md:min-h-full md:shrink-0" : "h-[208px]"
         }`}
         to={`/products/${product.slug}`}
       >
-        <span className="absolute left-3 top-3 rounded-full bg-mint/90 px-3 py-1 text-[11px] font-black uppercase tracking-[0.08em] text-forest shadow-sm">
-          {t(product.unit)}
-        </span>
         <img
           alt={`${product.name} agricultural product pack`}
           className={imageClass}
@@ -455,31 +452,24 @@ function CatalogueProductCard({ product, viewMode }) {
           src={product.image}
         />
       </Link>
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <span className="w-fit rounded-full bg-mint px-3 py-1 text-[11px] font-extrabold text-forest">
+      <div className="flex flex-1 flex-col px-4 pb-4 pt-2">
+        <span className="w-fit rounded-full border border-leaf/25 bg-mint px-2.5 py-1 text-[10px] font-extrabold leading-none text-forest">
           {t(product.category)}
         </span>
-        <h3 className="mt-3 text-lg font-black leading-tight text-ink">{t(product.name)}</h3>
-        <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted">{t(product.shortDescription)}</p>
+        <h3 className="mt-2 text-[15px] font-black leading-tight text-ink">{t(product.name)}</h3>
+        <p className="mt-2 line-clamp-3 min-h-[60px] text-[13px] leading-5 text-muted">
+          {t(product.shortDescription)}
+        </p>
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          <span className="rounded-full border border-forest/10 bg-[#fbfcf8] px-3 py-1 text-xs font-extrabold text-forest">
-            {t("Form")}: {t(product.unit)}
-          </span>
-          <span className="rounded-full border border-forest/10 bg-[#fbfcf8] px-3 py-1 text-xs font-extrabold text-forest">
-            {t(product.packSize)}
-          </span>
-        </div>
-
-        <div className={`mt-4 grid gap-2 ${isList ? "sm:grid-cols-2 md:max-w-sm" : "grid-cols-2"}`}>
+        <div className={`mt-4 grid gap-3 ${isList ? "sm:grid-cols-2 md:max-w-sm" : "grid-cols-2"}`}>
           <Link
-            className="inline-flex min-h-10 items-center justify-center rounded-xl border border-forest/35 bg-white px-3 text-center text-xs font-extrabold leading-snug text-forest transition hover:bg-mint"
+            className="inline-flex min-h-9 items-center justify-center rounded-md border border-forest/35 bg-white px-2 text-center text-[11px] font-extrabold leading-snug text-forest transition hover:bg-mint"
             to={`/products/${product.slug}`}
           >
             {t("View Details")}
           </Link>
           <Link
-            className="inline-flex min-h-10 items-center justify-center rounded-xl bg-forest px-3 text-center text-xs font-extrabold leading-snug text-white shadow-sm transition hover:bg-agriculture"
+            className="inline-flex min-h-9 items-center justify-center rounded-md bg-forest px-2 text-center text-[11px] font-extrabold leading-snug text-white shadow-sm transition hover:bg-agriculture"
             to={`/enquiry?product=${product.slug}`}
           >
             {t("Enquire Now")}
@@ -492,11 +482,11 @@ function CatalogueProductCard({ product, viewMode }) {
 
 function ProductSkeleton() {
   return (
-    <div className="animate-pulse overflow-hidden rounded-2xl border border-forest/10 bg-white shadow-card">
-      <div className="min-h-48 bg-mint" />
+    <div className="animate-pulse overflow-hidden rounded-lg border border-forest/10 bg-white shadow-card">
+      <div className="h-[208px] bg-mint" />
       <div className="space-y-3 p-4">
-        <div className="h-5 w-24 rounded-full bg-mint" />
-        <div className="h-5 w-2/3 rounded bg-mint" />
+        <div className="h-4 w-24 rounded-full bg-mint" />
+        <div className="h-4 w-2/3 rounded bg-mint" />
         <div className="h-4 w-full rounded bg-mint" />
         <div className="h-4 w-4/5 rounded bg-mint" />
       </div>
