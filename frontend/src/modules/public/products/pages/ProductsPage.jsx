@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import EmptyState from "../../../../shared/components/EmptyState";
 import Icon from "../../../../shared/components/Icon";
 import SEO from "../../../../shared/components/SEO";
 import { usePublicData } from "../../../../hooks/usePublicData";
 import { useLanguage } from "../../../../i18n/LanguageContext";
+import { PRODUCT_UNIT_LABELS } from "../../../../features/products/constants";
+import { useDebouncedValue } from "../../../../shared/hooks";
 import heroSectionImage from "../../../../assets/Hero Section Image.png";
 import { publicCategoriesApi } from "../../categories/api/publicCategories.api";
 import { publicProductsApi } from "../api/publicProducts.api";
@@ -12,28 +14,59 @@ import { publicProductsApi } from "../api/publicProducts.api";
 const initialVisibleCount = 5;
 const loadMoreCount = 5;
 const sortOptions = [
-  { label: "Sort by: Featured", value: "featured" },
-  { label: "Sort by: Name A-Z", value: "name-asc" },
-  { label: "Sort by: Name Z-A", value: "name-desc" },
+  { label: "Sort by: Newest", value: "createdAt-desc", sortBy: "createdAt", sortOrder: "desc" },
+  { label: "Sort by: Name A-Z", value: "name-asc", sortBy: "name", sortOrder: "asc" },
+  { label: "Sort by: Name Z-A", value: "name-desc", sortBy: "name", sortOrder: "desc" },
+  { label: "Sort by: Price Low-High", value: "sellingPrice-asc", sortBy: "sellingPrice", sortOrder: "asc" },
+  { label: "Sort by: Price High-Low", value: "sellingPrice-desc", sortBy: "sellingPrice", sortOrder: "desc" },
 ];
-const formFilters = [
-  { label: "Granular", values: ["Granules"] },
-  { label: "Powder", values: ["Powder"] },
-];
+const unitFilters = Object.entries(PRODUCT_UNIT_LABELS).map(([value, label]) => ({ label, value }));
+const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
+const getLimit = (searchParams) => {
+  const limit = Number(getQueryValue(searchParams, "limit", String(initialVisibleCount)));
+  return Number.isInteger(limit) && limit >= initialVisibleCount ? limit : initialVisibleCount;
+};
 
 export default function ProductsPage() {
   const { t } = useLanguage();
-  const [query, setQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [sortBy, setSortBy] = useState("featured");
-  const [selectedForms, setSelectedForms] = useState([]);
-  const [visibleCount, setVisibleCount] = useState(initialVisibleCount);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState("grid");
-  const productState = usePublicData(publicProductsApi.getProducts, []);
+  const searchInput = getQueryValue(searchParams, "search");
+  const selectedCategory = getQueryValue(searchParams, "category", "all");
+  const rawSortBy = getQueryValue(searchParams, "sort", "createdAt-desc");
+  const sortBy = sortOptions.some((option) => option.value === rawSortBy) ? rawSortBy : "createdAt-desc";
+  const rawSelectedUnit = getQueryValue(searchParams, "unit");
+  const selectedUnit = unitFilters.some((filter) => filter.value === rawSelectedUnit) ? rawSelectedUnit : "";
+  const visibleCount = getLimit(searchParams);
+  const debouncedSearch = useDebouncedValue(searchInput);
   const categoryState = usePublicData(publicCategoriesApi.getCategories, []);
-
-  const products = productState.data || [];
   const categories = categoryState.data || [];
+  const activeCategoryData = categories.find((category) => category.slug === selectedCategory);
+  const activeSort = sortOptions.find((option) => option.value === sortBy) || sortOptions[0];
+  const requestQuery = {
+    page: 1,
+    limit: visibleCount,
+    search: debouncedSearch.trim(),
+    category: selectedCategory === "all" ? "" : activeCategoryData?._id || "",
+    unit: selectedUnit,
+    sortBy: activeSort.sortBy,
+    sortOrder: activeSort.sortOrder,
+  };
+  const productState = usePublicData(
+    () => publicProductsApi.getPublicProducts(requestQuery),
+    [
+      requestQuery.page,
+      requestQuery.limit,
+      requestQuery.search,
+      requestQuery.category,
+      requestQuery.unit,
+      requestQuery.sortBy,
+      requestQuery.sortOrder,
+    ],
+  );
+
+  const products = productState.data?.products || [];
+  const pagination = productState.data?.pagination || {};
 
   const categoryItems = useMemo(
     () => [
@@ -41,87 +74,42 @@ export default function ProductsPage() {
         icon: "PackageCheck",
         name: "All Products",
         slug: "all",
-        count: products.length,
+        count: pagination.total ?? 0,
       },
       ...categories.map((category) => ({
         ...category,
-        count: products.filter((product) => product.categorySlug === category.slug).length,
+        count: category.productCount || 0,
       })),
     ],
-    [categories, products],
+    [categories, pagination.total],
   );
 
-  const filterCounts = useMemo(
-    () =>
-      formFilters.map((filter) => ({
-        ...filter,
-        count: products.filter((product) => filter.values.includes(product.unit)).length,
-      })),
-    [products],
-  );
+  const hasMoreProducts = products.length < (pagination.total || 0);
 
-  const filteredProducts = useMemo(() => {
-    const search = query.trim().toLowerCase();
-    const selectedFormValues = formFilters
-      .filter((filter) => selectedForms.includes(filter.label))
-      .flatMap((filter) => filter.values);
-
-    const filtered = products.filter((product) => {
-      const matchesCategory = selectedCategory === "all" || product.categorySlug === selectedCategory;
-      const matchesForm = !selectedFormValues.length || selectedFormValues.includes(product.unit);
-      const haystack = [
-        product.name,
-        t(product.name),
-        product.category,
-        t(product.category),
-        product.shortDescription,
-        t(product.shortDescription),
-        product.description,
-        t(product.description),
-        ...product.benefits,
-        ...product.benefits.map((benefit) => t(benefit)),
-        ...product.suitableCrops,
-        ...product.suitableCrops.map((crop) => t(crop)),
-      ]
-        .join(" ")
-        .toLowerCase();
-
-      return matchesCategory && matchesForm && (!search || haystack.includes(search));
+  const updateQuery = (updates) => {
+    const next = new URLSearchParams(searchParams);
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === "" || value === null || value === undefined) next.delete(key);
+      else next.set(key, String(value));
     });
-
-    return [...filtered].sort((a, b) => {
-      if (sortBy === "name-asc") return a.name.localeCompare(b.name);
-      if (sortBy === "name-desc") return b.name.localeCompare(a.name);
-      return Number(b.featured) - Number(a.featured) || a.name.localeCompare(b.name);
-    });
-  }, [products, query, selectedCategory, selectedForms, sortBy, t]);
-
-  const visibleProducts = filteredProducts.slice(0, visibleCount);
-  const hasMoreProducts = visibleProducts.length < filteredProducts.length;
-
-  const resetVisibleProducts = () => setVisibleCount(initialVisibleCount);
-  const activeCategory = categoryItems.find((category) => category.slug === selectedCategory) || categoryItems[0];
-  const hasActiveFilters =
-    query.trim().length > 0 || selectedCategory !== "all" || selectedForms.length > 0 || sortBy !== "featured";
-
-  const handleCategoryChange = (slug) => {
-    setSelectedCategory(slug);
-    resetVisibleProducts();
+    setSearchParams(next);
   };
 
-  const handleFormToggle = (label) => {
-    setSelectedForms((current) =>
-      current.includes(label) ? current.filter((item) => item !== label) : [...current, label],
-    );
-    resetVisibleProducts();
+  const resetVisibleProducts = () => updateQuery({ limit: "" });
+  const activeCategory = categoryItems.find((category) => category.slug === selectedCategory) || categoryItems[0];
+  const hasActiveFilters =
+    searchInput.trim().length > 0 || selectedCategory !== "all" || selectedUnit || sortBy !== "createdAt-desc";
+
+  const handleCategoryChange = (slug) => {
+    updateQuery({ category: slug === "all" ? "" : slug, limit: "" });
+  };
+
+  const handleUnitChange = (unit) => {
+    updateQuery({ unit, limit: "" });
   };
 
   const clearFilters = () => {
-    setQuery("");
-    setSelectedCategory("all");
-    setSelectedForms([]);
-    setSortBy("featured");
-    resetVisibleProducts();
+    setSearchParams(new URLSearchParams());
   };
 
   return (
@@ -175,18 +163,26 @@ export default function ProductsPage() {
             </FilterPanel>
 
             <FilterPanel title="Filter By">
-              <p className="text-sm font-extrabold text-ink">{t("Form")}</p>
+              <p className="text-sm font-extrabold text-ink">{t("Pack / Unit")}</p>
               <div className="mt-3 space-y-3">
-                {filterCounts.map((filter) => (
-                  <label className="flex cursor-pointer items-center gap-3 text-sm text-ink" key={filter.label}>
+                <label className="flex cursor-pointer items-center gap-3 text-sm text-ink">
+                  <input
+                    checked={!selectedUnit}
+                    className="h-4 w-4 border-forest/25 text-forest accent-forest"
+                    onChange={() => handleUnitChange("")}
+                    type="radio"
+                  />
+                  <span className="flex-1">{t("All Units")}</span>
+                </label>
+                {unitFilters.map((filter) => (
+                  <label className="flex cursor-pointer items-center gap-3 text-sm text-ink" key={filter.value}>
                     <input
-                      checked={selectedForms.includes(filter.label)}
-                      className="h-4 w-4 rounded border-forest/25 text-forest accent-forest"
-                      onChange={() => handleFormToggle(filter.label)}
-                      type="checkbox"
+                      checked={selectedUnit === filter.value}
+                      className="h-4 w-4 border-forest/25 text-forest accent-forest"
+                      onChange={() => handleUnitChange(filter.value)}
+                      type="radio"
                     />
                     <span className="flex-1">{t(filter.label)}</span>
-                    <span className="text-xs font-semibold text-muted">({filter.count})</span>
                   </label>
                 ))}
               </div>
@@ -205,8 +201,8 @@ export default function ProductsPage() {
                     {productState.isLoading
                       ? t("Loading products...")
                       : t("Showing {{visible}} of {{total}} products", {
-                          visible: String(visibleProducts.length),
-                          total: String(filteredProducts.length),
+                          visible: String(products.length),
+                          total: String(pagination.total ?? products.length),
                         })}
                   </p>
                 </div>
@@ -233,20 +229,18 @@ export default function ProductsPage() {
                   <input
                     className="h-12 w-full rounded-xl border border-forest/14 bg-white px-11 text-sm font-semibold text-ink shadow-sm outline-none transition placeholder:font-medium placeholder:text-muted focus:border-agriculture focus:ring-4 focus:ring-leaf/20"
                     onChange={(event) => {
-                      setQuery(event.target.value);
-                      resetVisibleProducts();
+                      updateQuery({ search: event.target.value, limit: "" });
                     }}
                     placeholder={t("Search products...")}
                     type="search"
-                    value={query}
+                    value={searchInput}
                   />
-                  {query ? (
+                  {searchInput ? (
                     <button
                       aria-label={t("Clear Search")}
                       className="absolute right-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-mint text-forest transition hover:bg-forest hover:text-white"
                       onClick={() => {
-                        setQuery("");
-                        resetVisibleProducts();
+                        updateQuery({ search: "", limit: "" });
                       }}
                       type="button"
                     >
@@ -263,8 +257,10 @@ export default function ProductsPage() {
                     className="h-12 w-full rounded-xl border border-forest/14 bg-white px-4 pr-10 text-sm font-extrabold text-ink shadow-sm outline-none focus:border-agriculture focus:ring-4 focus:ring-leaf/20 sm:w-[220px]"
                     id="products-sort"
                     onChange={(event) => {
-                      setSortBy(event.target.value);
-                      resetVisibleProducts();
+                      updateQuery({
+                        sort: event.target.value === "createdAt-desc" ? "" : event.target.value,
+                        limit: "",
+                      });
                     }}
                     value={sortBy}
                   >
@@ -298,7 +294,7 @@ export default function ProductsPage() {
                 <EmptyState
                   actionLabel="Send Enquiry"
                   actionTo="/enquiry"
-                  description={productState.error}
+                  description="We could not load the public product catalogue right now. Please try again shortly or send an enquiry."
                   title="Unable to load products"
                 />
               </div>
@@ -313,16 +309,18 @@ export default function ProductsPage() {
                 >
                   {productState.isLoading
                     ? Array.from({ length: initialVisibleCount }).map((_, index) => <ProductSkeleton key={index} />)
-                    : visibleProducts.map((product) => (
+                    : products.map((product) => (
                         <CatalogueProductCard key={product.id} product={product} viewMode={viewMode} />
                       ))}
                 </div>
 
-                {!productState.isLoading && !filteredProducts.length ? (
+                {!productState.isLoading && !products.length ? (
                   <div className="mt-8">
                     <EmptyState
-                      description="Try a different category, search, or form filter."
-                      title="No products match this selection"
+                      actionLabel="Send Enquiry"
+                      actionTo="/enquiry"
+                      description="Try a different category, search, unit filter, or send an enquiry for product support."
+                      title={hasActiveFilters ? "No products match this selection" : "No products available"}
                     />
                   </div>
                 ) : null}
@@ -331,7 +329,7 @@ export default function ProductsPage() {
                   <div className="mt-8 flex justify-center">
                     <button
                       className="inline-flex min-h-12 min-w-52 items-center justify-center gap-3 rounded-xl border border-forest/40 bg-white px-6 text-sm font-extrabold text-forest shadow-sm transition hover:bg-mint"
-                      onClick={() => setVisibleCount((current) => current + loadMoreCount)}
+                      onClick={() => updateQuery({ limit: visibleCount + loadMoreCount })}
                       type="button"
                     >
                       {t("Load More Products")}
@@ -427,7 +425,9 @@ function ViewToggle({ active, icon, label, onClick }) {
 
 function CatalogueProductCard({ product, viewMode }) {
   const { t } = useLanguage();
+  const [imageFailed, setImageFailed] = useState(false);
   const isList = viewMode === "list";
+  const hasImage = Boolean(product.image) && !imageFailed;
   const imageClass =
     product.imageFit === "contain"
       ? `${isList ? "max-h-44" : "max-h-[178px]"} w-full object-contain drop-shadow-[0_10px_8px_rgba(24,34,26,0.12)] transition duration-500 group-hover:scale-[1.03]`
@@ -445,12 +445,20 @@ function CatalogueProductCard({ product, viewMode }) {
         }`}
         to={`/products/${product.slug}`}
       >
-        <img
-          alt={`${product.name} agricultural product pack`}
-          className={imageClass}
-          loading="lazy"
-          src={product.image}
-        />
+        {hasImage ? (
+          <img
+            alt={`${product.name} agricultural product pack`}
+            className={imageClass}
+            loading="lazy"
+            onError={() => setImageFailed(true)}
+            src={product.image}
+          />
+        ) : (
+          <div className="flex h-full min-h-32 w-full flex-col items-center justify-center gap-2 rounded-lg bg-mint p-4 text-center text-forest">
+            <Icon name="PackageCheck" className="h-8 w-8" />
+            <span className="text-xs font-black uppercase tracking-[0.08em]">{t("Image unavailable")}</span>
+          </div>
+        )}
       </Link>
       <div className="flex flex-1 flex-col px-4 pb-4 pt-2">
         <span className="w-fit rounded-full border border-leaf/25 bg-mint px-2.5 py-1 text-[10px] font-extrabold leading-none text-forest">

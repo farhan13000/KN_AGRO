@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { companyConfig } from "../../config/company.config";
-import { categories } from "../../modules/public/data/categories.data";
+import { usePublicData } from "../../hooks/usePublicData";
+import { publicCategoriesApi } from "../../modules/public/categories/api/publicCategories.api";
 import { footerQuickLinks } from "../../modules/public/data/navigation.data";
 import logoImage from "../../assets/KN_AGRO_LOGO.png";
 import { useLanguage } from "../../i18n/LanguageContext";
@@ -8,6 +9,8 @@ import Icon from "../components/Icon";
 
 export default function Footer() {
   const { t } = useLanguage();
+  const categoryState = usePublicData(publicCategoriesApi.getCategories, []);
+  const categories = categoryState.data || [];
 
   return (
     <footer className="bg-[#064d1f] text-white">
@@ -58,13 +61,25 @@ export default function Footer() {
         <div>
           <h2 className="text-sm font-extrabold uppercase tracking-[0.16em] text-mustard">{t("Product Categories")}</h2>
           <ul className="mt-5 space-y-3 text-sm text-white/76">
-            {categories.slice(0, 6).map((category) => (
-              <li key={category.slug}>
-                <Link className="hover:text-white" to={`/categories/${category.slug}`}>
-                  {t(category.name)}
+            {categoryState.isLoading ? (
+              <li>{t("Loading categories...")}</li>
+            ) : null}
+            {!categoryState.isLoading && !categories.length ? (
+              <li>
+                <Link className="hover:text-white" to="/categories">
+                  {t("Browse Categories")}
                 </Link>
               </li>
-            ))}
+            ) : null}
+            {!categoryState.isLoading
+              ? categories.slice(0, 6).map((category) => (
+                  <li key={category.slug}>
+                    <Link className="hover:text-white" to={`/categories/${category.slug}`}>
+                      {t(category.name)}
+                    </Link>
+                  </li>
+                ))
+              : null}
           </ul>
         </div>
 

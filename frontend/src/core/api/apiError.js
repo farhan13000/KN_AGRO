@@ -16,10 +16,14 @@ export const normalizeApiError = (error) => {
   const response = error?.response;
   const payload = response?.data || {};
   const isNetworkError = !response && error?.message === "Network Error";
+  const isTimeoutError = error?.code === "ECONNABORTED" || error?.message?.includes("timeout");
 
   return new FrontendApiError({
     message:
       payload.message ||
+      (isTimeoutError
+        ? "The backend took too long to respond. Make sure the backend is running, MongoDB is connected, and then refresh the page."
+        : "") ||
       (isNetworkError
         ? "Cannot reach the backend. Make sure the backend is running and the frontend URL matches the backend CORS CLIENT_URL."
         : error?.message) ||

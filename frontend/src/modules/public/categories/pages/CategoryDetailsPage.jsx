@@ -28,6 +28,28 @@ export default function CategoryDetailsPage() {
     );
   }
 
+  if (categoryState.isError) {
+    return (
+      <>
+        <SEO description="Unable to load this KN Agro category." path={`/categories/${slug}`} title="Category Unavailable" />
+        <PageHero
+          breadcrumbs={[{ label: "Categories", path: "/categories" }, { label: "Unavailable" }]}
+          description="The category information could not be loaded right now."
+          eyebrow="Product Categories"
+          title="Category Unavailable"
+        />
+        <section className="site-container py-16">
+          <EmptyState
+            actionLabel="Browse Categories"
+            actionTo="/categories"
+            description="Please try again shortly or browse the full category list."
+            title="Unable to load this category"
+          />
+        </section>
+      </>
+    );
+  }
+
   if (!category) {
     return (
       <>
@@ -83,7 +105,7 @@ export default function CategoryDetailsPage() {
               </h2>
               <p className="mt-4 text-base leading-8 text-muted">{t(category.description)}</p>
               <div className="mt-8 grid gap-5 sm:grid-cols-3">
-                {category.benefits.map((benefit) => (
+                {(category.benefits || []).map((benefit) => (
                   <BenefitCard
                     description="This benefit is represented as catalogue guidance and can be replaced with product-specific technical details."
                     icon={category.icon}
@@ -108,7 +130,16 @@ export default function CategoryDetailsPage() {
               </p>
             </div>
             <div className="mt-10">
-              <ProductGrid isLoading={productState.isLoading} products={productState.data || []} />
+              {productState.isError ? (
+                <EmptyState
+                  actionLabel="Send Enquiry"
+                  actionTo="/enquiry"
+                  description="Products for this category could not be loaded right now."
+                  title="Unable to load category products"
+                />
+              ) : (
+                <ProductGrid isLoading={productState.isLoading} products={productState.data || []} />
+              )}
             </div>
           </div>
         </div>

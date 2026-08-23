@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite --host localhost",
     "build": "vite build",
-    "preview": "vite preview --host localhost"
+    "preview": "vite preview --host localhost",
+    "test:phase3:unit": "node scripts/phase3-unit-checks.mjs",
+    "test:phase3:audit": "node scripts/phase3-static-audit.mjs",
+    "test:phase3": "npm run test:phase3:unit && npm run test:phase3:audit"
   },
   "dependencies": {
     "axios": "^1.7.9",

@@ -8,12 +8,18 @@ export default function CategoryCard({ category }) {
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-forest/10 bg-white shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-soft">
       <div className="relative aspect-[4/3] overflow-hidden bg-mint">
-        <img
-          alt={`${category.name} category visual`}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-          loading="lazy"
-          src={category.image}
-        />
+        {category.image ? (
+          <img
+            alt={`${category.name} category visual`}
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            loading="lazy"
+            src={category.image}
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-forest">
+            <Icon name={category.icon} className="h-14 w-14" />
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-forest/75 via-transparent to-transparent" />
         <div className="absolute bottom-4 left-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-forest shadow-card">
           <Icon name={category.icon} />

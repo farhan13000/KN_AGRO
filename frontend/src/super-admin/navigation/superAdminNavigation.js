@@ -1,4 +1,15 @@
-import { ClipboardCheck, GitBranch, LayoutDashboard, Users } from "lucide-react";
+import {
+  AlertTriangle,
+  Boxes,
+  ClipboardCheck,
+  FolderTree,
+  GitBranch,
+  History,
+  LayoutDashboard,
+  Package,
+  Users,
+  Warehouse,
+} from "lucide-react";
 import { PERMISSIONS, ROUTES } from "../../shared/constants";
 
 export const superAdminNavigation = [
@@ -24,5 +35,41 @@ export const superAdminNavigation = [
     route: ROUTES.SUPER_ADMIN.EMPLOYEE_HIERARCHY,
     icon: GitBranch,
     permission: PERMISSIONS.EMPLOYEES_READ,
+  },
+  {
+    label: "Categories",
+    route: ROUTES.SUPER_ADMIN.CATEGORIES,
+    icon: FolderTree,
+    permission: PERMISSIONS.CATEGORIES_READ,
+  },
+  {
+    label: "Products",
+    route: ROUTES.SUPER_ADMIN.PRODUCTS,
+    icon: Package,
+    permission: PERMISSIONS.PRODUCTS_READ,
+  },
+  {
+    label: "Inventory",
+    route: ROUTES.SUPER_ADMIN.INVENTORY,
+    icon: Warehouse,
+    permission: PERMISSIONS.INVENTORY_READ,
+  },
+  {
+    label: "Low Stock",
+    route: ROUTES.SUPER_ADMIN.INVENTORY_LOW_STOCK,
+    icon: AlertTriangle,
+    permission: PERMISSIONS.INVENTORY_READ,
+  },
+  {
+    label: "Out Of Stock",
+    route: ROUTES.SUPER_ADMIN.INVENTORY_OUT_OF_STOCK,
+    icon: Boxes,
+    permission: PERMISSIONS.INVENTORY_READ,
+  },
+  {
+    label: "Transactions",
+    route: ROUTES.SUPER_ADMIN.INVENTORY_TRANSACTIONS,
+    icon: History,
+    permission: PERMISSIONS.INVENTORY_TRANSACTIONS_READ,
   },
 ];

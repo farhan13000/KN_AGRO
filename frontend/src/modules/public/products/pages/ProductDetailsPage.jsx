@@ -18,6 +18,7 @@ export default function ProductDetailsPage() {
   const { t } = useLanguage();
   const { slug } = useParams();
   const [selectedImage, setSelectedImage] = useState("");
+  const [failedImages, setFailedImages] = useState(() => new Set());
   const productState = usePublicData(() => publicProductsApi.getProductBySlug(slug), [slug]);
   const product = productState.data;
   const relatedState = usePublicData(
@@ -27,10 +28,14 @@ export default function ProductDetailsPage() {
 
   useEffect(() => {
     setSelectedImage("");
+    setFailedImages(new Set());
   }, [slug]);
 
   const gallery = useMemo(() => product?.gallery || [], [product]);
-  const activeImage = selectedImage || gallery[0] || product?.image;
+  const availableGallery = gallery.filter((image) => !failedImages.has(image));
+  const activeImage = [selectedImage, availableGallery[0], product?.image].find(
+    (image) => image && !failedImages.has(image),
+  );
   const galleryImageClass =
     product?.imageFit === "contain" ? "aspect-square w-full object-contain p-8" : "aspect-square w-full object-cover";
   const thumbnailImageClass =
@@ -51,6 +56,33 @@ export default function ProductDetailsPage() {
           </div>
         </div>
       </section>
+    );
+  }
+
+  if (productState.isError) {
+    return (
+      <>
+        <SEO
+          description="Unable to load this KN Agro product."
+          path={`/products/${slug}`}
+          title="Product Unavailable"
+        />
+        <PageHero
+          breadcrumbs={[{ label: "Products", path: "/products" }, { label: "Unavailable" }]}
+          description="The product information could not be loaded right now."
+          eyebrow="Product Catalogue"
+          image={heroImages.field}
+          title="Product Unavailable"
+        />
+        <section className="site-container py-16">
+          <EmptyState
+            actionLabel="Browse Products"
+            actionTo="/products"
+            description="Please try again shortly or browse the full catalogue."
+            title="Unable to load this product"
+          />
+        </section>
+      </>
     );
   }
 
@@ -101,15 +133,25 @@ export default function ProductDetailsPage() {
           <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr]">
             <div>
               <div className="overflow-hidden rounded-[2rem] bg-mint shadow-soft">
-                <img
-                  alt={`${product.name} gallery visual`}
-                  className={galleryImageClass}
-                  loading="eager"
-                  src={activeImage}
-                />
+                {activeImage ? (
+                  <img
+                    alt={`${product.name} gallery visual`}
+                    className={galleryImageClass}
+                    loading="eager"
+                    onError={() => setFailedImages((current) => new Set([...current, activeImage]))}
+                    src={activeImage}
+                  />
+                ) : (
+                  <div className="flex aspect-square w-full flex-col items-center justify-center gap-3 p-8 text-center text-forest">
+                    <Icon name="PackageCheck" className="h-12 w-12" />
+                    <span className="text-sm font-black uppercase tracking-[0.08em]">
+                      {t("Product image unavailable")}
+                    </span>
+                  </div>
+                )}
               </div>
               <div className="mt-4 grid grid-cols-4 gap-3">
-                {gallery.map((image) => (
+                {availableGallery.map((image) => (
                   <button
                     aria-label={`View ${product.name} image`}
                     className={`overflow-hidden rounded-2xl border-2 ${
@@ -119,7 +161,12 @@ export default function ProductDetailsPage() {
                     onClick={() => setSelectedImage(image)}
                     type="button"
                   >
-                    <img alt="" className={thumbnailImageClass} src={image} />
+                    <img
+                      alt=""
+                      className={thumbnailImageClass}
+                      onError={() => setFailedImages((current) => new Set([...current, image]))}
+                      src={image}
+                    />
                   </button>
                 ))}
               </div>
@@ -141,7 +188,9 @@ export default function ProductDetailsPage() {
                 </div>
                 <div className="rounded-2xl bg-mint p-4">
                   <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted">{t("Availability")}</p>
-                  <p className="mt-2 font-extrabold text-forest">{t("On Enquiry")}</p>
+                  <p className="mt-2 font-extrabold text-forest">
+                    {product.availability === "OUT_OF_STOCK" ? t("Out of Stock") : t("On Enquiry")}
+                  </p>
                 </div>
               </div>
 
@@ -173,7 +222,7 @@ export default function ProductDetailsPage() {
           <div className="mt-10 rounded-2xl border border-forest/10 bg-mint p-6">
             <h3 className="text-xl font-extrabold text-ink">{t("Technical / Product Information")}</h3>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              {product.technicalInfo.map((item) => (
+              {(product.technicalInfo || []).map((item) => (
                 <div className="rounded-xl bg-white px-4 py-3 text-sm font-semibold text-forest" key={item}>
                   {t(item)}
                 </div>
@@ -199,7 +248,16 @@ export default function ProductDetailsPage() {
               </Link>
             </div>
             <div className="mt-8">
-              <ProductGrid isLoading={relatedState.isLoading} products={relatedState.data || []} />
+              {relatedState.isError ? (
+                <EmptyState
+                  actionLabel="Browse Products"
+                  actionTo="/products"
+                  description="Related products could not be loaded right now."
+                  title="Unable to load related products"
+                />
+              ) : (
+                <ProductGrid isLoading={relatedState.isLoading} products={relatedState.data || []} />
+              )}
             </div>
           </div>
         </div>
@@ -210,12 +268,13 @@ export default function ProductDetailsPage() {
 
 function InfoPanel({ title, items }) {
   const { t } = useLanguage();
+  const list = items?.length ? items : ["Available on enquiry"];
 
   return (
     <article className="rounded-2xl border border-forest/10 bg-white p-6 shadow-card">
       <h3 className="text-lg font-extrabold text-ink">{t(title)}</h3>
       <ul className="mt-4 space-y-3">
-        {items.map((item) => (
+        {list.map((item) => (
           <li className="flex items-start gap-3 text-sm font-semibold text-muted" key={item}>
             <Icon name="CheckCircle2" className="mt-0.5 h-5 w-5 shrink-0 text-agriculture" />
             {t(item)}

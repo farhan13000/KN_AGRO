@@ -1,15 +1,20 @@
 import BenefitCard from "../../../../shared/components/BenefitCard";
 import Button from "../../../../shared/components/Button";
 import Icon from "../../../../shared/components/Icon";
+import EmptyState from "../../../../shared/components/EmptyState";
 import PageHero from "../../../../shared/components/PageHero";
 import SEO from "../../../../shared/components/SEO";
 import SectionHeading from "../../../../shared/components/SectionHeading";
+import SkeletonCard from "../../../../shared/components/SkeletonCard";
+import { usePublicData } from "../../../../hooks/usePublicData";
 import { useLanguage } from "../../../../i18n/LanguageContext";
-import { categories } from "../../data/categories.data";
+import { publicCategoriesApi } from "../../categories/api/publicCategories.api";
 import { businessAdvantages, companyValues, heroImages, productBenefits } from "../../data/company.data";
 
 export default function AboutPage() {
   const { t } = useLanguage();
+  const categoryState = usePublicData(publicCategoriesApi.getCategories, []);
+  const categories = categoryState.data || [];
 
   return (
     <>
@@ -81,16 +86,38 @@ export default function AboutPage() {
             description="The public catalogue is structured so customers can quickly understand the product category, intended benefits and enquiry path."
           />
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {categories.slice(0, 8).map((category) => (
-              <div className="rounded-2xl border border-forest/10 bg-white p-5 shadow-card" key={category.id}>
-                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-mint text-forest">
-                  <Icon name={category.icon} />
-                </span>
-                <h3 className="mt-5 text-lg font-extrabold text-ink">{t(category.name)}</h3>
-                <p className="mt-3 text-sm leading-6 text-muted">{t(category.description)}</p>
-              </div>
-            ))}
+            {categoryState.isLoading
+              ? Array.from({ length: 4 }).map((_, index) => <SkeletonCard key={index} />)
+              : categories.slice(0, 8).map((category) => (
+                  <div className="rounded-2xl border border-forest/10 bg-white p-5 shadow-card" key={category.id}>
+                    <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-mint text-forest">
+                      <Icon name={category.icon} />
+                    </span>
+                    <h3 className="mt-5 text-lg font-extrabold text-ink">{t(category.name)}</h3>
+                    <p className="mt-3 text-sm leading-6 text-muted">{t(category.description)}</p>
+                  </div>
+                ))}
           </div>
+          {!categoryState.isLoading && categoryState.isError ? (
+            <div className="mt-8">
+              <EmptyState
+                actionLabel="Browse Categories"
+                actionTo="/categories"
+                description="We could not load the current category list right now."
+                title="Unable to load product range"
+              />
+            </div>
+          ) : null}
+          {!categoryState.isLoading && !categoryState.isError && !categories.length ? (
+            <div className="mt-8">
+              <EmptyState
+                actionLabel="Send Enquiry"
+                actionTo="/enquiry"
+                description="No public categories are available right now."
+                title="No product range available"
+              />
+            </div>
+          ) : null}
         </div>
       </section>
 

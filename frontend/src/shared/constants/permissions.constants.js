@@ -16,5 +16,18 @@ export const PERMISSIONS = Object.freeze({
   EMPLOYEES_UPDATE_SELF: "employees.update_self",
   MANAGERS_READ: "managers.read",
   MANAGERS_MANAGE: "managers.manage",
+  CATEGORIES_READ: "categories.read",
+  CATEGORIES_MANAGE: "categories.manage",
+  PRODUCTS_READ: "products.read",
+  PRODUCTS_CREATE: "products.create",
+  PRODUCTS_UPDATE: "products.update",
+  PRODUCTS_MANAGE: "products.manage",
+  INVENTORY_READ: "inventory.read",
+  INVENTORY_STOCK_IN: "inventory.stock_in",
+  INVENTORY_STOCK_OUT: "inventory.stock_out",
+  INVENTORY_ADJUST: "inventory.adjust",
+  INVENTORY_MANAGE: "inventory.manage",
+  INVENTORY_TRANSACTIONS_READ: "inventory.transactions.read",
+  ANALYTICS_READ: "analytics.read",
 });
 

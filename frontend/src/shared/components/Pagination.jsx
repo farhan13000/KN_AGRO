@@ -1,12 +1,12 @@
 import { useLanguage } from "../../i18n/LanguageContext";
 import Button from "./Button";
 
-export default function Pagination({ page, totalPages, onPageChange }) {
+export default function Pagination({ ariaLabel = "Pagination", page, totalPages, onPageChange }) {
   const { t } = useLanguage();
   if (totalPages <= 1) return null;
 
   return (
-    <nav aria-label="Product pagination" className="mt-10 flex flex-wrap items-center justify-center gap-3">
+    <nav aria-label={t(ariaLabel)} className="mt-10 flex flex-wrap items-center justify-center gap-3">
       <Button disabled={page === 1} onClick={() => onPageChange(page - 1)} variant="secondary">
         {t("Previous")}
       </Button>
@@ -15,6 +15,7 @@ export default function Pagination({ page, totalPages, onPageChange }) {
         return (
           <button
             aria-current={pageNumber === page ? "page" : undefined}
+            aria-label={t("Go to page {{page}}", { page: String(pageNumber) })}
             className={`flex h-11 w-11 items-center justify-center rounded-xl text-sm font-extrabold transition ${
               pageNumber === page ? "bg-forest text-white" : "bg-white text-forest hover:bg-mint"
             }`}

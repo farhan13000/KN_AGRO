@@ -66,7 +66,9 @@ export default function EnquiryPage() {
             <SkeletonCard />
           ) : isError ? (
             <EmptyState
-              description={productState.error || categoryState.error}
+              actionLabel="Contact Us"
+              actionTo="/contact"
+              description="We could not load product options right now. You can still contact KN Agro directly."
               title="Unable to prepare enquiry form"
             />
           ) : (

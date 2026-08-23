@@ -28,7 +28,19 @@ export default function CategoriesPage() {
       <section className="section-padding">
         <div className="site-container">
           {categoryState.isError ? (
-            <EmptyState description={categoryState.error} title="Unable to load categories" />
+            <EmptyState
+              actionLabel="Send Enquiry"
+              actionTo="/enquiry"
+              description="We could not load the public category list right now. Please try again shortly or send an enquiry."
+              title="Unable to load categories"
+            />
+          ) : !categoryState.isLoading && !categoryState.data?.length ? (
+            <EmptyState
+              actionLabel="Send Enquiry"
+              actionTo="/enquiry"
+              description="There are no public categories available right now. The KN Agro team can still help with product information."
+              title="No categories available"
+            />
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {categoryState.isLoading

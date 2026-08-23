@@ -1,4 +1,4 @@
-import { ROUTES } from "../../shared/constants";
+import { PERMISSIONS, ROUTES } from "../../shared/constants";
 
 export const refineResources = [
   {
@@ -19,6 +19,69 @@ export const refineResources = [
         "terminate",
         "promote",
       ],
+    },
+  },
+  {
+    name: "categories",
+    list: ROUTES.SUPER_ADMIN.CATEGORIES,
+    create: ROUTES.SUPER_ADMIN.CATEGORY_CREATE,
+    edit: ROUTES.SUPER_ADMIN.CATEGORY_EDIT,
+    meta: {
+      domain: "catalog",
+      permissions: {
+        list: PERMISSIONS.CATEGORIES_READ,
+        create: PERMISSIONS.CATEGORIES_MANAGE,
+        edit: PERMISSIONS.CATEGORIES_MANAGE,
+      },
+      specialActions: ["changeStatus"],
+    },
+  },
+  {
+    name: "products",
+    list: ROUTES.SUPER_ADMIN.PRODUCTS,
+    show: ROUTES.SUPER_ADMIN.PRODUCT_DETAIL,
+    create: ROUTES.SUPER_ADMIN.PRODUCT_CREATE,
+    edit: ROUTES.SUPER_ADMIN.PRODUCT_EDIT,
+    meta: {
+      domain: "catalog",
+      permissions: {
+        list: PERMISSIONS.PRODUCTS_READ,
+        show: PERMISSIONS.PRODUCTS_READ,
+        create: PERMISSIONS.PRODUCTS_CREATE,
+        edit: PERMISSIONS.PRODUCTS_UPDATE,
+      },
+      specialActions: ["changeStatus"],
+    },
+  },
+  {
+    name: "inventory",
+    list: ROUTES.SUPER_ADMIN.INVENTORY,
+    show: ROUTES.SUPER_ADMIN.INVENTORY_DETAIL,
+    meta: {
+      domain: "inventory",
+      permissions: {
+        list: PERMISSIONS.INVENTORY_READ,
+        show: PERMISSIONS.INVENTORY_READ,
+      },
+      specialActions: [
+        "openingStock",
+        "stockIn",
+        "stockOut",
+        "adjustmentIn",
+        "adjustmentOut",
+        "damagedStock",
+      ],
+    },
+  },
+  {
+    name: "inventory-transactions",
+    list: ROUTES.SUPER_ADMIN.INVENTORY_TRANSACTIONS,
+    meta: {
+      domain: "inventory",
+      immutableLedger: true,
+      permissions: {
+        list: PERMISSIONS.INVENTORY_TRANSACTIONS_READ,
+      },
     },
   },
 ];
