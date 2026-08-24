@@ -10,10 +10,13 @@ const initialValues = {
   name: "",
   phone: "",
   email: "",
-  company: "",
+  companyName: "",
   subject: "",
   message: "",
 };
+
+const buildContactMessage = (values) =>
+  [values.subject ? `Subject: ${values.subject}` : "", values.message].filter(Boolean).join("\n");
 
 export default function ContactForm() {
   const [values, setValues] = useState(initialValues);
@@ -29,7 +32,8 @@ export default function ContactForm() {
   const validate = () => {
     const nextErrors = {};
     if (!validateRequired(values.name)) nextErrors.name = "Name is required.";
-    if (!isValidPhone(values.phone)) nextErrors.phone = "Enter a valid phone number.";
+    if (!values.phone && !values.email) nextErrors.phone = "Enter a phone number or email address.";
+    if (values.phone && !isValidPhone(values.phone)) nextErrors.phone = "Enter a valid phone number.";
     if (!isValidEmail(values.email)) nextErrors.email = "Enter a valid email address.";
     if (!validateMinLength(values.message, 10)) nextErrors.message = "Message must be at least 10 characters.";
     return nextErrors;
@@ -43,11 +47,21 @@ export default function ContactForm() {
 
     setIsSubmitting(true);
     try {
-      await publicEnquiriesApi.submitEnquiry({ type: "CONTACT", ...values });
-      showToast("Thank you. Your message has been recorded.");
+      await publicEnquiriesApi.submitEnquiry({
+        name: values.name,
+        phone: values.phone,
+        email: values.email,
+        companyName: values.companyName,
+        message: buildContactMessage(values),
+      });
+      showToast("Thank you. Your message has been submitted.");
       setValues(initialValues);
     } catch (error) {
-      showToast(error.friendlyMessage || "Unable to submit your message.", "error");
+      const message =
+        error.status === 429
+          ? "Too many messages were submitted recently. Please wait a little and try again."
+          : error.friendlyMessage || "Unable to submit your message.";
+      showToast(message, "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -83,8 +97,8 @@ export default function ContactForm() {
         <TextInput
           id="contact-company"
           label="Company / Business"
-          onChange={updateField("company")}
-          value={values.company}
+          onChange={updateField("companyName")}
+          value={values.companyName}
         />
         <div className="sm:col-span-2">
           <TextInput

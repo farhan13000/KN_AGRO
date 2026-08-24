@@ -2,11 +2,13 @@ import {
   AlertTriangle,
   Boxes,
   ClipboardCheck,
+  Columns3,
   FolderTree,
   GitBranch,
   History,
   LayoutDashboard,
   Package,
+  PhoneCall,
   Users,
   Warehouse,
 } from "lucide-react";
@@ -53,6 +55,24 @@ export const superAdminNavigation = [
     route: ROUTES.SUPER_ADMIN.INVENTORY,
     icon: Warehouse,
     permission: PERMISSIONS.INVENTORY_READ,
+  },
+  {
+    label: "CRM",
+    route: ROUTES.SUPER_ADMIN.CRM,
+    icon: Columns3,
+    permission: PERMISSIONS.LEADS_READ,
+  },
+  {
+    label: "Leads",
+    route: ROUTES.SUPER_ADMIN.LEADS,
+    icon: PhoneCall,
+    permission: PERMISSIONS.LEADS_READ,
+  },
+  {
+    label: "Follow-Ups",
+    route: ROUTES.SUPER_ADMIN.FOLLOW_UPS,
+    icon: ClipboardCheck,
+    permission: PERMISSIONS.LEADS_READ,
   },
   {
     label: "Low Stock",

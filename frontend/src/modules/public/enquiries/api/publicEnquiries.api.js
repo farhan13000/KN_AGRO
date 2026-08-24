@@ -1,10 +1,5 @@
-import { simulateNetwork } from "../../../../utils/mockApi";
+import { leadApi } from "../../../../features/leads/services";
 
 export const publicEnquiriesApi = {
-  submitEnquiry: (payload) =>
-    simulateNetwork({
-      id: `ENQ-${Date.now()}`,
-      ...payload,
-      status: "RECORDED",
-    }),
+  submitEnquiry: (payload) => leadApi.submitPublicEnquiry(payload),
 };

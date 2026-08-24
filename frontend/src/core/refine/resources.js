@@ -54,6 +54,33 @@ export const refineResources = [
     },
   },
   {
+    name: "leads",
+    list: ROUTES.SUPER_ADMIN.LEADS,
+    show: ROUTES.SUPER_ADMIN.LEAD_DETAIL,
+    create: ROUTES.SUPER_ADMIN.LEAD_CREATE,
+    meta: {
+      domain: "crm",
+      permissions: {
+        list: PERMISSIONS.LEADS_READ,
+        show: PERMISSIONS.LEADS_READ,
+        create: PERMISSIONS.LEADS_CREATE,
+      },
+      specialActions: [
+        "assignManager",
+        "assignEmployee",
+        "changeStatus",
+        "changePriority",
+        "updateExpectedValue",
+        "updateProductInterest",
+        "scheduleFollowUp",
+        "completeFollowUp",
+        "markLost",
+        "closeLead",
+        "logActivity",
+      ],
+    },
+  },
+  {
     name: "inventory",
     list: ROUTES.SUPER_ADMIN.INVENTORY,
     show: ROUTES.SUPER_ADMIN.INVENTORY_DETAIL,

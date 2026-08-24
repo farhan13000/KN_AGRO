@@ -1,14 +1,16 @@
 const stripTrailingSlash = (value) => String(value || "").replace(/\/+$/, "");
+const viteEnv = import.meta.env || {};
 
 export const env = Object.freeze({
-  appName: import.meta.env.VITE_APP_NAME || "KN Agro",
+  appName: viteEnv.VITE_APP_NAME || "KN Agro",
   apiBaseUrl: stripTrailingSlash(
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1",
+    viteEnv.VITE_API_BASE_URL || "http://localhost:5000/api/v1",
   ),
   publicSiteUrl: stripTrailingSlash(
-    import.meta.env.VITE_PUBLIC_SITE_URL || window.location.origin,
+    viteEnv.VITE_PUBLIC_SITE_URL || globalThis.window?.location?.origin || "http://localhost:5173",
   ),
-  useAuthMock: import.meta.env.DEV && import.meta.env.VITE_USE_AUTH_MOCK === "true",
-  useEmployeeMock: import.meta.env.DEV && import.meta.env.VITE_USE_EMPLOYEE_MOCK === "true",
-  salesManagerRoleId: import.meta.env.VITE_SALES_MANAGER_ROLE_ID || "",
+  businessTimezone: viteEnv.VITE_BUSINESS_TIMEZONE || "Asia/Kolkata",
+  useAuthMock: viteEnv.DEV && viteEnv.VITE_USE_AUTH_MOCK === "true",
+  useEmployeeMock: viteEnv.DEV && viteEnv.VITE_USE_EMPLOYEE_MOCK === "true",
+  salesManagerRoleId: viteEnv.VITE_SALES_MANAGER_ROLE_ID || "",
 });

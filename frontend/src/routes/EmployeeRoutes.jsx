@@ -1,12 +1,26 @@
 import { lazy } from "react";
+import { Navigate } from "react-router-dom";
+import { PermissionGuard } from "../core/auth";
 import ProtectedRoute from "./ProtectedRoute";
-import { BACKEND_ROLES, ROUTES } from "../shared/constants";
+import { BACKEND_ROLES, PERMISSIONS, ROUTES } from "../shared/constants";
 
 const EmployeeLayout = lazy(() => import("../employee/layout/EmployeeLayout"));
 const EmployeeDashboardPage = lazy(() => import("../employee/dashboard/EmployeeDashboardPage"));
 const EmployeeProfilePage = lazy(() => import("../employee/pages/profile/EmployeeProfilePage"));
 const EmployeeProfileEditPage = lazy(() => import("../employee/pages/profile/EmployeeProfileEditPage"));
+const EmployeeLeadListPage = lazy(() => import("../employee/pages/crm/EmployeeLeadListPage"));
+const EmployeeLeadDetailPage = lazy(() => import("../employee/pages/crm/EmployeeLeadDetailPage"));
+const EmployeeFollowUpsPage = lazy(() => import("../employee/pages/crm/EmployeeFollowUpsPage"));
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
+
+const withPermission = (permission, element) => (
+  <PermissionGuard
+    fallback={<Navigate replace to={ROUTES.ERROR.UNAUTHORIZED} />}
+    permission={permission}
+  >
+    {element}
+  </PermissionGuard>
+);
 
 export const employeeRouteConfig = {
   element: <ProtectedRoute allowedRoles={[BACKEND_ROLES.EMPLOYEE]} />,
@@ -17,6 +31,18 @@ export const employeeRouteConfig = {
         { path: ROUTES.EMPLOYEE.DASHBOARD, element: <EmployeeDashboardPage /> },
         { path: ROUTES.EMPLOYEE.PROFILE, element: <EmployeeProfilePage /> },
         { path: ROUTES.EMPLOYEE.PROFILE_EDIT, element: <EmployeeProfileEditPage /> },
+        {
+          path: ROUTES.EMPLOYEE.LEADS,
+          element: withPermission(PERMISSIONS.LEADS_READ, <EmployeeLeadListPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.LEAD_DETAIL,
+          element: withPermission(PERMISSIONS.LEADS_READ, <EmployeeLeadDetailPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.FOLLOW_UPS,
+          element: withPermission(PERMISSIONS.LEADS_READ, <EmployeeFollowUpsPage />),
+        },
         { path: "/employee/*", element: <InternalNotFoundPage /> },
       ],
     },

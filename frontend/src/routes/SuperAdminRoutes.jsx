@@ -62,6 +62,11 @@ const SuperAdminOutOfStockPage = lazy(
 const SuperAdminInventoryDetailPage = lazy(
   () => import("../super-admin/pages/inventory/SuperAdminInventoryDetailPage"),
 );
+const SuperAdminLeadListPage = lazy(() => import("../super-admin/pages/crm/SuperAdminLeadListPage"));
+const SuperAdminLeadCreatePage = lazy(() => import("../super-admin/pages/crm/SuperAdminLeadCreatePage"));
+const SuperAdminLeadDetailPage = lazy(() => import("../super-admin/pages/crm/SuperAdminLeadDetailPage"));
+const SuperAdminFollowUpsPage = lazy(() => import("../super-admin/pages/crm/SuperAdminFollowUpsPage"));
+const SuperAdminCrmPipelinePage = lazy(() => import("../super-admin/pages/crm/SuperAdminCrmPipelinePage"));
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -133,6 +138,26 @@ export const superAdminRouteConfig = {
         {
           path: ROUTES.SUPER_ADMIN.INVENTORY_DETAIL,
           element: withPermission(PERMISSIONS.INVENTORY_READ, <SuperAdminInventoryDetailPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.CRM,
+          element: withPermission(PERMISSIONS.LEADS_READ, <SuperAdminCrmPipelinePage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.LEADS,
+          element: withPermission(PERMISSIONS.LEADS_READ, <SuperAdminLeadListPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.LEAD_CREATE,
+          element: withPermission(PERMISSIONS.LEADS_CREATE, <SuperAdminLeadCreatePage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.LEAD_DETAIL,
+          element: withPermission(PERMISSIONS.LEADS_READ, <SuperAdminLeadDetailPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.FOLLOW_UPS,
+          element: withPermission(PERMISSIONS.LEADS_READ, <SuperAdminFollowUpsPage />),
         },
         { path: "/super-admin/*", element: <InternalNotFoundPage /> },
       ],

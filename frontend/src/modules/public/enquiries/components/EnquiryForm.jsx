@@ -13,7 +13,7 @@ const initialValues = {
   name: "",
   phone: "",
   email: "",
-  company: "",
+  companyName: "",
   location: "",
   product: "",
   category: "",
@@ -21,6 +21,19 @@ const initialValues = {
   preferredContact: "whatsapp",
   message: "",
 };
+
+const objectIdPattern = /^[a-f\d]{24}$/i;
+
+const buildMessage = (values, selectedProduct, selectedCategory) =>
+  [
+    values.message,
+    selectedProduct?.name ? `Product: ${selectedProduct.name}` : "",
+    selectedCategory?.name ? `Category: ${selectedCategory.name}` : "",
+    values.quantity ? `Quantity: ${values.quantity}` : "",
+    values.preferredContact ? `Preferred contact: ${values.preferredContact}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
 
 export default function EnquiryForm({ products = [], categories = [] }) {
   const [searchParams] = useSearchParams();
@@ -79,7 +92,8 @@ export default function EnquiryForm({ products = [], categories = [] }) {
   const validate = () => {
     const nextErrors = {};
     if (!validateRequired(values.name)) nextErrors.name = "Name is required.";
-    if (!isValidPhone(values.phone)) nextErrors.phone = "Enter a valid phone number.";
+    if (!values.phone && !values.email) nextErrors.phone = "Enter a phone number or email address.";
+    if (values.phone && !isValidPhone(values.phone)) nextErrors.phone = "Enter a valid phone number.";
     if (!isValidEmail(values.email)) nextErrors.email = "Enter a valid email address.";
     if (!validateRequired(values.location)) nextErrors.location = "Location is required.";
     if (!validateRequired(values.product) && !validateRequired(values.category)) {
@@ -96,12 +110,27 @@ export default function EnquiryForm({ products = [], categories = [] }) {
 
     setIsSubmitting(true);
     try {
-      await publicEnquiriesApi.submitEnquiry({ type: "PRODUCT_ENQUIRY", ...values });
+      const selectedProduct = products.find((product) => product.slug === values.product);
+      const selectedCategory = categories.find((category) => category.slug === values.category);
+      await publicEnquiriesApi.submitEnquiry({
+        name: values.name,
+        phone: values.phone,
+        email: values.email,
+        companyName: values.companyName,
+        location: values.location,
+        interestedProducts:
+          selectedProduct?.id && objectIdPattern.test(selectedProduct.id) ? [selectedProduct.id] : [],
+        message: buildMessage(values, selectedProduct, selectedCategory),
+      });
       setIsComplete(true);
-      showToast("Thank you. Your enquiry has been recorded.");
+      showToast("Thank you. Your enquiry has been submitted.");
       setValues(initialValues);
     } catch (error) {
-      showToast(error.friendlyMessage || "Unable to record your enquiry.", "error");
+      const message =
+        error.status === 429
+          ? "Too many enquiries were submitted recently. Please wait a little and try again."
+          : error.friendlyMessage || "Unable to submit your enquiry.";
+      showToast(message, "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -113,7 +142,7 @@ export default function EnquiryForm({ products = [], categories = [] }) {
         <div className="mb-6 rounded-2xl border border-agriculture/20 bg-mint p-5">
           <h2 className="text-xl font-extrabold text-forest">{t("Thank you. Your enquiry has been recorded.")}</h2>
           <p className="mt-2 text-sm leading-6 text-muted">
-            {t("This success state is currently simulated and ready to connect with the KN Agro backend enquiry endpoint.")}
+            {t("Your request has been submitted. The team will review the enquiry details and respond through your provided contact information.")}
           </p>
         </div>
       ) : null}
@@ -145,8 +174,8 @@ export default function EnquiryForm({ products = [], categories = [] }) {
         <TextInput
           id="enquiry-company"
           label="Company / Business Name"
-          onChange={updateField("company")}
-          value={values.company}
+          onChange={updateField("companyName")}
+          value={values.companyName}
         />
         <TextInput
           error={errors.location}
@@ -199,7 +228,7 @@ export default function EnquiryForm({ products = [], categories = [] }) {
           />
         </div>
       </div>
-      <Button className="mt-6 w-full sm:w-auto" disabled={isSubmitting} type="submit">
+      <Button className="mt-6 w-full sm:w-auto" disabled={isSubmitting || isComplete} type="submit">
         {isSubmitting ? "Submitting..." : "Submit Enquiry"}
       </Button>
     </form>

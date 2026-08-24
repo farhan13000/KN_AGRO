@@ -49,7 +49,7 @@ export const useAsyncResource = (queryKey, request, { enabled = true } = {}) => 
   };
 };
 
-export const useAsyncMutation = (mutationFn, { onSuccess } = {}) => {
+export const useAsyncMutation = (mutationFn, { onError, onSuccess } = {}) => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -64,12 +64,13 @@ export const useAsyncMutation = (mutationFn, { onSuccess } = {}) => {
         return payload;
       } catch (mutationError) {
         setError(mutationError);
+        if (onError) await onError(mutationError);
         throw mutationError;
       } finally {
         setIsLoading(false);
       }
     },
-    [mutationFn, onSuccess],
+    [mutationFn, onError, onSuccess],
   );
 
   return {
