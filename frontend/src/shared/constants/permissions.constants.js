@@ -39,5 +39,12 @@ export const PERMISSIONS = Object.freeze({
   INVENTORY_MANAGE: "inventory.manage",
   INVENTORY_TRANSACTIONS_READ: "inventory.transactions.read",
   ANALYTICS_READ: "analytics.read",
+  QUOTATIONS_READ: "quotations.read",
+  QUOTATIONS_CREATE: "quotations.create",
+  QUOTATIONS_UPDATE: "quotations.update",
+  QUOTATIONS_SEND: "quotations.send",
+  QUOTATIONS_ACCEPT: "quotations.accept",
+  QUOTATIONS_REJECT: "quotations.reject",
+  QUOTATIONS_MANAGE: "quotations.manage",
 });
 

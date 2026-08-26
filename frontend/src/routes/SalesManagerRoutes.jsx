@@ -16,6 +16,21 @@ const SalesManagerLeadListPage = lazy(() => import("../sales-manager/pages/crm/S
 const SalesManagerLeadDetailPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerLeadDetailPage"));
 const SalesManagerFollowUpsPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerFollowUpsPage"));
 const SalesManagerCrmPipelinePage = lazy(() => import("../sales-manager/pages/crm/SalesManagerCrmPipelinePage"));
+const SalesManagerQuotationListPage = lazy(
+  () => import("../sales-manager/pages/quotations/SalesManagerQuotationListPage"),
+);
+const SalesManagerQuotationCreatePage = lazy(
+  () => import("../sales-manager/pages/quotations/SalesManagerQuotationCreatePage"),
+);
+const SalesManagerQuotationDetailPage = lazy(
+  () => import("../sales-manager/pages/quotations/SalesManagerQuotationDetailPage"),
+);
+const SalesManagerQuotationEditPage = lazy(
+  () => import("../sales-manager/pages/quotations/SalesManagerQuotationEditPage"),
+);
+const SalesManagerQuotationPrintPage = lazy(
+  () => import("../sales-manager/pages/quotations/SalesManagerQuotationPrintPage"),
+);
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -51,6 +66,26 @@ export const salesManagerRouteConfig = {
         {
           path: ROUTES.SALES_MANAGER.FOLLOW_UPS,
           element: withPermission(PERMISSIONS.LEADS_READ, <SalesManagerFollowUpsPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.QUOTATIONS,
+          element: withPermission(PERMISSIONS.QUOTATIONS_READ, <SalesManagerQuotationListPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.QUOTATION_CREATE,
+          element: withPermission(PERMISSIONS.QUOTATIONS_CREATE, <SalesManagerQuotationCreatePage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.QUOTATION_DETAIL,
+          element: withPermission(PERMISSIONS.QUOTATIONS_READ, <SalesManagerQuotationDetailPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.QUOTATION_EDIT,
+          element: withPermission(PERMISSIONS.QUOTATIONS_UPDATE, <SalesManagerQuotationEditPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.QUOTATION_PRINT,
+          element: withPermission(PERMISSIONS.QUOTATIONS_READ, <SalesManagerQuotationPrintPage />),
         },
         { path: "/manager/*", element: <InternalNotFoundPage /> },
       ],

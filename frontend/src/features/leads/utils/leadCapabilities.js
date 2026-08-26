@@ -30,5 +30,12 @@ export const getLeadCapabilities = ({ hasPermission, lead, role }) => {
       ![LEAD_STATUS.CONVERTED, LEAD_STATUS.LOST, LEAD_STATUS.CLOSED].includes(lead?.status),
     canCloseLead: canChangeStatus && [LEAD_STATUS.CONVERTED, LEAD_STATUS.LOST].includes(lead?.status),
     canQualify: canChangeStatus && !terminalStatuses.includes(lead?.status) && lead?.status !== LEAD_STATUS.QUALIFIED,
+    // Backend only accepts creating a quotation against a QUALIFIED lead
+    // (see PHASE5_FRONTEND_API_CONTRACT.md) and re-validates this itself —
+    // this only decides whether the button is worth showing. It does not
+    // pre-check "does this lead already have an active quotation", since
+    // no endpoint for that is wired into this feature yet; the backend's
+    // 409 on a duplicate active quotation is the real guard.
+    canCreateQuotation: hasPermission(PERMISSIONS.QUOTATIONS_CREATE) && lead?.status === LEAD_STATUS.QUALIFIED,
   };
 };

@@ -2,6 +2,7 @@ import {
   BadgeCheck,
   CalendarCheck,
   ClipboardList,
+  FileText,
   GitPullRequest,
   MessageSquarePlus,
   PackagePlus,
@@ -34,7 +35,7 @@ import { getLeadCapabilities } from "../utils";
 
 const actionButtonClass = "w-full justify-start rounded-lg";
 
-export default function LeadActionsPanel({ lead, onSuccess }) {
+export default function LeadActionsPanel({ lead, onSuccess, quotationCreatePath = "" }) {
   const { hasPermission, role } = useAuth();
   const [dialog, setDialog] = useState("");
 
@@ -46,6 +47,7 @@ export default function LeadActionsPanel({ lead, onSuccess }) {
     canChangeStatus,
     canCloseLead,
     canCompleteFollowUp,
+    canCreateQuotation,
     canEditLead,
     canMarkLost,
     canQualify,
@@ -53,6 +55,8 @@ export default function LeadActionsPanel({ lead, onSuccess }) {
     canUpdateExpectedValue,
     canUpdateProductInterest,
   } = getLeadCapabilities({ hasPermission, lead, role });
+
+  const showCreateQuotation = canCreateQuotation && Boolean(quotationCreatePath);
 
   if (
     !canEditLead &&
@@ -67,7 +71,8 @@ export default function LeadActionsPanel({ lead, onSuccess }) {
     !canCloseLead &&
     !canScheduleFollowUp &&
     !canCompleteFollowUp &&
-    !canAddActivity
+    !canAddActivity &&
+    !showCreateQuotation
   ) {
     return null;
   }
@@ -77,6 +82,16 @@ export default function LeadActionsPanel({ lead, onSuccess }) {
       <Card className="p-5">
         <h2 className="text-lg font-black text-ink">Actions</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {showCreateQuotation ? (
+            <Button
+              className={actionButtonClass}
+              to={`${quotationCreatePath}?leadId=${lead._id}`}
+              variant="secondary"
+            >
+              <FileText className="h-4 w-4" />
+              Create Quotation
+            </Button>
+          ) : null}
           {canEditLead ? (
             <Button className={actionButtonClass} onClick={() => setDialog("edit")} variant="secondary">
               <Pencil className="h-4 w-4" />

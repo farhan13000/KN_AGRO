@@ -3,6 +3,7 @@ import {
   Boxes,
   ClipboardCheck,
   Columns3,
+  FileText,
   FolderTree,
   GitBranch,
   History,
@@ -73,6 +74,12 @@ export const superAdminNavigation = [
     route: ROUTES.SUPER_ADMIN.FOLLOW_UPS,
     icon: ClipboardCheck,
     permission: PERMISSIONS.LEADS_READ,
+  },
+  {
+    label: "Quotations",
+    route: ROUTES.SUPER_ADMIN.QUOTATIONS,
+    icon: FileText,
+    permission: PERMISSIONS.QUOTATIONS_READ,
   },
   {
     label: "Low Stock",

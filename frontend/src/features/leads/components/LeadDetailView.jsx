@@ -1,5 +1,6 @@
 import Card from "../../../shared/components/Card";
 import { LeadActivityTimeline } from "../../lead-activities";
+import { QuotationsForLeadSection } from "../../quotations";
 import LeadActionsPanel from "./LeadActionsPanel";
 import { LeadPriorityBadge, LeadSourceBadge, LeadStatusBadge } from "./LeadBadges";
 import {
@@ -96,6 +97,8 @@ function ActivitySection({ recentActivities = [], timelineState }) {
 export default function LeadDetailView({
   lead,
   onMutationSuccess,
+  quotationCreatePath = "",
+  quotationDetailPathFor,
   recentActivities = [],
   roleLabel = "CRM",
   timelineState,
@@ -110,7 +113,7 @@ export default function LeadDetailView({
         </p>
       </div>
       <LeadOverviewSection lead={lead} />
-      <LeadActionsPanel lead={lead} onSuccess={onMutationSuccess} />
+      <LeadActionsPanel lead={lead} onSuccess={onMutationSuccess} quotationCreatePath={quotationCreatePath} />
       <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
         <div className="space-y-6">
           <LeadContactSummary lead={lead} />
@@ -122,6 +125,12 @@ export default function LeadDetailView({
           <LeadFollowUpSummary lead={lead} />
         </div>
       </div>
+      {quotationDetailPathFor ? (
+        <QuotationsForLeadSection
+          detailPath={(quotation) => quotationDetailPathFor(quotation._id)}
+          leadId={lead._id}
+        />
+      ) : null}
       <ActivitySection recentActivities={recentActivities} timelineState={timelineState} />
     </div>
   );

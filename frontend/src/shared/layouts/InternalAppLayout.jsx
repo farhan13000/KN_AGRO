@@ -126,7 +126,7 @@ export default function InternalAppLayout({ navigationItems, portalLabel }) {
       ) : null}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-forest/10 bg-white px-4 py-5 shadow-card transition-all lg:translate-x-0 ${desktopSidebarClass} ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-forest/10 bg-white px-4 py-5 shadow-card transition-all lg:translate-x-0 print:hidden ${desktopSidebarClass} ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -157,8 +157,8 @@ export default function InternalAppLayout({ navigationItems, portalLabel }) {
         </div>
       </aside>
 
-      <div className={`transition-all ${desktopContentClass}`}>
-        <header className="sticky top-0 z-30 border-b border-forest/10 bg-ivory/95 px-4 py-3 backdrop-blur sm:px-6">
+      <div className={`transition-all print:pl-0 ${desktopContentClass}`}>
+        <header className="sticky top-0 z-30 border-b border-forest/10 bg-ivory/95 px-4 py-3 backdrop-blur sm:px-6 print:hidden">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <button
@@ -196,7 +196,7 @@ export default function InternalAppLayout({ navigationItems, portalLabel }) {
           </div>
         </header>
 
-        <main className="px-4 py-6 sm:px-6 lg:px-8">
+        <main className="px-4 py-6 sm:px-6 lg:px-8 print:p-0">
           <Outlet />
         </main>
       </div>

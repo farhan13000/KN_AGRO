@@ -11,6 +11,9 @@ const EmployeeProfileEditPage = lazy(() => import("../employee/pages/profile/Emp
 const EmployeeLeadListPage = lazy(() => import("../employee/pages/crm/EmployeeLeadListPage"));
 const EmployeeLeadDetailPage = lazy(() => import("../employee/pages/crm/EmployeeLeadDetailPage"));
 const EmployeeFollowUpsPage = lazy(() => import("../employee/pages/crm/EmployeeFollowUpsPage"));
+const EmployeeQuotationListPage = lazy(() => import("../employee/pages/quotations/EmployeeQuotationListPage"));
+const EmployeeQuotationDetailPage = lazy(() => import("../employee/pages/quotations/EmployeeQuotationDetailPage"));
+const EmployeeQuotationPrintPage = lazy(() => import("../employee/pages/quotations/EmployeeQuotationPrintPage"));
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -42,6 +45,18 @@ export const employeeRouteConfig = {
         {
           path: ROUTES.EMPLOYEE.FOLLOW_UPS,
           element: withPermission(PERMISSIONS.LEADS_READ, <EmployeeFollowUpsPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.QUOTATIONS,
+          element: withPermission(PERMISSIONS.QUOTATIONS_READ, <EmployeeQuotationListPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.QUOTATION_DETAIL,
+          element: withPermission(PERMISSIONS.QUOTATIONS_READ, <EmployeeQuotationDetailPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.QUOTATION_PRINT,
+          element: withPermission(PERMISSIONS.QUOTATIONS_READ, <EmployeeQuotationPrintPage />),
         },
         { path: "/employee/*", element: <InternalNotFoundPage /> },
       ],

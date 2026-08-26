@@ -87,6 +87,17 @@ export const API_ENDPOINTS = Object.freeze({
     ACTIVITIES: (leadId) => `/leads/${leadId}/activities`,
     FOLLOW_UPS: (leadId) => `/leads/${leadId}/follow-ups`,
     COMPLETE_FOLLOW_UP: (leadId) => `/leads/${leadId}/follow-ups/complete`,
+    QUOTATIONS: (leadId) => `/leads/${leadId}/quotations`,
+  },
+  QUOTATIONS: {
+    BASE: "/quotations",
+    DETAIL: (quotationId) => `/quotations/${quotationId}`,
+    PRINT: (quotationId) => `/quotations/${quotationId}/print`,
+    SEND: (quotationId) => `/quotations/${quotationId}/send`,
+    ACCEPT: (quotationId) => `/quotations/${quotationId}/accept`,
+    REJECT: (quotationId) => `/quotations/${quotationId}/reject`,
+    CANCEL: (quotationId) => `/quotations/${quotationId}/cancel`,
+    REVISE: (quotationId) => `/quotations/${quotationId}/revise`,
   },
   PUBLIC: {
     CATEGORIES: "/public/categories",

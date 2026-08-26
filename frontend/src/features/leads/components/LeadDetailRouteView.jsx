@@ -6,7 +6,12 @@ import { useLeadActivityTimeline } from "../../lead-activities/hooks";
 import { useLeadDetail } from "../hooks";
 import LeadDetailView from "./LeadDetailView";
 
-export default function LeadDetailRouteView({ backTo, roleLabel = "CRM" }) {
+export default function LeadDetailRouteView({
+  backTo,
+  quotationCreatePath = "",
+  quotationDetailPathFor,
+  roleLabel = "CRM",
+}) {
   const { leadId } = useParams();
   const leadState = useLeadDetail(leadId);
   const timelineState = useLeadActivityTimeline(leadId, { limit: 20 });
@@ -37,6 +42,8 @@ export default function LeadDetailRouteView({ backTo, roleLabel = "CRM" }) {
     <LeadDetailView
       lead={lead}
       onMutationSuccess={refetchLeadAndTimeline}
+      quotationCreatePath={quotationCreatePath}
+      quotationDetailPathFor={quotationDetailPathFor}
       recentActivities={recentActivities}
       roleLabel={roleLabel}
       timelineState={timelineState}

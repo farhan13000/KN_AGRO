@@ -42,6 +42,11 @@ export const ROUTES = Object.freeze({
     LEAD_CREATE: "/super-admin/leads/create",
     LEAD_DETAIL: "/super-admin/leads/:leadId",
     FOLLOW_UPS: "/super-admin/follow-ups",
+    QUOTATIONS: "/super-admin/quotations",
+    QUOTATION_CREATE: "/super-admin/quotations/create",
+    QUOTATION_DETAIL: "/super-admin/quotations/:quotationId",
+    QUOTATION_EDIT: "/super-admin/quotations/:quotationId/edit",
+    QUOTATION_PRINT: "/super-admin/quotations/:quotationId/print",
   },
   SALES_MANAGER: {
     DASHBOARD: "/manager/dashboard",
@@ -51,6 +56,11 @@ export const ROUTES = Object.freeze({
     LEADS: "/manager/leads",
     LEAD_DETAIL: "/manager/leads/:leadId",
     FOLLOW_UPS: "/manager/follow-ups",
+    QUOTATIONS: "/manager/quotations",
+    QUOTATION_CREATE: "/manager/quotations/create",
+    QUOTATION_DETAIL: "/manager/quotations/:quotationId",
+    QUOTATION_EDIT: "/manager/quotations/:quotationId/edit",
+    QUOTATION_PRINT: "/manager/quotations/:quotationId/print",
   },
   EMPLOYEE: {
     DASHBOARD: "/employee/dashboard",
@@ -59,6 +69,9 @@ export const ROUTES = Object.freeze({
     LEADS: "/employee/leads",
     LEAD_DETAIL: "/employee/leads/:leadId",
     FOLLOW_UPS: "/employee/follow-ups",
+    QUOTATIONS: "/employee/quotations",
+    QUOTATION_DETAIL: "/employee/quotations/:quotationId",
+    QUOTATION_PRINT: "/employee/quotations/:quotationId/print",
   },
   ERROR: {
     UNAUTHORIZED: "/unauthorized",

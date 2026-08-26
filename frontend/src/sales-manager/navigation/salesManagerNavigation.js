@@ -1,4 +1,4 @@
-import { CalendarCheck, Columns3, LayoutDashboard, PhoneCall, Users } from "lucide-react";
+import { CalendarCheck, Columns3, FileText, LayoutDashboard, PhoneCall, Users } from "lucide-react";
 import { PERMISSIONS, ROUTES } from "../../shared/constants";
 
 export const salesManagerNavigation = [
@@ -30,5 +30,11 @@ export const salesManagerNavigation = [
     route: ROUTES.SALES_MANAGER.FOLLOW_UPS,
     icon: CalendarCheck,
     permission: PERMISSIONS.LEADS_READ,
+  },
+  {
+    label: "Quotations",
+    route: ROUTES.SALES_MANAGER.QUOTATIONS,
+    icon: FileText,
+    permission: PERMISSIONS.QUOTATIONS_READ,
   },
 ];

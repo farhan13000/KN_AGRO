@@ -1,4 +1,4 @@
-import { CalendarCheck, LayoutDashboard, PhoneCall, UserCircle } from "lucide-react";
+import { CalendarCheck, FileText, LayoutDashboard, PhoneCall, UserCircle } from "lucide-react";
 import { PERMISSIONS, ROUTES } from "../../shared/constants";
 
 export const employeeNavigation = [
@@ -24,5 +24,11 @@ export const employeeNavigation = [
     route: ROUTES.EMPLOYEE.FOLLOW_UPS,
     icon: CalendarCheck,
     permission: PERMISSIONS.LEADS_READ,
+  },
+  {
+    label: "Quotations",
+    route: ROUTES.EMPLOYEE.QUOTATIONS,
+    icon: FileText,
+    permission: PERMISSIONS.QUOTATIONS_READ,
   },
 ];

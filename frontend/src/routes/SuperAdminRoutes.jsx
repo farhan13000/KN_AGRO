@@ -67,6 +67,21 @@ const SuperAdminLeadCreatePage = lazy(() => import("../super-admin/pages/crm/Sup
 const SuperAdminLeadDetailPage = lazy(() => import("../super-admin/pages/crm/SuperAdminLeadDetailPage"));
 const SuperAdminFollowUpsPage = lazy(() => import("../super-admin/pages/crm/SuperAdminFollowUpsPage"));
 const SuperAdminCrmPipelinePage = lazy(() => import("../super-admin/pages/crm/SuperAdminCrmPipelinePage"));
+const SuperAdminQuotationListPage = lazy(
+  () => import("../super-admin/pages/quotations/SuperAdminQuotationListPage"),
+);
+const SuperAdminQuotationCreatePage = lazy(
+  () => import("../super-admin/pages/quotations/SuperAdminQuotationCreatePage"),
+);
+const SuperAdminQuotationDetailPage = lazy(
+  () => import("../super-admin/pages/quotations/SuperAdminQuotationDetailPage"),
+);
+const SuperAdminQuotationEditPage = lazy(
+  () => import("../super-admin/pages/quotations/SuperAdminQuotationEditPage"),
+);
+const SuperAdminQuotationPrintPage = lazy(
+  () => import("../super-admin/pages/quotations/SuperAdminQuotationPrintPage"),
+);
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -158,6 +173,26 @@ export const superAdminRouteConfig = {
         {
           path: ROUTES.SUPER_ADMIN.FOLLOW_UPS,
           element: withPermission(PERMISSIONS.LEADS_READ, <SuperAdminFollowUpsPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.QUOTATIONS,
+          element: withPermission(PERMISSIONS.QUOTATIONS_READ, <SuperAdminQuotationListPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.QUOTATION_CREATE,
+          element: withPermission(PERMISSIONS.QUOTATIONS_CREATE, <SuperAdminQuotationCreatePage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.QUOTATION_DETAIL,
+          element: withPermission(PERMISSIONS.QUOTATIONS_READ, <SuperAdminQuotationDetailPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.QUOTATION_EDIT,
+          element: withPermission(PERMISSIONS.QUOTATIONS_UPDATE, <SuperAdminQuotationEditPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.QUOTATION_PRINT,
+          element: withPermission(PERMISSIONS.QUOTATIONS_READ, <SuperAdminQuotationPrintPage />),
         },
         { path: "/super-admin/*", element: <InternalNotFoundPage /> },
       ],
