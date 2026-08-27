@@ -22,7 +22,9 @@ export default function QuotationDetailView({
   editPath = "",
   leadDetailPath = "",
   onMutationSuccess,
+  onOrderCreated,
   onRevised,
+  orderDetailPath = "",
   parentDetailPath = "",
   printPath = "",
   quotation,
@@ -31,7 +33,7 @@ export default function QuotationDetailView({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <QuotationHeader quotation={quotation} roleLabel={roleLabel} />
+        <QuotationHeader orderDetailPath={orderDetailPath} quotation={quotation} roleLabel={roleLabel} />
         {printPath ? (
           <Button className="shrink-0" to={printPath} variant="secondary">
             <Printer className="h-4 w-4" />
@@ -42,6 +44,7 @@ export default function QuotationDetailView({
 
       <QuotationLifecycleActions
         editPath={editPath}
+        onOrderCreated={onOrderCreated}
         onRevised={onRevised}
         onSuccess={onMutationSuccess}
         quotation={quotation}

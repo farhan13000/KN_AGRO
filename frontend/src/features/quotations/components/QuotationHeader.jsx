@@ -1,8 +1,9 @@
+import { Link } from "react-router-dom";
 import { formatBusinessDateTime } from "../../../shared/utils";
 import QuotationStatusBadge from "./QuotationStatusBadge";
 import { QUOTATION_STATUS } from "../constants";
 
-export default function QuotationHeader({ quotation, roleLabel = "CRM" }) {
+export default function QuotationHeader({ orderDetailPath = "", quotation, roleLabel = "CRM" }) {
   return (
     <div>
       <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{roleLabel}</p>
@@ -16,7 +17,17 @@ export default function QuotationHeader({ quotation, roleLabel = "CRM" }) {
       </p>
       {quotation.status === QUOTATION_STATUS.ACCEPTED ? (
         <p className="mt-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-bold text-green-800">
-          Accepted — Ready for Order. Order creation is not part of Phase 5 and does not happen automatically.
+          Accepted — ready for Order. Use the Create Order action below; this never happens automatically.
+        </p>
+      ) : null}
+      {quotation.status === QUOTATION_STATUS.CONVERTED ? (
+        <p className="mt-4 flex flex-wrap items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800">
+          Converted into an Order.
+          {orderDetailPath ? (
+            <Link className="underline hover:no-underline" to={orderDetailPath}>
+              View Order
+            </Link>
+          ) : null}
         </p>
       ) : null}
       {quotation.status === QUOTATION_STATUS.REJECTED && quotation.rejectionReason ? (

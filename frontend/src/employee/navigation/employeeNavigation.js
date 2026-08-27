@@ -1,4 +1,15 @@
-import { CalendarCheck, FileText, LayoutDashboard, PhoneCall, UserCircle } from "lucide-react";
+import {
+  AlertTriangle,
+  CalendarCheck,
+  CreditCard,
+  FileText,
+  LayoutDashboard,
+  PhoneCall,
+  Receipt,
+  ShoppingCart,
+  UserCircle,
+  Users,
+} from "lucide-react";
 import { PERMISSIONS, ROUTES } from "../../shared/constants";
 
 export const employeeNavigation = [
@@ -30,5 +41,40 @@ export const employeeNavigation = [
     route: ROUTES.EMPLOYEE.QUOTATIONS,
     icon: FileText,
     permission: PERMISSIONS.QUOTATIONS_READ,
+  },
+  // Prompt 59: Employee genuinely holds customers/orders/invoices/payments
+  // .read (verified against seedRoles.js) — read-only, no create/mutate
+  // permission for any of the four, so these entries are added (not
+  // withheld) but every page behind them is read-only, matching the
+  // pattern already established on the pages themselves.
+  {
+    label: "Customers",
+    route: ROUTES.EMPLOYEE.CUSTOMERS,
+    icon: Users,
+    permission: PERMISSIONS.CUSTOMERS_READ,
+  },
+  {
+    label: "Orders",
+    route: ROUTES.EMPLOYEE.ORDERS,
+    icon: ShoppingCart,
+    permission: PERMISSIONS.ORDERS_READ,
+  },
+  {
+    label: "Invoices",
+    route: ROUTES.EMPLOYEE.INVOICES,
+    icon: Receipt,
+    permission: PERMISSIONS.INVOICES_READ,
+  },
+  {
+    label: "Outstanding",
+    route: ROUTES.EMPLOYEE.INVOICE_OUTSTANDING,
+    icon: AlertTriangle,
+    permission: PERMISSIONS.INVOICES_READ,
+  },
+  {
+    label: "Payments",
+    route: ROUTES.EMPLOYEE.PAYMENTS,
+    icon: CreditCard,
+    permission: PERMISSIONS.PAYMENTS_READ,
   },
 ];

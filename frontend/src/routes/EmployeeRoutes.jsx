@@ -14,6 +14,18 @@ const EmployeeFollowUpsPage = lazy(() => import("../employee/pages/crm/EmployeeF
 const EmployeeQuotationListPage = lazy(() => import("../employee/pages/quotations/EmployeeQuotationListPage"));
 const EmployeeQuotationDetailPage = lazy(() => import("../employee/pages/quotations/EmployeeQuotationDetailPage"));
 const EmployeeQuotationPrintPage = lazy(() => import("../employee/pages/quotations/EmployeeQuotationPrintPage"));
+const EmployeeCustomerListPage = lazy(() => import("../employee/pages/customers/EmployeeCustomerListPage"));
+const EmployeeCustomerDetailPage = lazy(() => import("../employee/pages/customers/EmployeeCustomerDetailPage"));
+const EmployeeOrderListPage = lazy(() => import("../employee/pages/orders/EmployeeOrderListPage"));
+const EmployeeOrderDetailPage = lazy(() => import("../employee/pages/orders/EmployeeOrderDetailPage"));
+const EmployeeOrderPrintPage = lazy(() => import("../employee/pages/orders/EmployeeOrderPrintPage"));
+const EmployeeInvoiceListPage = lazy(() => import("../employee/pages/invoices/EmployeeInvoiceListPage"));
+const EmployeeInvoiceOutstandingPage = lazy(
+  () => import("../employee/pages/invoices/EmployeeInvoiceOutstandingPage"),
+);
+const EmployeeInvoiceDetailPage = lazy(() => import("../employee/pages/invoices/EmployeeInvoiceDetailPage"));
+const EmployeeInvoicePrintPage = lazy(() => import("../employee/pages/invoices/EmployeeInvoicePrintPage"));
+const EmployeePaymentListPage = lazy(() => import("../employee/pages/payments/EmployeePaymentListPage"));
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -57,6 +69,46 @@ export const employeeRouteConfig = {
         {
           path: ROUTES.EMPLOYEE.QUOTATION_PRINT,
           element: withPermission(PERMISSIONS.QUOTATIONS_READ, <EmployeeQuotationPrintPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.CUSTOMERS,
+          element: withPermission(PERMISSIONS.CUSTOMERS_READ, <EmployeeCustomerListPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.CUSTOMER_DETAIL,
+          element: withPermission(PERMISSIONS.CUSTOMERS_READ, <EmployeeCustomerDetailPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.ORDERS,
+          element: withPermission(PERMISSIONS.ORDERS_READ, <EmployeeOrderListPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.ORDER_DETAIL,
+          element: withPermission(PERMISSIONS.ORDERS_READ, <EmployeeOrderDetailPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.ORDER_PRINT,
+          element: withPermission(PERMISSIONS.ORDERS_READ, <EmployeeOrderPrintPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.INVOICES,
+          element: withPermission(PERMISSIONS.INVOICES_READ, <EmployeeInvoiceListPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.INVOICE_OUTSTANDING,
+          element: withPermission(PERMISSIONS.INVOICES_READ, <EmployeeInvoiceOutstandingPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.INVOICE_DETAIL,
+          element: withPermission(PERMISSIONS.INVOICES_READ, <EmployeeInvoiceDetailPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.INVOICE_PRINT,
+          element: withPermission(PERMISSIONS.INVOICES_READ, <EmployeeInvoicePrintPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.PAYMENTS,
+          element: withPermission(PERMISSIONS.PAYMENTS_READ, <EmployeePaymentListPage />),
         },
         { path: "/employee/*", element: <InternalNotFoundPage /> },
       ],
