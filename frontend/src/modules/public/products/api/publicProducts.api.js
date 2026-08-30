@@ -1,99 +1,52 @@
-import { API_ENDPOINTS, apiClient, unwrapApiData } from "../../../../core/api";
 import { getProductUnitLabel } from "../../../../features/products/utils";
-import { publicCategoriesApi } from "../../categories/api/publicCategories.api";
+import { simulateNetwork } from "../../../../utils/mockApi";
+import { products } from "../../data/products.data";
 
-const cleanPublicProductQuery = (query = {}) =>
-  Object.fromEntries(
-    Object.entries(query).filter(([, value]) => value !== "" && value !== null && value !== undefined),
+// Temporary static data source while the backend product APIs are not wired up yet.
+// Function signatures below are kept identical to the real backend-backed API so
+// pages can switch back without changes once the backend is ready.
+
+const toPublicProductView = (product) => ({
+  ...product,
+  unit: getProductUnitLabel(product.apiUnit),
+});
+
+const matchesSearch = (product, search) => {
+  if (!search) return true;
+  const term = search.toLowerCase();
+  return (
+    product.name.toLowerCase().includes(term) ||
+    product.shortDescription.toLowerCase().includes(term) ||
+    product.category.toLowerCase().includes(term)
   );
-
-const firstPresentSpec = (specifications = {}, keys = []) => {
-  for (const key of keys) {
-    if (specifications[key]) return specifications[key];
-  }
-  return "";
 };
 
-const toList = (value) => {
-  if (Array.isArray(value)) return value;
-  if (!value) return [];
-  return String(value)
-    .split(/[,;\n]/)
-    .map((item) => item.trim())
-    .filter(Boolean);
-};
-
-const toTechnicalInfo = (product = {}) => {
-  const specs = product.specifications || {};
-  const specItems = Object.entries(specs).map(([key, value]) => `${key}: ${value}`);
-  return [
-    product.category?.name ? `Category: ${product.category.name}` : "",
-    product.unit ? `Unit: ${getProductUnitLabel(product.unit)}` : "",
-    ...specItems,
-  ].filter(Boolean);
-};
-
-const getPrimaryImage = (images = []) =>
-  images.find((image) => image.isPrimary)?.url || images[0]?.url || "";
-
-const toPublicProductView = (product = {}) => {
-  const specifications = product.specifications || {};
-  const gallery = (product.images || []).map((image) => image.url).filter(Boolean);
-  const image = getPrimaryImage(product.images);
-  const categoryName = product.category?.name || "";
-  const categorySlug = product.category?.slug || "";
-
-  return {
-    ...product,
-    id: product._id || product.id || product.slug,
-    category: categoryName,
-    categoryId: product.category?._id || "",
-    categorySlug,
-    shortDescription: product.shortDescription || product.description || product.name || "",
-    description: product.description || product.shortDescription || "",
-    image,
-    imageFit: "contain",
-    gallery: gallery.length ? gallery : image ? [image] : [],
-    packSize: firstPresentSpec(specifications, ["Pack Size", "Pack size", "packSize"]) || getProductUnitLabel(product.unit),
-    unit: getProductUnitLabel(product.unit),
-    apiUnit: product.unit,
-    benefits: toList(firstPresentSpec(specifications, ["Benefits", "Main Benefits", "benefits"])),
-    applications: toList(firstPresentSpec(specifications, ["Application", "Applications", "Usage", "applications"])),
-    suitableCrops: toList(firstPresentSpec(specifications, ["Suitable Crops", "Crop Type", "Crop", "suitableCrops"])),
-    technicalInfo: toTechnicalInfo(product),
-    featured: false,
-    availability: product.availability || "",
-    active: product.availability !== "OUT_OF_STOCK",
-  };
-};
-
-const getMockPublicProductApi = async () => {
-  if (!(import.meta.env.DEV && import.meta.env.VITE_USE_PHASE3_MOCK === "true")) {
-    return null;
-  }
-
-  const { mockPublicProductApi } = await import("../../../../mocks/products/product.mock");
-  return mockPublicProductApi;
-};
-
-const getPublicProducts = async (query) => {
-  const mock = await getMockPublicProductApi();
-  if (mock) {
-    const data = await mock.getPublicProducts(query);
-    return {
-      ...data,
-      products: (data?.products || []).map(toPublicProductView),
-    };
-  }
-
-  const response = await apiClient.get(API_ENDPOINTS.PUBLIC.PRODUCTS, {
-    params: cleanPublicProductQuery(query),
+const sortProducts = (list, sortBy, sortOrder) => {
+  const direction = sortOrder === "asc" ? 1 : -1;
+  return [...list].sort((a, b) => {
+    if (sortBy === "name") return direction * a.name.localeCompare(b.name);
+    if (sortBy === "sellingPrice") return direction * (a.sellingPrice - b.sellingPrice);
+    return direction * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   });
-  const data = unwrapApiData(response);
-  return {
-    ...data,
-    products: (data?.products || []).map(toPublicProductView),
-  };
+};
+
+const getPublicProducts = async (query = {}) => {
+  const { limit = 100, search = "", category = "", unit = "", sortBy = "createdAt", sortOrder = "desc" } = query || {};
+
+  let filtered = products.filter((product) => product.active);
+  if (category) filtered = filtered.filter((product) => product.categoryId === category);
+  if (unit) filtered = filtered.filter((product) => product.apiUnit === unit);
+  filtered = filtered.filter((product) => matchesSearch(product, search.trim()));
+
+  const sorted = sortProducts(filtered, sortBy, sortOrder);
+  const total = sorted.length;
+  const safeLimit = Number(limit) > 0 ? Number(limit) : total || 1;
+  const paged = sorted.slice(0, safeLimit).map(toPublicProductView);
+
+  return simulateNetwork({
+    products: paged,
+    pagination: { page: 1, limit: safeLimit, total, pages: Math.max(1, Math.ceil(total / safeLimit)) },
+  });
 };
 
 const getProducts = async (query) => {
@@ -102,29 +55,14 @@ const getProducts = async (query) => {
 };
 
 const getFeaturedProducts = async () => {
-  const data = await getPublicProducts({ page: 1, limit: 5, sortBy: "createdAt", sortOrder: "desc" });
+  const data = await getPublicProducts({ limit: 5, sortBy: "createdAt", sortOrder: "desc" });
   return data.products;
 };
 
 const getPublicProductBySlug = async (slug) => {
   const safeSlug = String(slug || "").trim();
-  if (!safeSlug) return { product: null };
-
-  const mock = await getMockPublicProductApi();
-  if (mock) {
-    const data = await mock.getPublicProductBySlug(safeSlug);
-    return {
-      ...data,
-      product: data?.product ? toPublicProductView(data.product) : null,
-    };
-  }
-
-  const response = await apiClient.get(API_ENDPOINTS.PUBLIC.PRODUCT_DETAIL(encodeURIComponent(safeSlug)));
-  const data = unwrapApiData(response);
-  return {
-    ...data,
-    product: data?.product ? toPublicProductView(data.product) : null,
-  };
+  const product = products.find((item) => item.slug === safeSlug && item.active) || null;
+  return simulateNetwork({ product: product ? toPublicProductView(product) : null });
 };
 
 const getProductBySlug = async (slug) => {
@@ -133,9 +71,7 @@ const getProductBySlug = async (slug) => {
 };
 
 const getProductsByCategory = async (categorySlug) => {
-  const category = await publicCategoriesApi.getCategoryBySlug(categorySlug);
-  if (!category?._id) return [];
-  const data = await getPublicProducts({ category: category._id, limit: 100 });
+  const data = await getPublicProducts({ category: categorySlug, limit: 100 });
   return data.products;
 };
 

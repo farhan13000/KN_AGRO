@@ -1,50 +1,24 @@
-import { API_ENDPOINTS, apiClient, unwrapApiData } from "../../../../core/api";
+import { simulateNetwork } from "../../../../utils/mockApi";
+import { categories } from "../../data/categories.data";
+import { products } from "../../data/products.data";
 
-const categoryIconBySlug = {
-  "bio-fertilizers": "Sprout",
-  "organic-fertilizers": "Leaf",
-  micronutrients: "FlaskConical",
-  "growth-promoters": "TrendingUp",
-  "soil-conditioners": "Layers",
-  "compost-organic-products": "Recycle",
-  "crop-nutrition": "Wheat",
-  "specialty-agro-inputs": "PackageCheck",
-};
+// Temporary static data source while the backend category APIs are not wired up yet.
+// Function signatures below are kept identical to the real backend-backed API so
+// pages can switch back without changes once the backend is ready.
 
-const toPublicCategoryView = (category = {}) => ({
+const countActiveProducts = (categorySlug) =>
+  products.filter((product) => product.active && product.categorySlug === categorySlug).length;
+
+const toPublicCategoryView = (category) => ({
   ...category,
-  id: category._id || category.id || category.slug,
-  icon: category.icon || categoryIconBySlug[category.slug] || "PackageCheck",
-  productCount: category.activeProductCount ?? category.productCount ?? 0,
-  benefits: Array.isArray(category.benefits) ? category.benefits : [],
+  id: category.slug,
+  _id: category.slug,
+  productCount: countActiveProducts(category.slug),
+  activeProductCount: countActiveProducts(category.slug),
 });
 
-const getMockPublicCategoriesApi = async () => {
-  if (!(import.meta.env.DEV && import.meta.env.VITE_USE_PHASE3_MOCK === "true")) {
-    return null;
-  }
-
-  const { mockPublicCategoriesApi } = await import("../../../../mocks/categories/category.mock");
-  return mockPublicCategoriesApi;
-};
-
-const getPublicCategories = async () => {
-  const mock = await getMockPublicCategoriesApi();
-  if (mock) {
-    const data = await mock.getPublicCategories();
-    return {
-      ...data,
-      categories: (data?.categories || []).map(toPublicCategoryView),
-    };
-  }
-
-  const response = await apiClient.get(API_ENDPOINTS.PUBLIC.CATEGORIES);
-  const data = unwrapApiData(response);
-  return {
-    ...data,
-    categories: (data?.categories || []).map(toPublicCategoryView),
-  };
-};
+const getPublicCategories = async () =>
+  simulateNetwork({ categories: categories.map(toPublicCategoryView) });
 
 const getCategories = async () => {
   const data = await getPublicCategories();
@@ -52,8 +26,8 @@ const getCategories = async () => {
 };
 
 const getCategoryBySlug = async (slug) => {
-  const categories = await getCategories();
-  return categories.find((category) => category.slug === slug) || null;
+  const list = await getCategories();
+  return list.find((category) => category.slug === slug) || null;
 };
 
 export const publicCategoriesApi = {
