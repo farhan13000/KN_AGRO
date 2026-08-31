@@ -27,7 +27,7 @@ export default function FeaturedProductsSection({ products = [], isLoading = fal
           >
             <Icon name="ChevronRight" className="h-5 w-5 rotate-180" />
           </button>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
             {isLoading
               ? Array.from({ length: 5 }).map((_, index) => <SkeletonCard key={index} />)
               : products.slice(0, 5).map((product) => (

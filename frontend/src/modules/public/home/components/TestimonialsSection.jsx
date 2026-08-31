@@ -37,7 +37,7 @@ export default function TestimonialsSection({ testimonials = [] }) {
               <Icon name="ChevronRight" className="h-5 w-5 rotate-180" />
             </button>
           ) : null}
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {visibleTestimonials.map((testimonial) => (
               <article className="rounded-xl border border-forest/10 bg-white p-6 shadow-card" key={testimonial.id}>
                 <Icon name="Quote" className="h-10 w-10 text-leaf" strokeWidth={1.5} />

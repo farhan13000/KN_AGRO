@@ -23,7 +23,7 @@ export default function CategorySolutionsSection({ categories = [], isLoading = 
         <div className="mx-auto mt-3 h-5 w-16 text-agriculture">
           <Icon name="Leaf" className="mx-auto h-5 w-5 fill-current" />
         </div>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
           {isLoading
             ? Array.from({ length: 6 }).map((_, index) => <SkeletonCard key={index} />)
             : categories.slice(0, 6).map((category) => (
