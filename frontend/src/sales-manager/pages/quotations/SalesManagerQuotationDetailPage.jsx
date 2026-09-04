@@ -8,6 +8,7 @@ export default function SalesManagerQuotationDetailPage() {
       detailPathFor={(quotation) => `${ROUTES.SALES_MANAGER.QUOTATIONS}/${quotation._id}`}
       editPathFor={(quotation) => `${ROUTES.SALES_MANAGER.QUOTATIONS}/${quotation._id}/edit`}
       leadDetailPathFor={(lead) => `${ROUTES.SALES_MANAGER.LEADS}/${lead._id}`}
+      orderDetailPathFor={(order) => `${ROUTES.SALES_MANAGER.ORDERS}/${order._id}`}
       printPathFor={(quotation) => `${ROUTES.SALES_MANAGER.QUOTATIONS}/${quotation._id}/print`}
       roleLabel="Manager CRM"
     />

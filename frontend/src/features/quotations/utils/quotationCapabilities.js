@@ -39,5 +39,14 @@ export const getQuotationCapabilities = ({ hasPermission, quotation }) => {
     canReviseQuotation:
       hasPermission(PERMISSIONS.QUOTATIONS_CREATE) &&
       [QUOTATION_STATUS.REJECTED, QUOTATION_STATUS.EXPIRED].includes(status),
+    // Phase 6 Prompt 23: cross-domain, same shape as canCreateQuotation on
+    // getLeadCapabilities — "can create an Order" gated on the Orders
+    // permission (not a Quotations one) plus this specific Quotation being
+    // ACCEPTED (the only source status createOrderFromQuotation accepts,
+    // per order.service.js — 409 otherwise). Once the Order is created the
+    // backend flips this same quotation to CONVERTED, so the button
+    // naturally stops rendering afterward without any extra bookkeeping.
+    canCreateOrderFromQuotation:
+      hasPermission(PERMISSIONS.ORDERS_CREATE) && status === QUOTATION_STATUS.ACCEPTED,
   };
 };

@@ -10,6 +10,7 @@ export default function QuotationDetailRouteView({
   detailPathFor,
   editPathFor,
   leadDetailPathFor,
+  orderDetailPathFor,
   printPathFor,
   roleLabel = "CRM",
 }) {
@@ -39,12 +40,21 @@ export default function QuotationDetailRouteView({
     if (detailPathFor && newQuotation) navigate(detailPathFor(newQuotation));
   };
 
+  // Create Order (Prompt 23) is the same posture as Revise: it produces a
+  // different record than the one on screen, so we navigate to it instead
+  // of refetching this (now-CONVERTED) quotation in place.
+  const handleOrderCreated = (order) => {
+    if (orderDetailPathFor && order) navigate(orderDetailPathFor(order));
+  };
+
   return (
     <QuotationDetailView
       editPath={editPathFor ? editPathFor(quotation) : ""}
       leadDetailPath={leadDetailPathFor && quotation.lead ? leadDetailPathFor(quotation.lead) : ""}
       onMutationSuccess={quotationState.refetch}
+      onOrderCreated={handleOrderCreated}
       onRevised={handleRevised}
+      orderDetailPath={quotation.order && orderDetailPathFor ? orderDetailPathFor({ _id: quotation.order }) : ""}
       parentDetailPath={
         quotation.parentQuotation && detailPathFor ? detailPathFor({ _id: quotation.parentQuotation }) : ""
       }

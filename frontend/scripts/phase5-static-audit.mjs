@@ -24,8 +24,8 @@ const quotationFiles = (await walk(quotationsRoot)).filter((file) => /\.(js|jsx)
 const quotationSource = await Promise.all(quotationFiles.map(async (file) => [file, await readFile(file, "utf8")]));
 const allQuotationSource = quotationSource.map(([, text]) => text).join("\n");
 
-// Prompt 53 — no unsafe HTML injection, no debug output, no hard-delete or
-// premature Order-creation surface anywhere in the feature.
+// Prompt 53 — no unsafe HTML injection, no debug output, no hard-delete
+// surface anywhere in the feature.
 assert.equal(
   /dangerouslySetInnerHTML|insertAdjacentHTML|\.innerHTML\s*=/.test(allQuotationSource),
   false,
@@ -41,10 +41,28 @@ assert.equal(
   false,
   "No hard-delete surface should exist for quotations — lifecycle/status operations only.",
 );
-assert.equal(
-  /createOrder|convertToOrder|ORDER_CREATE/i.test(allQuotationSource),
-  false,
-  "Phase 5 must never create Orders — that begins in Phase 6.",
+// This file originally asserted that NO Order-creation surface existed
+// anywhere in features/quotations, since Order creation began only in
+// Phase 6. Phase 6 Prompt 23 deliberately and correctly added exactly
+// that — a "Create Order" action on an ACCEPTED quotation
+// (QuotationLifecycleActions.jsx) — so that blanket prohibition is now
+// obsolete by design, not a regression. What still must hold, and is
+// re-asserted here instead: the feature must call the real
+// orderApi.createOrderFromQuotation (never invent its own endpoint or
+// simulate the conversion), and must never locally assign
+// `quotation.status = "CONVERTED"` anywhere — the real backend transition
+// is only ever observed by refetching, never patched client-side. See
+// scripts/phase6-static-audit.mjs for the full, current set of
+// Order/Invoice/Payment invariants this project maintains going forward.
+assert.match(
+  allQuotationSource,
+  /orderApi\.createOrderFromQuotation/,
+  "Create Order must call the real orderApi.createOrderFromQuotation (Phase 6 Prompt 23).",
+);
+assert.doesNotMatch(
+  allQuotationSource,
+  /quotation\.status\s*=\s*["']CONVERTED["']/,
+  "Quotation status must never be assigned CONVERTED locally — only ever observed via refetch.",
 );
 
 // Prompt 40 — every payload builder is a real whitelist, never a spread of

@@ -1,4 +1,4 @@
-import { CheckCircle2, GitPullRequest, Pencil, RefreshCw, ShieldX, XCircle } from "lucide-react";
+import { CheckCircle2, GitPullRequest, PackagePlus, Pencil, RefreshCw, ShieldX, XCircle } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../../core/auth";
 import Button from "../../../shared/components/Button";
@@ -6,7 +6,14 @@ import Card from "../../../shared/components/Card";
 import ConfirmDialog from "../../../shared/components/ConfirmDialog";
 import Modal from "../../../shared/components/Modal";
 import { useAsyncMutation } from "../../../shared/hooks";
+import TextInput from "../../../shared/forms/TextInput";
 import Textarea from "../../../shared/forms/Textarea";
+import { getBusinessDateKey } from "../../../shared/utils";
+// Deliberately imports from the orders feature's services subpath, not its
+// root barrel — this needs only orderApi.createOrderFromQuotation, not the
+// whole Orders UI (components/hooks), so importing the narrower path keeps
+// that code out of the Quotations bundle's module graph.
+import { orderApi } from "../../orders/services";
 import { quotationApi } from "../services";
 import { useQuotationActions } from "../hooks";
 import { getQuotationCapabilities } from "../utils";
@@ -35,15 +42,24 @@ const ignoreHandledError = () => {};
 // other action refetches this same quotation in place, but Revise creates
 // a brand-new DRAFT record — Prompt 33 requires navigating to it, not
 // refetching the (unchanged) original.
-export default function QuotationLifecycleActions({ editPath = "", onRevised, onSuccess, quotation }) {
+export default function QuotationLifecycleActions({
+  editPath = "",
+  onOrderCreated,
+  onRevised,
+  onSuccess,
+  quotation,
+}) {
   const { hasPermission } = useAuth();
   const [dialog, setDialog] = useState("");
   const [rejectReason, setRejectReason] = useState("");
   const [cancelReason, setCancelReason] = useState("");
+  const [expectedDeliveryDate, setExpectedDeliveryDate] = useState("");
+  const [orderNotes, setOrderNotes] = useState("");
 
   const {
     canAcceptQuotation,
     canCancelQuotation,
+    canCreateOrderFromQuotation,
     canEditQuotation,
     canRejectQuotation,
     canReviseQuotation,
@@ -54,6 +70,8 @@ export default function QuotationLifecycleActions({ editPath = "", onRevised, on
     setDialog("");
     setRejectReason("");
     setCancelReason("");
+    setExpectedDeliveryDate("");
+    setOrderNotes("");
   };
 
   // Prompt 50: on a conflict (409 — someone else already sent/accepted/
@@ -88,13 +106,33 @@ export default function QuotationLifecycleActions({ editPath = "", onRevised, on
     },
   });
 
+  // Prompt 23: ACCEPTED quotation -> backend creates/resolves the Customer,
+  // creates the Order, flips this Quotation to CONVERTED, and best-effort
+  // advances the Lead to CONVERTED — all server-side, in one transaction.
+  // This component only calls the endpoint and navigates to the result; it
+  // never patches quotation.status/lead.status locally, per Prompt 23's
+  // explicit "frontend must not patch these statuses independently".
+  const createOrder = useAsyncMutation(
+    (quotationId, values) => orderApi.createOrderFromQuotation(quotationId, values),
+    {
+      onError: async () => {
+        await onSuccess?.();
+      },
+      onSuccess: async (payload) => {
+        closeDialog();
+        if (payload?.order) await onOrderCreated?.(payload.order);
+      },
+    },
+  );
+
   if (
     !canEditQuotation &&
     !canSendQuotation &&
     !canAcceptQuotation &&
     !canRejectQuotation &&
     !canCancelQuotation &&
-    !canReviseQuotation
+    !canReviseQuotation &&
+    !canCreateOrderFromQuotation
   ) {
     return null;
   }
@@ -102,6 +140,13 @@ export default function QuotationLifecycleActions({ editPath = "", onRevised, on
   const handleSend = () => actions.sendQuotation.mutate(quotation._id).catch(ignoreHandledError);
   const handleAccept = () => actions.acceptQuotation.mutate(quotation._id).catch(ignoreHandledError);
   const handleRevise = () => reviseQuotation.mutate(quotation._id).catch(ignoreHandledError);
+
+  const handleCreateOrder = (event) => {
+    event.preventDefault();
+    createOrder
+      .mutate(quotation._id, { expectedDeliveryDate, notes: orderNotes })
+      .catch(ignoreHandledError);
+  };
 
   const handleReject = async (event) => {
     event.preventDefault();
@@ -128,6 +173,12 @@ export default function QuotationLifecycleActions({ editPath = "", onRevised, on
             <Button className={actionButtonClass} onClick={() => setDialog("send")} variant="secondary">
               <GitPullRequest className="h-4 w-4" />
               Send
+            </Button>
+          ) : null}
+          {canCreateOrderFromQuotation ? (
+            <Button className={actionButtonClass} onClick={() => setDialog("create-order")} variant="secondary">
+              <PackagePlus className="h-4 w-4" />
+              Create Order
             </Button>
           ) : null}
           {canAcceptQuotation ? (
@@ -171,13 +222,47 @@ export default function QuotationLifecycleActions({ editPath = "", onRevised, on
       <ConfirmDialog
         cancelLabel="Back"
         confirmLabel={actions.acceptQuotation.isLoading ? "Accepting..." : "Accept"}
-        description={`Mark ${quotation.quotationNumber} as accepted by the customer? This does not create an Order — Order creation is a later phase.`}
+        description={`Mark ${quotation.quotationNumber} as accepted by the customer? This does not create an Order automatically — use the separate "Create Order" action once accepted.`}
         isOpen={dialog === "accept"}
         onCancel={closeDialog}
         onConfirm={handleAccept}
         title="Accept quotation"
       />
       {dialog === "accept" ? <ActionError message={actions.acceptQuotation.errorMessage} /> : null}
+
+      <Modal isOpen={dialog === "create-order"} onClose={closeDialog} title="Create order">
+        <form className="space-y-4" onSubmit={handleCreateOrder}>
+          <p className="text-sm leading-6 text-muted">
+            Create an Order from {quotation.quotationNumber}? The backend resolves/creates the Customer,
+            creates the Order from this quotation&apos;s saved items and totals, and moves this Quotation to
+            Converted. This cannot be undone from here.
+          </p>
+          <TextInput
+            id="order-expected-delivery-date"
+            label="Expected Delivery Date"
+            min={getBusinessDateKey(new Date())}
+            onChange={(event) => setExpectedDeliveryDate(event.target.value)}
+            type="date"
+            value={expectedDeliveryDate}
+          />
+          <Textarea
+            id="order-notes"
+            label="Notes"
+            maxLength={1000}
+            onChange={(event) => setOrderNotes(event.target.value)}
+            value={orderNotes}
+          />
+          <ActionError message={createOrder.errorMessage} />
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <Button onClick={closeDialog} type="button" variant="secondary">
+              Back
+            </Button>
+            <Button disabled={createOrder.isLoading} type="submit">
+              {createOrder.isLoading ? "Creating..." : "Create Order"}
+            </Button>
+          </div>
+        </form>
+      </Modal>
 
       <ConfirmDialog
         cancelLabel="Back"

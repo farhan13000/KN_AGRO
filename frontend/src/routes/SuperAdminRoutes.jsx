@@ -103,6 +103,32 @@ const SuperAdminQuotationEditPage = lazy(
 const SuperAdminQuotationPrintPage = lazy(
   () => import("../super-admin/pages/quotations/SuperAdminQuotationPrintPage"),
 );
+const SuperAdminCustomerListPage = lazy(
+  () => import("../super-admin/pages/customers/SuperAdminCustomerListPage"),
+);
+const SuperAdminCustomerCreatePage = lazy(
+  () => import("../super-admin/pages/customers/SuperAdminCustomerCreatePage"),
+);
+const SuperAdminCustomerDetailPage = lazy(
+  () => import("../super-admin/pages/customers/SuperAdminCustomerDetailPage"),
+);
+const SuperAdminCustomerEditPage = lazy(
+  () => import("../super-admin/pages/customers/SuperAdminCustomerEditPage"),
+);
+const SuperAdminOrderListPage = lazy(() => import("../super-admin/pages/orders/SuperAdminOrderListPage"));
+const SuperAdminOrderDetailPage = lazy(() => import("../super-admin/pages/orders/SuperAdminOrderDetailPage"));
+const SuperAdminOrderPrintPage = lazy(() => import("../super-admin/pages/orders/SuperAdminOrderPrintPage"));
+const SuperAdminInvoiceListPage = lazy(() => import("../super-admin/pages/invoices/SuperAdminInvoiceListPage"));
+const SuperAdminInvoiceOutstandingPage = lazy(
+  () => import("../super-admin/pages/invoices/SuperAdminInvoiceOutstandingPage"),
+);
+const SuperAdminInvoiceDetailPage = lazy(
+  () => import("../super-admin/pages/invoices/SuperAdminInvoiceDetailPage"),
+);
+const SuperAdminInvoicePrintPage = lazy(
+  () => import("../super-admin/pages/invoices/SuperAdminInvoicePrintPage"),
+);
+const SuperAdminPaymentListPage = lazy(() => import("../super-admin/pages/payments/SuperAdminPaymentListPage"));
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -244,6 +270,54 @@ export const superAdminRouteConfig = {
         {
           path: ROUTES.SUPER_ADMIN.QUOTATION_PRINT,
           element: withPermission(PERMISSIONS.QUOTATIONS_READ, <SuperAdminQuotationPrintPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.CUSTOMERS,
+          element: withPermission(PERMISSIONS.CUSTOMERS_READ, <SuperAdminCustomerListPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.CUSTOMER_CREATE,
+          element: withPermission(PERMISSIONS.CUSTOMERS_CREATE, <SuperAdminCustomerCreatePage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.CUSTOMER_DETAIL,
+          element: withPermission(PERMISSIONS.CUSTOMERS_READ, <SuperAdminCustomerDetailPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.CUSTOMER_EDIT,
+          element: withPermission(PERMISSIONS.CUSTOMERS_UPDATE, <SuperAdminCustomerEditPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.ORDERS,
+          element: withPermission(PERMISSIONS.ORDERS_READ, <SuperAdminOrderListPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.ORDER_DETAIL,
+          element: withPermission(PERMISSIONS.ORDERS_READ, <SuperAdminOrderDetailPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.ORDER_PRINT,
+          element: withPermission(PERMISSIONS.ORDERS_READ, <SuperAdminOrderPrintPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.INVOICES,
+          element: withPermission(PERMISSIONS.INVOICES_READ, <SuperAdminInvoiceListPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.INVOICE_OUTSTANDING,
+          element: withPermission(PERMISSIONS.INVOICES_READ, <SuperAdminInvoiceOutstandingPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.INVOICE_DETAIL,
+          element: withPermission(PERMISSIONS.INVOICES_READ, <SuperAdminInvoiceDetailPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.INVOICE_PRINT,
+          element: withPermission(PERMISSIONS.INVOICES_READ, <SuperAdminInvoicePrintPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.PAYMENTS,
+          element: withPermission(PERMISSIONS.PAYMENTS_READ, <SuperAdminPaymentListPage />),
         },
         { path: "/super-admin/*", element: <InternalNotFoundPage /> },
       ],

@@ -40,6 +40,40 @@ const SalesManagerQuotationEditPage = lazy(
 const SalesManagerQuotationPrintPage = lazy(
   () => import("../sales-manager/pages/quotations/SalesManagerQuotationPrintPage"),
 );
+const SalesManagerCustomerListPage = lazy(
+  () => import("../sales-manager/pages/customers/SalesManagerCustomerListPage"),
+);
+const SalesManagerCustomerCreatePage = lazy(
+  () => import("../sales-manager/pages/customers/SalesManagerCustomerCreatePage"),
+);
+const SalesManagerCustomerDetailPage = lazy(
+  () => import("../sales-manager/pages/customers/SalesManagerCustomerDetailPage"),
+);
+const SalesManagerCustomerEditPage = lazy(
+  () => import("../sales-manager/pages/customers/SalesManagerCustomerEditPage"),
+);
+const SalesManagerOrderListPage = lazy(() => import("../sales-manager/pages/orders/SalesManagerOrderListPage"));
+const SalesManagerOrderDetailPage = lazy(
+  () => import("../sales-manager/pages/orders/SalesManagerOrderDetailPage"),
+);
+const SalesManagerOrderPrintPage = lazy(
+  () => import("../sales-manager/pages/orders/SalesManagerOrderPrintPage"),
+);
+const SalesManagerInvoiceListPage = lazy(
+  () => import("../sales-manager/pages/invoices/SalesManagerInvoiceListPage"),
+);
+const SalesManagerInvoiceOutstandingPage = lazy(
+  () => import("../sales-manager/pages/invoices/SalesManagerInvoiceOutstandingPage"),
+);
+const SalesManagerInvoiceDetailPage = lazy(
+  () => import("../sales-manager/pages/invoices/SalesManagerInvoiceDetailPage"),
+);
+const SalesManagerInvoicePrintPage = lazy(
+  () => import("../sales-manager/pages/invoices/SalesManagerInvoicePrintPage"),
+);
+const SalesManagerPaymentListPage = lazy(
+  () => import("../sales-manager/pages/payments/SalesManagerPaymentListPage"),
+);
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -117,6 +151,54 @@ export const salesManagerRouteConfig = {
         {
           path: ROUTES.SALES_MANAGER.QUOTATION_PRINT,
           element: withPermission(PERMISSIONS.QUOTATIONS_READ, <SalesManagerQuotationPrintPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.CUSTOMERS,
+          element: withPermission(PERMISSIONS.CUSTOMERS_READ, <SalesManagerCustomerListPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.CUSTOMER_CREATE,
+          element: withPermission(PERMISSIONS.CUSTOMERS_CREATE, <SalesManagerCustomerCreatePage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.CUSTOMER_DETAIL,
+          element: withPermission(PERMISSIONS.CUSTOMERS_READ, <SalesManagerCustomerDetailPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.CUSTOMER_EDIT,
+          element: withPermission(PERMISSIONS.CUSTOMERS_UPDATE, <SalesManagerCustomerEditPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.ORDERS,
+          element: withPermission(PERMISSIONS.ORDERS_READ, <SalesManagerOrderListPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.ORDER_DETAIL,
+          element: withPermission(PERMISSIONS.ORDERS_READ, <SalesManagerOrderDetailPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.ORDER_PRINT,
+          element: withPermission(PERMISSIONS.ORDERS_READ, <SalesManagerOrderPrintPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.INVOICES,
+          element: withPermission(PERMISSIONS.INVOICES_READ, <SalesManagerInvoiceListPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.INVOICE_OUTSTANDING,
+          element: withPermission(PERMISSIONS.INVOICES_READ, <SalesManagerInvoiceOutstandingPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.INVOICE_DETAIL,
+          element: withPermission(PERMISSIONS.INVOICES_READ, <SalesManagerInvoiceDetailPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.INVOICE_PRINT,
+          element: withPermission(PERMISSIONS.INVOICES_READ, <SalesManagerInvoicePrintPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.PAYMENTS,
+          element: withPermission(PERMISSIONS.PAYMENTS_READ, <SalesManagerPaymentListPage />),
         },
         { path: "/manager/*", element: <InternalNotFoundPage /> },
       ],

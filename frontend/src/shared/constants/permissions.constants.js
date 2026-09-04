@@ -46,6 +46,22 @@ export const PERMISSIONS = Object.freeze({
   QUOTATIONS_ACCEPT: "quotations.accept",
   QUOTATIONS_REJECT: "quotations.reject",
   QUOTATIONS_MANAGE: "quotations.manage",
+  CUSTOMERS_READ: "customers.read",
+  CUSTOMERS_CREATE: "customers.create",
+  CUSTOMERS_UPDATE: "customers.update",
+  ORDERS_READ: "orders.read",
+  ORDERS_CREATE: "orders.create",
+  ORDERS_CONFIRM: "orders.confirm",
+  // ORDERS_FULFILL gates all four fulfillment actions: Processing (Prompt
+  // 30, Batch 3), Ready/Dispatch/Deliver (Prompts 31/32/34, this batch).
+  ORDERS_FULFILL: "orders.fulfill",
+  ORDERS_CANCEL: "orders.cancel",
+  INVOICES_READ: "invoices.read",
+  INVOICES_CREATE: "invoices.create",
+  INVOICES_ISSUE: "invoices.issue",
+  INVOICES_CANCEL: "invoices.cancel",
+  PAYMENTS_READ: "payments.read",
+  PAYMENTS_CREATE: "payments.create",
 
   // Org-hierarchy migration (SA/OA/GM/RM/ASM/SO/FO) — matches
   // BACKEND/backend/src/constants/permissions.js byte-for-byte. Only the

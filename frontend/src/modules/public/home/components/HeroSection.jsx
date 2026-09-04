@@ -1,6 +1,7 @@
 import Button from "../../../../shared/components/Button";
 import Icon from "../../../../shared/components/Icon";
 import { useLanguage } from "../../../../i18n/LanguageContext";
+import { companyConfig } from "../../../../config/company.config";
 import heroSectionImage from "../../../../assets/Hero Section Image.png";
 
 const trustCards = [
@@ -31,10 +32,10 @@ export default function HeroSection() {
 
   return (
     <section className="relative z-0 overflow-visible bg-white">
-      <div className="relative z-0 min-h-[680px] overflow-hidden">
+      <div className="relative z-0 min-h-[600px] overflow-hidden sm:min-h-[640px] lg:min-h-[680px]">
         <img
           alt="KN Agro fertilizer bags in a green farm field at sunrise"
-          className="absolute inset-0 h-full w-full object-cover object-[58%_center]"
+          className="absolute inset-0 h-full w-full object-cover object-[72%_center] sm:object-[58%_center]"
           loading="eager"
           src={heroSectionImage}
         />
@@ -43,12 +44,18 @@ export default function HeroSection() {
         <div className="absolute inset-y-0 left-0 w-[38%] bg-white/10 backdrop-blur-[0.5px]" />
         <div className="absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-[#356f24]/55 via-leaf/20 to-transparent" />
 
-        <div className="site-container relative z-10 flex min-h-[680px] items-center pb-28 pt-12">
+        <div className="site-container relative z-10 flex min-h-[600px] items-center pb-24 pt-10 sm:min-h-[640px] sm:pb-28 sm:pt-12 lg:min-h-[680px]">
           <div className="max-w-2xl rounded-[1.75rem] bg-white/56 p-5 shadow-[0_20px_70px_rgba(255,255,255,0.28)] backdrop-blur-[2px] sm:p-7 lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-0">
-            <p className="text-sm font-extrabold uppercase tracking-[0.16em] text-agriculture">
+            <div className="inline-flex items-center gap-2 rounded-full bg-mustard/15 px-4 py-1.5 ring-1 ring-mustard/50">
+              <Icon name="Leaf" className="h-4 w-4 shrink-0 text-mustard" strokeWidth={2} />
+              <span className="text-sm font-extrabold italic tracking-wide text-forest sm:text-base">
+                {companyConfig.tagline}
+              </span>
+            </div>
+            <p className="mt-4 text-sm font-extrabold uppercase tracking-[0.16em] text-agriculture">
               {t("Trusted Agricultural Solutions")}
             </p>
-            <h1 className="mt-5 text-5xl font-black leading-[1.08] text-[#101811] drop-shadow-[0_2px_0_rgba(255,255,255,0.75)] sm:text-6xl lg:text-7xl">
+            <h1 className="mt-5 text-4xl font-black leading-[1.08] text-[#101811] drop-shadow-[0_2px_0_rgba(255,255,255,0.75)] sm:text-5xl md:text-6xl lg:text-7xl">
               {t("Better Inputs.")}
               <span className="block">{t("Healthier Crops.")}</span>
               <span className="block text-agriculture drop-shadow-[0_2px_0_rgba(255,255,255,0.8)]">
@@ -72,8 +79,8 @@ export default function HeroSection() {
         </div>
       </div>
 
-      <div className="site-container relative z-30 -mt-20">
-        <div className="relative z-40 grid gap-4 rounded-[2rem] border border-forest/10 bg-white p-5 shadow-[0_24px_60px_rgba(24,34,26,0.15)] backdrop-blur md:grid-cols-2 lg:grid-cols-4 lg:p-6">
+      <div className="site-container relative z-30 -mt-14 sm:-mt-20">
+        <div className="relative z-40 grid gap-4 rounded-[2rem] border border-forest/10 bg-white p-5 shadow-[0_24px_60px_rgba(24,34,26,0.15)] backdrop-blur grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 lg:p-6">
           {trustCards.map((item) => (
             <article className="flex items-center gap-4 rounded-2xl p-3" key={item.title}>
               <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-mint text-agriculture ring-1 ring-forest/10">

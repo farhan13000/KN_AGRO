@@ -24,7 +24,8 @@ export default function Footer() {
               src={logoImage}
             />
           </Link>
-          <p className="mt-5 max-w-sm text-sm leading-7 text-white/72">
+          <p className="mt-4 text-sm font-extrabold italic tracking-wide text-mustard">{companyConfig.tagline}</p>
+          <p className="mt-3 max-w-sm text-sm leading-7 text-white/72">
             {t("Your trusted partner in agricultural growth. We provide quality inputs for better soil, better crops and better tomorrow.")}
           </p>
           <div className="mt-5 flex gap-3">

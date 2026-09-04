@@ -1,4 +1,17 @@
-import { CalendarCheck, Columns3, FileText, GitBranch, LayoutDashboard, MapPin, PhoneCall, Users } from "lucide-react";
+import {
+  AlertTriangle,
+  CalendarCheck,
+  Columns3,
+  CreditCard,
+  FileText,
+  GitBranch,
+  LayoutDashboard,
+  MapPin,
+  PhoneCall,
+  Receipt,
+  ShoppingCart,
+  Users,
+} from "lucide-react";
 import { PERMISSIONS, ROUTES } from "../../shared/constants";
 
 export const salesManagerNavigation = [
@@ -48,5 +61,40 @@ export const salesManagerNavigation = [
     route: ROUTES.SALES_MANAGER.QUOTATIONS,
     icon: FileText,
     permission: PERMISSIONS.QUOTATIONS_READ,
+  },
+  // Prompt 58: only backend-permitted commercial pages — Sales Manager
+  // genuinely holds customers/orders/invoices/payments read (and most
+  // create/mutate) permissions per seedRoles.js, so full nav parity with
+  // Super Admin here isn't an assumption, it's what the backend already
+  // grants.
+  {
+    label: "Customers",
+    route: ROUTES.SALES_MANAGER.CUSTOMERS,
+    icon: Users,
+    permission: PERMISSIONS.CUSTOMERS_READ,
+  },
+  {
+    label: "Orders",
+    route: ROUTES.SALES_MANAGER.ORDERS,
+    icon: ShoppingCart,
+    permission: PERMISSIONS.ORDERS_READ,
+  },
+  {
+    label: "Invoices",
+    route: ROUTES.SALES_MANAGER.INVOICES,
+    icon: Receipt,
+    permission: PERMISSIONS.INVOICES_READ,
+  },
+  {
+    label: "Outstanding",
+    route: ROUTES.SALES_MANAGER.INVOICE_OUTSTANDING,
+    icon: AlertTriangle,
+    permission: PERMISSIONS.INVOICES_READ,
+  },
+  {
+    label: "Payments",
+    route: ROUTES.SALES_MANAGER.PAYMENTS,
+    icon: CreditCard,
+    permission: PERMISSIONS.PAYMENTS_READ,
   },
 ];

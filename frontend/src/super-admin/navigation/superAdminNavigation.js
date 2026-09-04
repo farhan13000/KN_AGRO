@@ -3,6 +3,7 @@ import {
   Boxes,
   ClipboardCheck,
   Columns3,
+  CreditCard,
   FileText,
   FolderTree,
   GitBranch,
@@ -11,6 +12,8 @@ import {
   MapPin,
   Package,
   PhoneCall,
+  Receipt,
+  ShoppingCart,
   Users,
   Warehouse,
 } from "lucide-react";
@@ -93,6 +96,41 @@ export const superAdminNavigation = [
     route: ROUTES.SUPER_ADMIN.QUOTATIONS,
     icon: FileText,
     permission: PERMISSIONS.QUOTATIONS_READ,
+  },
+  {
+    label: "Customers",
+    route: ROUTES.SUPER_ADMIN.CUSTOMERS,
+    icon: Users,
+    permission: PERMISSIONS.CUSTOMERS_READ,
+  },
+  {
+    label: "Orders",
+    route: ROUTES.SUPER_ADMIN.ORDERS,
+    icon: ShoppingCart,
+    permission: PERMISSIONS.ORDERS_READ,
+  },
+  {
+    label: "Invoices",
+    route: ROUTES.SUPER_ADMIN.INVOICES,
+    icon: Receipt,
+    permission: PERMISSIONS.INVOICES_READ,
+  },
+  // Flat sibling of "Invoices", not nested under it — Prompt 57 marks
+  // nesting as optional, and this app's nav renderer has no support for a
+  // `children` structure at all (verified in InternalAppLayout.jsx); this
+  // mirrors the exact "Inventory" / "Low Stock" / "Out Of Stock" /
+  // "Transactions" flat-sibling pattern already used a few entries below.
+  {
+    label: "Outstanding",
+    route: ROUTES.SUPER_ADMIN.INVOICE_OUTSTANDING,
+    icon: AlertTriangle,
+    permission: PERMISSIONS.INVOICES_READ,
+  },
+  {
+    label: "Payments",
+    route: ROUTES.SUPER_ADMIN.PAYMENTS,
+    icon: CreditCard,
+    permission: PERMISSIONS.PAYMENTS_READ,
   },
   {
     label: "Low Stock",

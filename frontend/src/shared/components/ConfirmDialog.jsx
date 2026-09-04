@@ -2,6 +2,7 @@ import Modal from "./Modal";
 
 export default function ConfirmDialog({
   cancelLabel = "Cancel",
+  confirmDisabled = false,
   confirmLabel = "Confirm",
   description,
   isOpen,
@@ -21,7 +22,8 @@ export default function ConfirmDialog({
           {cancelLabel}
         </button>
         <button
-          className="inline-flex min-h-11 items-center justify-center rounded-xl bg-forest px-5 py-3 text-sm font-bold text-white shadow-soft transition hover:bg-agriculture"
+          className="inline-flex min-h-11 items-center justify-center rounded-xl bg-forest px-5 py-3 text-sm font-bold text-white shadow-soft transition hover:bg-agriculture disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={confirmDisabled}
           onClick={onConfirm}
           type="button"
         >
