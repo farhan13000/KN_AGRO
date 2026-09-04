@@ -17,6 +17,7 @@ import {
   Receipt,
   ShoppingCart,
   Users,
+  Wallet,
   Warehouse,
 } from "lucide-react";
 import { PERMISSIONS, ROUTES } from "../../shared/constants";
@@ -68,6 +69,12 @@ export const superAdminNavigation = [
     route: ROUTES.SUPER_ADMIN.PROMOTION_APPROVALS,
     icon: TrendingUp,
     permission: PERMISSIONS.PROMOTION_READ,
+  },
+  {
+    label: "Salary Proposals",
+    route: ROUTES.SUPER_ADMIN.SALARY_PROPOSAL_APPROVALS,
+    icon: Wallet,
+    permission: PERMISSIONS.SALARY_PROPOSAL_READ,
   },
   {
     label: "Categories",

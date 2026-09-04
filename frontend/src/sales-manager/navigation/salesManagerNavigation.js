@@ -13,6 +13,7 @@ import {
   TrendingUp,
   UserPlus,
   Users,
+  Wallet,
 } from "lucide-react";
 import { PERMISSIONS, ROUTES } from "../../shared/constants";
 
@@ -51,6 +52,12 @@ export const salesManagerNavigation = [
     route: ROUTES.SALES_MANAGER.PROMOTION_APPROVALS,
     icon: TrendingUp,
     permission: PERMISSIONS.PROMOTION_READ,
+  },
+  {
+    label: "Salary Proposals",
+    route: ROUTES.SALES_MANAGER.SALARY_PROPOSAL_APPROVALS,
+    icon: Wallet,
+    permission: PERMISSIONS.SALARY_PROPOSAL_READ,
   },
   {
     label: "CRM",

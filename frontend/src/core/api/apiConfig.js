@@ -122,6 +122,22 @@ export const API_ENDPOINTS = Object.freeze({
     REJECT: (promotionId) => `/promotions/${promotionId}/reject`,
     CANCEL: (promotionId) => `/promotions/${promotionId}/cancel`,
   },
+  // Existing (pre-migration) live SalaryStructure module — only the
+  // single read-only "current structure" endpoint is used here, as the
+  // prerequisite CurrentSalaryCard needs (see Phase F08's own note on
+  // this). setSalaryStructure/history are NOT wired here; this phase
+  // doesn't build salary-management UI, only the proposal workflow.
+  SALARY: {
+    CURRENT: (employeeId) => `/salary/${employeeId}/current`,
+  },
+  SALARY_PROPOSALS: {
+    BASE: "/salary-proposals",
+    DETAIL: (proposalId) => `/salary-proposals/${proposalId}`,
+    REVIEW: (proposalId) => `/salary-proposals/${proposalId}/review`,
+    APPROVE: (proposalId) => `/salary-proposals/${proposalId}/approve`,
+    REJECT: (proposalId) => `/salary-proposals/${proposalId}/reject`,
+    FINALIZE: (proposalId) => `/salary-proposals/${proposalId}/finalize`,
+  },
   REGIONS: {
     BASE: "/regions",
     DETAIL: (regionId) => `/regions/${regionId}`,

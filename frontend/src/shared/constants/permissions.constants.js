@@ -104,5 +104,25 @@ export const PERMISSIONS = Object.freeze({
   HIRING_RECOMMEND: "hiring.recommend",
   HIRING_APPROVE: "hiring.approve",
   HIRING_REJECT: "hiring.reject",
+
+  // Existing (pre-migration) live SalaryStructure/Payroll permissions —
+  // added here in Phase F08 since no frontend code referenced them before
+  // this phase needed a read-only "current salary" display as a
+  // prerequisite for the proposal-creation dialog (see CurrentSalaryCard).
+  SALARY_READ_SELF: "salary.read_self",
+  SALARY_READ: "salary.read",
+  SALARY_MANAGE: "salary.manage",
+
+  // Salary Proposal workflow (backend Phase 9, verified). /reject reuses
+  // SALARY_PROPOSAL_RECOMMEND on the backend (no dedicated REJECT
+  // permission exists) — GM genuinely holds it for their own
+  // RECOMMENDED-stage rejection, and SA reaches every route via the
+  // ALL_PERMISSIONS wildcard regardless; mirrored here rather than
+  // inventing a REJECT constant the backend doesn't check.
+  SALARY_PROPOSAL_READ: "salary_proposal.read",
+  SALARY_PROPOSAL_CREATE: "salary_proposal.create",
+  SALARY_PROPOSAL_RECOMMEND: "salary_proposal.recommend",
+  SALARY_PROPOSAL_APPROVE: "salary_proposal.approve",
+  SALARY_PROPOSAL_FINALIZE: "salary_proposal.finalize",
 });
 

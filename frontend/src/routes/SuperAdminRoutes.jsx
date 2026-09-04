@@ -56,6 +56,9 @@ const SuperAdminHiringCreatePage = lazy(
 const SuperAdminPromotionApprovalsPage = lazy(
   () => import("../super-admin/pages/promotions/SuperAdminPromotionApprovalsPage"),
 );
+const SuperAdminSalaryProposalApprovalsPage = lazy(
+  () => import("../super-admin/pages/salaryProposals/SuperAdminSalaryProposalApprovalsPage"),
+);
 const SuperAdminCategoryListPage = lazy(
   () => import("../super-admin/pages/categories/SuperAdminCategoryListPage"),
 );
@@ -203,6 +206,10 @@ export const superAdminRouteConfig = {
         {
           path: ROUTES.SUPER_ADMIN.PROMOTION_APPROVALS,
           element: withPermission(PERMISSIONS.PROMOTION_READ, <SuperAdminPromotionApprovalsPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.SALARY_PROPOSAL_APPROVALS,
+          element: withPermission(PERMISSIONS.SALARY_PROPOSAL_READ, <SuperAdminSalaryProposalApprovalsPage />),
         },
         {
           path: ROUTES.SUPER_ADMIN.CATEGORIES,

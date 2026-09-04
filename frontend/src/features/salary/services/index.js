@@ -1,0 +1,1 @@
+export { salaryApi } from "./salaryApi";

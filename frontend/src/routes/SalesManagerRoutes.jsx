@@ -30,6 +30,9 @@ const SalesManagerHiringCreatePage = lazy(
 const SalesManagerPromotionApprovalsPage = lazy(
   () => import("../sales-manager/pages/promotions/SalesManagerPromotionApprovalsPage"),
 );
+const SalesManagerSalaryProposalApprovalsPage = lazy(
+  () => import("../sales-manager/pages/salaryProposals/SalesManagerSalaryProposalApprovalsPage"),
+);
 const SalesManagerLeadListPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerLeadListPage"));
 const SalesManagerLeadDetailPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerLeadDetailPage"));
 const SalesManagerFollowUpsPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerFollowUpsPage"));
@@ -136,6 +139,10 @@ export const salesManagerRouteConfig = {
         {
           path: ROUTES.SALES_MANAGER.PROMOTION_APPROVALS,
           element: withPermission(PERMISSIONS.PROMOTION_READ, <SalesManagerPromotionApprovalsPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.SALARY_PROPOSAL_APPROVALS,
+          element: withPermission(PERMISSIONS.SALARY_PROPOSAL_READ, <SalesManagerSalaryProposalApprovalsPage />),
         },
         {
           path: ROUTES.SALES_MANAGER.CRM,

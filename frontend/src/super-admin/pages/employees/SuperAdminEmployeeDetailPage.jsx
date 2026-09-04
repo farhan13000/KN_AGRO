@@ -23,6 +23,8 @@ import {
   useEmployeeDetail,
 } from "../../../features/employees";
 import { PromotionHistorySection, PromotionRecommendDialog } from "../../../features/promotions";
+import { CurrentSalaryCard } from "../../../features/salary";
+import { SalaryProposalCreateDialog, SalaryProposalHistorySection } from "../../../features/salaryProposals";
 
 export default function SuperAdminEmployeeDetailPage() {
   const { employeeId } = useParams();
@@ -34,6 +36,7 @@ export default function SuperAdminEmployeeDetailPage() {
   const [managerOpen, setManagerOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
   const [recommendOpen, setRecommendOpen] = useState(false);
+  const [salaryProposalOpen, setSalaryProposalOpen] = useState(false);
   const [lifecycleAction, setLifecycleAction] = useState("");
   const [message, setMessage] = useState("");
 
@@ -184,6 +187,15 @@ export default function SuperAdminEmployeeDetailPage() {
                 Recommend for Promotion
               </button>
             </PermissionGuard>
+            <PermissionGuard permission={PERMISSIONS.SALARY_PROPOSAL_CREATE}>
+              <button
+                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-forest ring-1 ring-forest/15 transition hover:bg-mint"
+                onClick={() => setSalaryProposalOpen(true)}
+                type="button"
+              >
+                Propose Salary Change
+              </button>
+            </PermissionGuard>
           </div>
         </div>
       </Card>
@@ -196,6 +208,12 @@ export default function SuperAdminEmployeeDetailPage() {
       <TransferHistoryList employeeId={employeeId} />
 
       <PromotionHistorySection employeeId={employeeId} />
+
+      <PermissionGuard permission={PERMISSIONS.SALARY_READ}>
+        <CurrentSalaryCard employeeId={employeeId} />
+      </PermissionGuard>
+
+      <SalaryProposalHistorySection employeeId={employeeId} />
 
       <EmployeeApprovalDialog
         employee={employee}
@@ -226,6 +244,12 @@ export default function SuperAdminEmployeeDetailPage() {
         isOpen={recommendOpen}
         onClose={() => setRecommendOpen(false)}
         onSuccess={() => refetchWithMessage("Promotion recommended.")}
+      />
+      <SalaryProposalCreateDialog
+        employee={employee}
+        isOpen={salaryProposalOpen}
+        onClose={() => setSalaryProposalOpen(false)}
+        onSuccess={() => refetchWithMessage("Salary change proposed.")}
       />
       <EmployeeLifecycleDialog
         action={lifecycleAction}
