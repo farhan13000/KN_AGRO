@@ -1,3 +1,4 @@
+import { useEmployeeLocations } from "../hooks/useEmployeeLocations";
 import { formatEmploymentType, toDateInputValue } from "../utils";
 import EmployeeDualStatus from "./EmployeeDualStatus";
 import EmployeeStatusBadge from "./EmployeeStatusBadge";
@@ -27,6 +28,8 @@ export default function EmployeeDetailSections({
   showLifecycle = true,
   showStatusOverview = true,
 }) {
+  // region/district come back as raw ids on the employee payload.
+  const { districtName, regionName } = useEmployeeLocations();
   const address = employee?.address || {};
   const emergencyContact = employee?.emergencyContact || {};
 
@@ -82,6 +85,8 @@ export default function EmployeeDetailSections({
         <DetailItem label="Manager" value={employee?.manager?.user?.name} />
         <DetailItem label="Manager Code" value={employee?.manager?.employeeCode} />
         <DetailItem label="Manager Designation" value={employee?.manager?.designation} />
+        <DetailItem label="Region" value={regionName(employee?.region)} />
+        <DetailItem label="District" value={districtName(employee?.district)} />
       </Section>
 
       <Section title="Emergency Contact">

@@ -1,5 +1,6 @@
 import { useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
+import { getPortalLabelForRole, useAuth } from "../../../core/auth";
 import EmptyState from "../../../shared/components/EmptyState";
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
@@ -14,6 +15,7 @@ import {
 } from "../../../features/employees";
 
 export default function SalesManagerTeamPage() {
+  const { role } = useAuth();
   const { query, updateQuery } = useEmployeeListQuery();
   const [searchParams] = useSearchParams();
   const searchInput = searchParams.get("search") || "";
@@ -30,7 +32,7 @@ export default function SalesManagerTeamPage() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Sales Manager Portal</p>
+        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{getPortalLabelForRole(role)}</p>
         <h1 className="mt-2 text-3xl font-black text-ink">My Team</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
           Team records are loaded from the backend manager-team endpoint scoped to your account.

@@ -159,6 +159,7 @@ export const useEmployeeActions = ({ onSuccess } = {}) => ({
   resignEmployee: useEmployeeMutation(employeeApi.resignEmployee, { onSuccess }),
   terminateEmployee: useEmployeeMutation(employeeApi.terminateEmployee, { onSuccess }),
   promoteToManager: useEmployeeMutation(employeeApi.promoteToManager, { onSuccess }),
+  transferEmployee: useEmployeeMutation(employeeApi.transferEmployee, { onSuccess }),
   requestPromotion: useEmployeeMutation(employeeApi.requestPromotion, { onSuccess }),
   registerEmployee: useEmployeeMutation(employeeApi.registerEmployee, { onSuccess }),
   approveActionRequest: useEmployeeMutation(employeeApi.approveActionRequest, { onSuccess }),

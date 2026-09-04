@@ -3,8 +3,8 @@ import DashboardShell from "../../shared/components/DashboardShell";
 export default function SuperAdminDashboardPage() {
   return (
     <DashboardShell
-      description="System-wide control starts here. Phase 1 establishes authentication, routing, and the protected shell before management modules are added."
-      title="Super Admin Dashboard"
+      description="System-wide control starts here. Authentication, routing, and the protected shell are in place before full management modules are added."
+      title="Admin Dashboard"
     />
   );
 }

@@ -1,7 +1,9 @@
+import { getPortalLabelForRole, useAuth } from "../../core/auth";
 import InternalAppLayout from "../../shared/layouts/InternalAppLayout";
 import { employeeNavigation } from "../navigation/employeeNavigation";
 
 export default function EmployeeLayout() {
-  return <InternalAppLayout navigationItems={employeeNavigation} portalLabel="Employee Portal" />;
+  const { role } = useAuth();
+  return <InternalAppLayout navigationItems={employeeNavigation} portalLabel={getPortalLabelForRole(role)} />;
 }
 

@@ -19,25 +19,7 @@ const toPublicCategoryView = (category = {}) => ({
   benefits: Array.isArray(category.benefits) ? category.benefits : [],
 });
 
-const getMockPublicCategoriesApi = async () => {
-  if (!(import.meta.env.DEV && import.meta.env.VITE_USE_PHASE3_MOCK === "true")) {
-    return null;
-  }
-
-  const { mockPublicCategoriesApi } = await import("../../../../mocks/categories/category.mock");
-  return mockPublicCategoriesApi;
-};
-
 const getPublicCategories = async () => {
-  const mock = await getMockPublicCategoriesApi();
-  if (mock) {
-    const data = await mock.getPublicCategories();
-    return {
-      ...data,
-      categories: (data?.categories || []).map(toPublicCategoryView),
-    };
-  }
-
   const response = await apiClient.get(API_ENDPOINTS.PUBLIC.CATEGORIES);
   const data = unwrapApiData(response);
   return {

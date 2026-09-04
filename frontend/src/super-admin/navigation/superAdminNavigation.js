@@ -8,6 +8,7 @@ import {
   GitBranch,
   History,
   LayoutDashboard,
+  MapPin,
   Package,
   PhoneCall,
   Users,
@@ -38,6 +39,18 @@ export const superAdminNavigation = [
     route: ROUTES.SUPER_ADMIN.EMPLOYEE_HIERARCHY,
     icon: GitBranch,
     permission: PERMISSIONS.EMPLOYEES_READ,
+  },
+  {
+    label: "Regions",
+    route: ROUTES.SUPER_ADMIN.REGIONS,
+    icon: MapPin,
+    permission: PERMISSIONS.REGION_READ,
+  },
+  {
+    label: "Districts",
+    route: ROUTES.SUPER_ADMIN.DISTRICTS,
+    icon: GitBranch,
+    permission: PERMISSIONS.DISTRICT_READ,
   },
   {
     label: "Categories",

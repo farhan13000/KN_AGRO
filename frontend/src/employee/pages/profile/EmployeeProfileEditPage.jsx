@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getPortalLabelForRole, useAuth } from "../../../core/auth";
 import Button from "../../../shared/components/Button";
 import Card from "../../../shared/components/Card";
 import ErrorState from "../../../shared/components/ErrorState";
@@ -23,6 +24,7 @@ const toFormValues = (employee) => ({
 });
 
 export default function EmployeeProfileEditPage() {
+  const { role } = useAuth();
   const navigate = useNavigate();
   const profileState = useMyEmployeeProfile();
   const employee = profileState.data?.employee;
@@ -66,7 +68,7 @@ export default function EmployeeProfileEditPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Employee Portal</p>
+        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{getPortalLabelForRole(role)}</p>
         <h1 className="mt-2 text-3xl font-black text-ink">Edit My Profile</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
           You can update only the self-editable fields allowed by the backend: phone, address, and emergency contact.

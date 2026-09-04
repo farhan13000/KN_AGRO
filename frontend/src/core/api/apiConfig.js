@@ -34,6 +34,8 @@ export const API_ENDPOINTS = Object.freeze({
     REJECT: (employeeId) => `/employees/${employeeId}/reject`,
     PROMOTE: (employeeId) => `/employees/${employeeId}/promote`,
     PROMOTION_REQUEST: (employeeId) => `/employees/${employeeId}/promotion-request`,
+    TRANSFER: (employeeId) => `/employees/${employeeId}/transfer`,
+    TRANSFERS: (employeeId) => `/employees/${employeeId}/transfers`,
   },
   EMPLOYEE_ACTION_REQUESTS: {
     BASE: "/employee-action-requests",
@@ -98,6 +100,18 @@ export const API_ENDPOINTS = Object.freeze({
     REJECT: (quotationId) => `/quotations/${quotationId}/reject`,
     CANCEL: (quotationId) => `/quotations/${quotationId}/cancel`,
     REVISE: (quotationId) => `/quotations/${quotationId}/revise`,
+  },
+  REGIONS: {
+    BASE: "/regions",
+    DETAIL: (regionId) => `/regions/${regionId}`,
+  },
+  DISTRICTS: {
+    BASE: "/districts",
+    DETAIL: (districtId) => `/districts/${districtId}`,
+    ASSIGN: (districtId) => `/districts/${districtId}/assign`,
+    REASSIGN: (districtId) => `/districts/${districtId}/reassign`,
+    ASSIGN_REVIEW: (districtId) => `/districts/${districtId}/assign/review`,
+    ASSIGN_FINALIZE: (districtId) => `/districts/${districtId}/assign/finalize`,
   },
   PUBLIC: {
     CATEGORIES: "/public/categories",

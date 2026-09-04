@@ -1,22 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "../../../shared/components/Modal";
-import { EMPLOYEE_STATUS } from "../constants";
-import { useEmployeeActions, useEmployeeList } from "../hooks";
+import { useEligibleManagerCandidates, useEmployeeActions } from "../hooks";
 import { employeeOptionLabel, getEmployeeDisplayName } from "../utils";
 
 export default function ManagerAssignmentDialog({ employee, isOpen, onClose, onSuccess }) {
   const [managerId, setManagerId] = useState("");
-  const query = useMemo(
-    () => ({
-      page: 1,
-      limit: 100,
-      employeeStatus: EMPLOYEE_STATUS.ACTIVE,
-      sortBy: "employeeCode",
-      sortOrder: "asc",
-    }),
-    [],
-  );
-  const managerState = useEmployeeList(query, { enabled: isOpen });
+  const managerState = useEligibleManagerCandidates({
+    enabled: isOpen,
+    excludeEmployeeId: employee?._id,
+  });
   const actions = useEmployeeActions({
     onSuccess: async () => {
       await onSuccess?.();
@@ -29,13 +21,7 @@ export default function ManagerAssignmentDialog({ employee, isOpen, onClose, onS
     }
   }, [employee, isOpen]);
 
-  const candidates = (managerState.data?.employees || []).filter(
-    (candidate) =>
-      candidate._id !== employee?._id &&
-      candidate.employeeStatus === EMPLOYEE_STATUS.ACTIVE &&
-      candidate.user?.status === "ACTIVE" &&
-      candidate.user?.role?.name === "sales_manager",
-  );
+  const candidates = managerState.candidates;
 
   const handleSubmit = async (event) => {
     event.preventDefault();

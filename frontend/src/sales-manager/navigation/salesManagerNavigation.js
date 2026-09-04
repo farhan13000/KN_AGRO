@@ -1,4 +1,4 @@
-import { CalendarCheck, Columns3, FileText, LayoutDashboard, PhoneCall, Users } from "lucide-react";
+import { CalendarCheck, Columns3, FileText, GitBranch, LayoutDashboard, MapPin, PhoneCall, Users } from "lucide-react";
 import { PERMISSIONS, ROUTES } from "../../shared/constants";
 
 export const salesManagerNavigation = [
@@ -12,6 +12,18 @@ export const salesManagerNavigation = [
     route: ROUTES.SALES_MANAGER.TEAM,
     icon: Users,
     permission: PERMISSIONS.MANAGERS_READ,
+  },
+  {
+    label: "Regions",
+    route: ROUTES.SALES_MANAGER.REGIONS,
+    icon: MapPin,
+    permission: PERMISSIONS.REGION_READ,
+  },
+  {
+    label: "Districts",
+    route: ROUTES.SALES_MANAGER.DISTRICTS,
+    icon: GitBranch,
+    permission: PERMISSIONS.DISTRICT_READ,
   },
   {
     label: "CRM",

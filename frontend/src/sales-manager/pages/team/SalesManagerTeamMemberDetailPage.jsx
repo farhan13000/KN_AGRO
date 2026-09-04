@@ -3,7 +3,12 @@ import Button from "../../../shared/components/Button";
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
 import { ROUTES } from "../../../shared/constants";
-import { EmployeeDetailSections, getEmployeeDisplayName, useEmployeeDetail } from "../../../features/employees";
+import {
+  EmployeeDetailSections,
+  TransferHistoryList,
+  getEmployeeDisplayName,
+  useEmployeeDetail,
+} from "../../../features/employees";
 
 export default function SalesManagerTeamMemberDetailPage() {
   const { employeeId } = useParams();
@@ -39,6 +44,8 @@ export default function SalesManagerTeamMemberDetailPage() {
         showLifecycle={false}
         showStatusOverview={false}
       />
+
+      <TransferHistoryList employeeId={employeeId} />
     </div>
   );
 }

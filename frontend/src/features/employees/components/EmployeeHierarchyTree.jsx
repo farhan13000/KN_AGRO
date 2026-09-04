@@ -1,100 +1,135 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import EmptyState from "../../../shared/components/EmptyState";
 import EmployeeStatusBadge from "./EmployeeStatusBadge";
 import { getEmployeeDisplayName } from "../utils";
 
-function EmployeeNode({ employee, managerName }) {
+// Indentation stops growing past this depth so a long chain
+// (GM -> RM -> ASM -> SO -> FO and beyond) can't push the tree off-screen.
+const MAX_INDENT_DEPTH = 4;
+const INDENT_PER_LEVEL = 20;
+
+/**
+ * Groups a flat employee list into a manager -> reports map, and works out
+ * which nodes are roots.
+ *
+ * A root is anyone with no manager AND anyone whose manager isn't in this
+ * list — the second case matters because the backend scope-filters the
+ * list to the actor's own downline, so an RM viewing their team sees
+ * themselves with a `manager` (their GM) who isn't in the response. Without
+ * that rule those employees would be silently dropped from the tree.
+ */
+const buildTree = (employees) => {
+  const byId = new Map(employees.map((employee) => [String(employee._id), employee]));
+  const childrenByManagerId = new Map();
+
+  for (const employee of employees) {
+    const managerId = employee.manager?._id ? String(employee.manager._id) : null;
+    if (!managerId || !byId.has(managerId)) continue;
+    if (!childrenByManagerId.has(managerId)) childrenByManagerId.set(managerId, []);
+    childrenByManagerId.get(managerId).push(employee);
+  }
+
+  const roots = employees.filter((employee) => {
+    const managerId = employee.manager?._id ? String(employee.manager._id) : null;
+    return !managerId || !byId.has(managerId);
+  });
+
+  return { childrenByManagerId, roots };
+};
+
+const countDescendants = (employee, childrenByManagerId) => {
+  const children = childrenByManagerId.get(String(employee._id)) || [];
+  return children.reduce((total, child) => total + 1 + countDescendants(child, childrenByManagerId), 0);
+};
+
+function HierarchyNode({ childrenByManagerId, depth, employee }) {
+  const children = childrenByManagerId.get(String(employee._id)) || [];
+  const hasChildren = children.length > 0;
+  const [open, setOpen] = useState(true);
+  const indent = Math.min(depth, MAX_INDENT_DEPTH) * INDENT_PER_LEVEL;
+  const roleName = employee.user?.role?.name;
+  const totalBelow = hasChildren ? countDescendants(employee, childrenByManagerId) : 0;
+
   return (
-    <div className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm font-black text-ink">{getEmployeeDisplayName(employee)}</p>
-          <p className="mt-1 text-xs font-semibold text-muted">
-            {employee.employeeCode || "No code"} | {employee.designation || "No designation"}
-          </p>
-          {managerName ? (
-            <p className="mt-1 text-xs font-semibold text-muted">Manager: {managerName}</p>
-          ) : null}
+    <div style={{ marginLeft: depth === 0 ? 0 : indent }}>
+      <div
+        className={`rounded-lg border bg-white p-4 shadow-sm ${
+          hasChildren ? "border-forest/15" : "border-forest/10"
+        }`}
+      >
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-start gap-2">
+            {hasChildren ? (
+              <button
+                aria-expanded={open}
+                aria-label={open ? `Collapse ${getEmployeeDisplayName(employee)}` : `Expand ${getEmployeeDisplayName(employee)}`}
+                className="mt-0.5 shrink-0 text-forest"
+                onClick={() => setOpen((current) => !current)}
+                type="button"
+              >
+                {open ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+              </button>
+            ) : (
+              <span aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0" />
+            )}
+            <div className="min-w-0">
+              <p className="truncate text-sm font-black text-ink">{getEmployeeDisplayName(employee)}</p>
+              <p className="mt-1 truncate text-xs font-semibold text-muted">
+                {employee.employeeCode || "No code"}
+                {roleName ? ` | ${roleName.toUpperCase()}` : ""}
+                {` | ${employee.designation || "No designation"}`}
+                {hasChildren ? ` | ${children.length} direct, ${totalBelow} total below` : ""}
+              </p>
+            </div>
+          </div>
+          <EmployeeStatusBadge status={employee.employeeStatus} />
         </div>
-        <EmployeeStatusBadge status={employee.employeeStatus} />
       </div>
+
+      {hasChildren && open ? (
+        <div className="mt-3 grid gap-3 border-l-2 border-mint pl-4">
+          {children.map((child) => (
+            <HierarchyNode
+              childrenByManagerId={childrenByManagerId}
+              depth={depth + 1}
+              employee={child}
+              key={child._id}
+            />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
 
-function ManagerGroup({ group }) {
-  const [open, setOpen] = useState(true);
-  const manager = group.manager;
-  const reports = group.employees || [];
+/**
+ * Renders an org tree of ANY depth from a flat employee list.
+ *
+ * Built client-side from the ordinary employee list rather than the
+ * backend's /employees/hierarchy endpoint: that endpoint still hardcodes
+ * the legacy two-level model (it classifies managers by
+ * `role === "sales_manager"` and returns {managers, unassignedEmployees}),
+ * so under the new 7-role hierarchy every GM/RM/ASM/SO would come back
+ * misfiled as unassigned staff.
+ */
+export default function EmployeeHierarchyTree({ employees = [] }) {
+  const { childrenByManagerId, roots } = useMemo(() => buildTree(employees), [employees]);
 
-  return (
-    <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
-      <button
-        className="flex w-full items-center justify-between gap-3 text-left"
-        onClick={() => setOpen((current) => !current)}
-        type="button"
-      >
-        <span className="flex min-w-0 items-center gap-3">
-          {open ? <ChevronDown className="h-5 w-5 text-forest" /> : <ChevronRight className="h-5 w-5 text-forest" />}
-          <span className="min-w-0">
-            <span className="block truncate text-base font-black text-ink">{getEmployeeDisplayName(manager)}</span>
-            <span className="mt-1 block truncate text-xs font-semibold text-muted">
-              {manager.employeeCode || "No code"} | {manager.designation || "No designation"} | {reports.length} direct reports
-            </span>
-          </span>
-        </span>
-        <EmployeeStatusBadge status={manager.employeeStatus} />
-      </button>
-
-      {open ? (
-        <div className="mt-4 grid gap-3 border-l-2 border-mint pl-4">
-          {reports.length ? (
-            reports.map((employee) => (
-              <EmployeeNode employee={employee} key={employee._id} managerName={getEmployeeDisplayName(manager)} />
-            ))
-          ) : (
-            <p className="rounded-lg bg-mint/60 px-4 py-3 text-sm font-semibold text-muted">
-              No direct employees assigned.
-            </p>
-          )}
-        </div>
-      ) : null}
-    </section>
-  );
-}
-
-export default function EmployeeHierarchyTree({ hierarchy }) {
-  const managers = hierarchy?.managers || [];
-  const unassignedEmployees = hierarchy?.unassignedEmployees || [];
-
-  if (!managers.length && !unassignedEmployees.length) {
-    return <EmptyState description="No active hierarchy records are available." title="No hierarchy data" />;
+  if (!employees.length) {
+    return <EmptyState description="No active employees are visible to you." title="No hierarchy data" />;
   }
 
   return (
-    <div className="space-y-5">
-      <section className="rounded-lg border border-forest/10 bg-mint/60 p-4">
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Super Admin</p>
-        <h2 className="mt-1 text-xl font-black text-forest">Company employee hierarchy</h2>
-      </section>
-
-      <div className="grid gap-4">
-        {managers.map((group) => (
-          <ManagerGroup group={group} key={group.manager?._id} />
-        ))}
-      </div>
-
-      {unassignedEmployees.length ? (
-        <section className="space-y-3">
-          <h2 className="text-lg font-black text-ink">Unassigned Employees</h2>
-          <div className="grid gap-3 lg:grid-cols-2">
-            {unassignedEmployees.map((employee) => (
-              <EmployeeNode employee={employee} key={employee._id} />
-            ))}
-          </div>
-        </section>
-      ) : null}
+    <div className="grid gap-4">
+      {roots.map((employee) => (
+        <HierarchyNode
+          childrenByManagerId={childrenByManagerId}
+          depth={0}
+          employee={employee}
+          key={employee._id}
+        />
+      ))}
     </div>
   );
 }

@@ -7,6 +7,7 @@ import {
   getEmployeeDisplayName,
   getEmployeeEmail,
 } from "../utils";
+import { useEmployeeLocations } from "../hooks/useEmployeeLocations";
 import EmployeeStatusBadge from "./EmployeeStatusBadge";
 import UserAccountStatusBadge from "./UserAccountStatusBadge";
 
@@ -17,10 +18,18 @@ const formatDate = (value) => {
   return parsed.toLocaleDateString();
 };
 
+const formatLocation = (regionLabel, districtLabel) => {
+  if (regionLabel && districtLabel) return `${regionLabel} / ${districtLabel}`;
+  return regionLabel || districtLabel || "Not Set";
+};
+
 export default function EmployeeTable({ employees = [], onApprove, onReject, showApprovalActions = false }) {
   const { hasPermission } = useAuth();
   const canUpdate = hasPermission(PERMISSIONS.EMPLOYEES_UPDATE);
   const canApprove = hasPermission(PERMISSIONS.EMPLOYEES_APPROVE);
+  // region/district arrive as raw ids on the employee payload, so names
+  // are resolved here rather than by the API.
+  const { districtName, regionName } = useEmployeeLocations();
 
   return (
     <div className="overflow-hidden rounded-lg border border-forest/10 bg-white shadow-sm">
@@ -38,6 +47,7 @@ export default function EmployeeTable({ employees = [], onApprove, onReject, sho
               <th className="px-4 py-3">Employee Status</th>
               <th className="px-4 py-3">Account Status</th>
               <th className="px-4 py-3">Manager</th>
+              <th className="px-4 py-3">Location</th>
               <th className="px-4 py-3">Joining Date</th>
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
@@ -61,6 +71,9 @@ export default function EmployeeTable({ employees = [], onApprove, onReject, sho
                   <UserAccountStatusBadge status={employee.user?.status} />
                 </td>
                 <td className="px-4 py-3 text-muted">{employee.manager?.user?.name || "Not Assigned"}</td>
+                <td className="px-4 py-3 text-muted">
+                  {formatLocation(regionName(employee.region), districtName(employee.district))}
+                </td>
                 <td className="px-4 py-3 text-muted">{formatDate(employee.dateOfJoining)}</td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-2">

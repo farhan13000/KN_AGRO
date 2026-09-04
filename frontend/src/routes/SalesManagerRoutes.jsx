@@ -12,6 +12,15 @@ const SalesManagerTeamPage = lazy(() => import("../sales-manager/pages/team/Sale
 const SalesManagerTeamMemberDetailPage = lazy(
   () => import("../sales-manager/pages/team/SalesManagerTeamMemberDetailPage"),
 );
+const SalesManagerRegionListPage = lazy(
+  () => import("../sales-manager/pages/regions/SalesManagerRegionListPage"),
+);
+const SalesManagerDistrictListPage = lazy(
+  () => import("../sales-manager/pages/districts/SalesManagerDistrictListPage"),
+);
+const SalesManagerDistrictDetailPage = lazy(
+  () => import("../sales-manager/pages/districts/SalesManagerDistrictDetailPage"),
+);
 const SalesManagerLeadListPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerLeadListPage"));
 const SalesManagerLeadDetailPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerLeadDetailPage"));
 const SalesManagerFollowUpsPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerFollowUpsPage"));
@@ -43,7 +52,17 @@ const withPermission = (permission, element) => (
 );
 
 export const salesManagerRouteConfig = {
-  element: <ProtectedRoute allowedRoles={[BACKEND_ROLES.SALES_MANAGER]} />,
+  element: (
+    <ProtectedRoute
+      allowedRoles={[
+        BACKEND_ROLES.SALES_MANAGER,
+        BACKEND_ROLES.GM,
+        BACKEND_ROLES.RM,
+        BACKEND_ROLES.ASM,
+        BACKEND_ROLES.SO,
+      ]}
+    />
+  ),
   children: [
     {
       element: <SalesManagerLayout />,
@@ -51,6 +70,18 @@ export const salesManagerRouteConfig = {
         { path: ROUTES.SALES_MANAGER.DASHBOARD, element: <SalesManagerDashboardPage /> },
         { path: ROUTES.SALES_MANAGER.TEAM, element: <SalesManagerTeamPage /> },
         { path: ROUTES.SALES_MANAGER.TEAM_MEMBER_DETAIL, element: <SalesManagerTeamMemberDetailPage /> },
+        {
+          path: ROUTES.SALES_MANAGER.REGIONS,
+          element: withPermission(PERMISSIONS.REGION_READ, <SalesManagerRegionListPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.DISTRICTS,
+          element: withPermission(PERMISSIONS.DISTRICT_READ, <SalesManagerDistrictListPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.DISTRICT_DETAIL,
+          element: withPermission(PERMISSIONS.DISTRICT_READ, <SalesManagerDistrictDetailPage />),
+        },
         {
           path: ROUTES.SALES_MANAGER.CRM,
           element: withPermission(PERMISSIONS.LEADS_READ, <SalesManagerCrmPipelinePage />),

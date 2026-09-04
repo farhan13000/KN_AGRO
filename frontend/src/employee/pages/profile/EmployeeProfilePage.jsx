@@ -1,3 +1,4 @@
+import { getPortalLabelForRole, useAuth } from "../../../core/auth";
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
 import Button from "../../../shared/components/Button";
@@ -5,6 +6,7 @@ import { ROUTES } from "../../../shared/constants";
 import { EmployeeDetailSections, useMyEmployeeProfile } from "../../../features/employees";
 
 export default function EmployeeProfilePage() {
+  const { role } = useAuth();
   const profileState = useMyEmployeeProfile();
   const employee = profileState.data?.employee;
 
@@ -20,7 +22,7 @@ export default function EmployeeProfilePage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Employee Portal</p>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{getPortalLabelForRole(role)}</p>
           <h1 className="mt-2 text-3xl font-black text-ink">My Profile</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
             Your employee profile is loaded from the dedicated self-profile endpoint.

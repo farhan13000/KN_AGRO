@@ -46,5 +46,38 @@ export const PERMISSIONS = Object.freeze({
   QUOTATIONS_ACCEPT: "quotations.accept",
   QUOTATIONS_REJECT: "quotations.reject",
   QUOTATIONS_MANAGE: "quotations.manage",
+
+  // Org-hierarchy migration (SA/OA/GM/RM/ASM/SO/FO) — matches
+  // BACKEND/backend/src/constants/permissions.js byte-for-byte. Only the
+  // permissions this frontend's current migration phases actually need
+  // are added here; HIRING_*/SALARY_PROPOSAL_*/DSR_* are deferred to the
+  // phases that build their UI (F07/F08/F10) even though the backend
+  // already seeds them ahead of those modules being built.
+  REGION_READ: "region.read",
+  REGION_CREATE: "region.create",
+  REGION_UPDATE: "region.update",
+  REGION_MANAGE: "region.manage",
+  REGION_ASSIGN: "region.assign",
+
+  DISTRICT_READ: "district.read",
+  DISTRICT_CREATE: "district.create",
+  DISTRICT_UPDATE: "district.update",
+  DISTRICT_MANAGE: "district.manage",
+  DISTRICT_ASSIGN: "district.assign",
+  DISTRICT_TRANSFER: "district.transfer",
+
+  EMPLOYEES_TRANSFER: "employees.transfer",
+
+  // New tiered promotion workflow (backend Phase 7, verified) — distinct
+  // from the existing EMPLOYEES_PROMOTE/EMPLOYEES_PROMOTE_REQUEST above,
+  // which still serve today's legacy 3-role promotion-request flow.
+  // EMPLOYEES_PROMOTE/EMPLOYEES_PROMOTE_REQUEST are used by
+  // SuperAdminEmployeeDetailPage.jsx and features/employees/utils/
+  // lifecycleActions.js — Phase F06 (Promotion Workflow UI) replaces
+  // those call sites with these and removes the old two.
+  PROMOTION_READ: "promotion.read",
+  PROMOTION_RECOMMEND: "promotion.recommend",
+  PROMOTION_APPROVE: "promotion.approve",
+  PROMOTION_REJECT: "promotion.reject",
 });
 

@@ -12,4 +12,6 @@ export { default as EmploymentTypeText } from "./EmploymentTypeText";
 export { default as ManagerAssignmentDialog } from "./ManagerAssignmentDialog";
 export { default as PendingApplicationsTable } from "./PendingApplicationsTable";
 export { default as TeamMembersTable } from "./TeamMembersTable";
+export { default as TransferEmployeeDialog } from "./TransferEmployeeDialog";
+export { default as TransferHistoryList } from "./TransferHistoryList";
 export { default as UserAccountStatusBadge } from "./UserAccountStatusBadge";

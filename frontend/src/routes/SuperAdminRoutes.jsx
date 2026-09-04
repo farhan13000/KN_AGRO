@@ -26,6 +26,27 @@ const SuperAdminEmployeeEditPage = lazy(
 const SuperAdminPendingEmployeesPage = lazy(
   () => import("../super-admin/pages/employees/SuperAdminPendingEmployeesPage"),
 );
+const SuperAdminRegionListPage = lazy(
+  () => import("../super-admin/pages/regions/SuperAdminRegionListPage"),
+);
+const SuperAdminRegionCreatePage = lazy(
+  () => import("../super-admin/pages/regions/SuperAdminRegionCreatePage"),
+);
+const SuperAdminRegionEditPage = lazy(
+  () => import("../super-admin/pages/regions/SuperAdminRegionEditPage"),
+);
+const SuperAdminDistrictListPage = lazy(
+  () => import("../super-admin/pages/districts/SuperAdminDistrictListPage"),
+);
+const SuperAdminDistrictCreatePage = lazy(
+  () => import("../super-admin/pages/districts/SuperAdminDistrictCreatePage"),
+);
+const SuperAdminDistrictDetailPage = lazy(
+  () => import("../super-admin/pages/districts/SuperAdminDistrictDetailPage"),
+);
+const SuperAdminDistrictEditPage = lazy(
+  () => import("../super-admin/pages/districts/SuperAdminDistrictEditPage"),
+);
 const SuperAdminCategoryListPage = lazy(
   () => import("../super-admin/pages/categories/SuperAdminCategoryListPage"),
 );
@@ -94,7 +115,9 @@ const withPermission = (permission, element) => (
 );
 
 export const superAdminRouteConfig = {
-  element: <ProtectedRoute allowedRoles={[BACKEND_ROLES.SUPER_ADMIN]} />,
+  element: (
+    <ProtectedRoute allowedRoles={[BACKEND_ROLES.SUPER_ADMIN, BACKEND_ROLES.SA, BACKEND_ROLES.OA]} />
+  ),
   children: [
     {
       element: <SuperAdminLayout />,
@@ -106,6 +129,34 @@ export const superAdminRouteConfig = {
         { path: ROUTES.SUPER_ADMIN.EMPLOYEE_CREATE, element: <SuperAdminEmployeeCreatePage /> },
         { path: ROUTES.SUPER_ADMIN.EMPLOYEE_EDIT, element: <SuperAdminEmployeeEditPage /> },
         { path: ROUTES.SUPER_ADMIN.EMPLOYEE_DETAIL, element: <SuperAdminEmployeeDetailPage /> },
+        {
+          path: ROUTES.SUPER_ADMIN.REGIONS,
+          element: withPermission(PERMISSIONS.REGION_READ, <SuperAdminRegionListPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.REGION_CREATE,
+          element: withPermission(PERMISSIONS.REGION_CREATE, <SuperAdminRegionCreatePage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.REGION_EDIT,
+          element: withPermission(PERMISSIONS.REGION_UPDATE, <SuperAdminRegionEditPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.DISTRICTS,
+          element: withPermission(PERMISSIONS.DISTRICT_READ, <SuperAdminDistrictListPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.DISTRICT_CREATE,
+          element: withPermission(PERMISSIONS.DISTRICT_CREATE, <SuperAdminDistrictCreatePage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.DISTRICT_DETAIL,
+          element: withPermission(PERMISSIONS.DISTRICT_READ, <SuperAdminDistrictDetailPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.DISTRICT_EDIT,
+          element: withPermission(PERMISSIONS.DISTRICT_UPDATE, <SuperAdminDistrictEditPage />),
+        },
         {
           path: ROUTES.SUPER_ADMIN.CATEGORIES,
           element: withPermission(PERMISSIONS.CATEGORIES_READ, <SuperAdminCategoryListPage />),

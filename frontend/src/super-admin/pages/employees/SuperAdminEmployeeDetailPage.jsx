@@ -16,6 +16,8 @@ import {
   EmployeeLifecycleDialog,
   EmployeeRejectionDialog,
   ManagerAssignmentDialog,
+  TransferEmployeeDialog,
+  TransferHistoryList,
   EMPLOYEE_LIFECYCLE_ACTIONS,
   canShowEmployeeLifecycleAction,
   getEmployeeDisplayName,
@@ -30,6 +32,7 @@ export default function SuperAdminEmployeeDetailPage() {
   const [approvalOpen, setApprovalOpen] = useState(false);
   const [rejectionOpen, setRejectionOpen] = useState(false);
   const [managerOpen, setManagerOpen] = useState(false);
+  const [transferOpen, setTransferOpen] = useState(false);
   const [lifecycleAction, setLifecycleAction] = useState("");
   const [message, setMessage] = useState("");
 
@@ -122,6 +125,15 @@ export default function SuperAdminEmployeeDetailPage() {
                 </button>
               ) : null}
             </PermissionGuard>
+            <PermissionGuard permission={PERMISSIONS.EMPLOYEES_TRANSFER}>
+              <button
+                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-forest ring-1 ring-forest/15 transition hover:bg-mint"
+                onClick={() => setTransferOpen(true)}
+                type="button"
+              >
+                Transfer
+              </button>
+            </PermissionGuard>
             <PermissionGuard permission={PERMISSIONS.EMPLOYEES_DEACTIVATE}>
               {canShow(EMPLOYEE_LIFECYCLE_ACTIONS.DEACTIVATE) ? (
                 <button
@@ -182,6 +194,8 @@ export default function SuperAdminEmployeeDetailPage() {
         <DirectReportsList employeeId={employeeId} />
       </section>
 
+      <TransferHistoryList employeeId={employeeId} />
+
       <EmployeeApprovalDialog
         employee={employee}
         isOpen={approvalOpen}
@@ -199,6 +213,12 @@ export default function SuperAdminEmployeeDetailPage() {
         isOpen={managerOpen}
         onClose={() => setManagerOpen(false)}
         onSuccess={() => refetchWithMessage("Manager assignment updated.")}
+      />
+      <TransferEmployeeDialog
+        employee={employee}
+        isOpen={transferOpen}
+        onClose={() => setTransferOpen(false)}
+        onSuccess={() => refetchWithMessage("Employee transferred successfully.")}
       />
       <EmployeeLifecycleDialog
         action={lifecycleAction}

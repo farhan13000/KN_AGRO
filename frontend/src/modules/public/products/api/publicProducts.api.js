@@ -67,25 +67,7 @@ const toPublicProductView = (product = {}) => {
   };
 };
 
-const getMockPublicProductApi = async () => {
-  if (!(import.meta.env.DEV && import.meta.env.VITE_USE_PHASE3_MOCK === "true")) {
-    return null;
-  }
-
-  const { mockPublicProductApi } = await import("../../../../mocks/products/product.mock");
-  return mockPublicProductApi;
-};
-
 const getPublicProducts = async (query) => {
-  const mock = await getMockPublicProductApi();
-  if (mock) {
-    const data = await mock.getPublicProducts(query);
-    return {
-      ...data,
-      products: (data?.products || []).map(toPublicProductView),
-    };
-  }
-
   const response = await apiClient.get(API_ENDPOINTS.PUBLIC.PRODUCTS, {
     params: cleanPublicProductQuery(query),
   });
@@ -109,15 +91,6 @@ const getFeaturedProducts = async () => {
 const getPublicProductBySlug = async (slug) => {
   const safeSlug = String(slug || "").trim();
   if (!safeSlug) return { product: null };
-
-  const mock = await getMockPublicProductApi();
-  if (mock) {
-    const data = await mock.getPublicProductBySlug(safeSlug);
-    return {
-      ...data,
-      product: data?.product ? toPublicProductView(data.product) : null,
-    };
-  }
 
   const response = await apiClient.get(API_ENDPOINTS.PUBLIC.PRODUCT_DETAIL(encodeURIComponent(safeSlug)));
   const data = unwrapApiData(response);

@@ -60,12 +60,15 @@ export default function Modal({ children, isOpen, onClose, title }) {
       <div
         aria-label={typeof title === "string" ? title : "Dialog"}
         aria-modal="true"
-        className="w-full max-w-lg rounded-2xl bg-white shadow-card ring-1 ring-forest/10"
+        // Capped to the viewport with a scrollable body: a taller form
+        // (the transfer dialog, for one) would otherwise push its own
+        // submit buttons off-screen with no way to reach them.
+        className="flex max-h-full w-full max-w-lg flex-col rounded-2xl bg-white shadow-card ring-1 ring-forest/10"
         onMouseDown={(event) => event.stopPropagation()}
         ref={dialogRef}
         role="dialog"
       >
-        <div className="flex items-center justify-between gap-3 border-b border-forest/10 px-5 py-4">
+        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-forest/10 px-5 py-4">
           <h2 className="text-lg font-black text-ink">{title}</h2>
           <button
             aria-label="Close dialog"
@@ -76,7 +79,7 @@ export default function Modal({ children, isOpen, onClose, title }) {
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="px-5 py-4">{children}</div>
+        <div className="overflow-y-auto px-5 py-4">{children}</div>
       </div>
     </div>
   );
