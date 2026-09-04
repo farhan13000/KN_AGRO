@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
-import { Bell, ChevronDown, KeyRound, LogOut, Menu, PanelLeftClose, UserCircle, X } from "lucide-react";
+import { ChevronDown, KeyRound, LogOut, Menu, PanelLeftClose, UserCircle, X } from "lucide-react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import logo from "../../assets/KN_AGRO_LOGO.png";
 import { useAuth } from "../../core/auth";
-import { ROLE_LABELS, ROUTES } from "../constants";
+import { NotificationBell } from "../../features/notifications";
+import { PERMISSIONS, ROLE_LABELS, ROUTES } from "../constants";
 
 const getInitials = (name = "") =>
   name
@@ -114,6 +115,7 @@ function ProfileMenu() {
 }
 
 export default function InternalAppLayout({ navigationItems, portalLabel }) {
+  const { hasPermission } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const desktopSidebarClass = desktopCollapsed ? "lg:w-24" : "lg:w-72";
@@ -184,13 +186,7 @@ export default function InternalAppLayout({ navigationItems, portalLabel }) {
             </div>
 
             <div className="flex items-center gap-2">
-              <button
-                aria-label="Notifications"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white text-muted shadow-sm ring-1 ring-forest/10 transition hover:bg-mint hover:text-forest"
-                type="button"
-              >
-                <Bell className="h-5 w-5" />
-              </button>
+              {hasPermission(PERMISSIONS.NOTIFICATIONS_READ) ? <NotificationBell /> : null}
               <ProfileMenu />
             </div>
           </div>

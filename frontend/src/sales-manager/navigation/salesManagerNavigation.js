@@ -1,11 +1,13 @@
 import {
   AlertTriangle,
   CalendarCheck,
+  ClipboardList,
   Columns3,
   CreditCard,
   FileText,
   GitBranch,
   LayoutDashboard,
+  Lightbulb,
   MapPin,
   PhoneCall,
   Receipt,
@@ -82,6 +84,24 @@ export const salesManagerNavigation = [
     route: ROUTES.SALES_MANAGER.QUOTATIONS,
     icon: FileText,
     permission: PERMISSIONS.QUOTATIONS_READ,
+  },
+  {
+    label: "My DSRs",
+    route: ROUTES.SALES_MANAGER.DSR_ME,
+    icon: ClipboardList,
+    permission: PERMISSIONS.DSR_READ_SELF,
+  },
+  {
+    label: "Team DSRs",
+    route: ROUTES.SALES_MANAGER.DSR_TEAM,
+    icon: ClipboardList,
+    permission: PERMISSIONS.DSR_READ_TEAM,
+  },
+  {
+    label: "Product Recommendations",
+    route: ROUTES.SALES_MANAGER.PRODUCT_RECOMMENDATIONS,
+    icon: Lightbulb,
+    permission: PERMISSIONS.PRODUCTS_READ,
   },
   // Prompt 58: only backend-permitted commercial pages — Sales Manager
   // genuinely holds customers/orders/invoices/payments read (and most

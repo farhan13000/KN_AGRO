@@ -15,3 +15,8 @@ export const formatEmployeeSummary = (employee) => {
   const code = employee.employeeCode || "";
   return [name, code].filter(Boolean).join(" - ") || "Assigned";
 };
+
+// region/district come back as {_id, name, code} or null (backend
+// lead.serializer.js's toGeoSummary) — captured once at creation, never
+// recomputed on a later employee transfer (see Phase F09's own note).
+export const formatGeoSummary = (geo) => (geo?.name ? geo.name : "Not Set");

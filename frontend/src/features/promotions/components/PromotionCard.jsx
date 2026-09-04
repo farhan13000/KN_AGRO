@@ -1,4 +1,7 @@
 import { ArrowRight } from "lucide-react";
+import { useAuth } from "../../../core/auth";
+import { PERMISSIONS } from "../../../shared/constants";
+import { AuditTrailToggle } from "../../audit";
 import PromotionStatusBadge from "./PromotionStatusBadge";
 
 const formatDate = (value) => {
@@ -16,6 +19,7 @@ const roleName = (role) => (role?.name ? role.name.toUpperCase() : "—");
  * on the approvals queue, nothing on an employee's read-only history).
  */
 export default function PromotionCard({ actions = null, promotion, showEmployee = true }) {
+  const { hasPermission } = useAuth();
   const employeeName = promotion.employee?.user?.name || promotion.employee?.employeeCode || "Unknown";
 
   return (
@@ -52,6 +56,10 @@ export default function PromotionCard({ actions = null, promotion, showEmployee 
       </p>
 
       {actions ? <div className="mt-4">{actions}</div> : null}
+
+      {hasPermission(PERMISSIONS.AUDIT_READ) ? (
+        <AuditTrailToggle entityId={promotion._id} entityType="Promotion" />
+      ) : null}
     </li>
   );
 }

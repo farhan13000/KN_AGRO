@@ -26,6 +26,11 @@ const EmployeeInvoiceOutstandingPage = lazy(
 const EmployeeInvoiceDetailPage = lazy(() => import("../employee/pages/invoices/EmployeeInvoiceDetailPage"));
 const EmployeeInvoicePrintPage = lazy(() => import("../employee/pages/invoices/EmployeeInvoicePrintPage"));
 const EmployeePaymentListPage = lazy(() => import("../employee/pages/payments/EmployeePaymentListPage"));
+const EmployeeDSRSubmitPage = lazy(() => import("../employee/pages/dsr/EmployeeDSRSubmitPage"));
+const EmployeeMyDSRListPage = lazy(() => import("../employee/pages/dsr/EmployeeMyDSRListPage"));
+const EmployeeProductRecommendationsPage = lazy(
+  () => import("../employee/pages/productRecommendations/EmployeeProductRecommendationsPage"),
+);
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -111,6 +116,18 @@ export const employeeRouteConfig = {
         {
           path: ROUTES.EMPLOYEE.PAYMENTS,
           element: withPermission(PERMISSIONS.PAYMENTS_READ, <EmployeePaymentListPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.DSR_SUBMIT,
+          element: withPermission(PERMISSIONS.DSR_CREATE, <EmployeeDSRSubmitPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.DSR_ME,
+          element: withPermission(PERMISSIONS.DSR_READ_SELF, <EmployeeMyDSRListPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.PRODUCT_RECOMMENDATIONS,
+          element: withPermission(PERMISSIONS.PRODUCTS_READ, <EmployeeProductRecommendationsPage />),
         },
         { path: "/employee/*", element: <InternalNotFoundPage /> },
       ],

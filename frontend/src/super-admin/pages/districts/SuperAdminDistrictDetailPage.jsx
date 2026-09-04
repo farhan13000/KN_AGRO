@@ -6,7 +6,9 @@ import EmptyState from "../../../shared/components/EmptyState";
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
 import { PERMISSIONS, ROUTES } from "../../../shared/constants";
+import { PermissionGuard } from "../../../core/auth";
 import { DistrictAssignmentPanel, DistrictStatusBadge, useDistrictDetail } from "../../../features/districts";
+import { AuditTrailSection } from "../../../features/audit";
 
 export default function SuperAdminDistrictDetailPage() {
   const { districtId } = useParams();
@@ -73,6 +75,10 @@ export default function SuperAdminDistrictDetailPage() {
       </Card>
 
       <DistrictAssignmentPanel district={district} onRefresh={districtState.refetch} />
+
+      <PermissionGuard permission={PERMISSIONS.AUDIT_READ}>
+        <AuditTrailSection entityId={districtId} entityType="District" />
+      </PermissionGuard>
     </div>
   );
 }

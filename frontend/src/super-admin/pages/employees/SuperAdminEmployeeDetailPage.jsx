@@ -25,6 +25,7 @@ import {
 import { PromotionHistorySection, PromotionRecommendDialog } from "../../../features/promotions";
 import { CurrentSalaryCard } from "../../../features/salary";
 import { SalaryProposalCreateDialog, SalaryProposalHistorySection } from "../../../features/salaryProposals";
+import { AuditTrailSection } from "../../../features/audit";
 
 export default function SuperAdminEmployeeDetailPage() {
   const { employeeId } = useParams();
@@ -214,6 +215,10 @@ export default function SuperAdminEmployeeDetailPage() {
       </PermissionGuard>
 
       <SalaryProposalHistorySection employeeId={employeeId} />
+
+      <PermissionGuard permission={PERMISSIONS.AUDIT_READ}>
+        <AuditTrailSection entityId={employeeId} entityType="Employee" />
+      </PermissionGuard>
 
       <EmployeeApprovalDialog
         employee={employee}

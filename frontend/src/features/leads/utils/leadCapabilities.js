@@ -1,11 +1,9 @@
 import { PERMISSIONS } from "../../../shared/constants/permissions.constants.js";
-import { BACKEND_ROLES, normalizeRoleName } from "../../../shared/constants/roles.constants.js";
 import { LEAD_STATUS } from "../constants/lead.constants.js";
 
 const terminalStatuses = [LEAD_STATUS.CONVERTED, LEAD_STATUS.LOST, LEAD_STATUS.CLOSED];
 
-export const getLeadCapabilities = ({ hasPermission, lead, role }) => {
-  const normalizedRole = normalizeRoleName(role);
+export const getLeadCapabilities = ({ hasPermission, lead }) => {
   const canUpdateLead = hasPermission(PERMISSIONS.LEADS_UPDATE);
   const canAssign = hasPermission(PERMISSIONS.LEADS_ASSIGN);
   const canChangeStatus = hasPermission(PERMISSIONS.LEADS_CHANGE_STATUS);
@@ -15,9 +13,18 @@ export const getLeadCapabilities = ({ hasPermission, lead, role }) => {
     canViewLead: hasPermission(PERMISSIONS.LEADS_READ),
     canCreateLead: hasPermission(PERMISSIONS.LEADS_CREATE),
     canEditLead: canUpdateLead,
-    canAssignManager: canAssign && normalizedRole === BACKEND_ROLES.SUPER_ADMIN,
-    canAssignEmployee:
-      canAssign && [BACKEND_ROLES.SUPER_ADMIN, BACKEND_ROLES.SALES_MANAGER].includes(normalizedRole),
+    // ORG-HIERARCHY MIGRATION (Phase F09) — was hardcoded to
+    // role === SUPER_ADMIN / [SUPER_ADMIN, SALES_MANAGER], silently
+    // hiding both buttons from every new-hierarchy role (SA/OA/GM/RM/ASM)
+    // even though they hold LEADS_ASSIGN — a real regression this phase's
+    // own grep was meant to catch. The backend route for both
+    // (PATCH /leads/:id/manager and /employee) is gated by the SAME
+    // single LEADS_ASSIGN permission with no further role split, so a
+    // role check here duplicated (and drifted from) a rule the backend
+    // already enforces — matches this file's own convention (every other
+    // capability below is permission-only, no role branching).
+    canAssignManager: canAssign,
+    canAssignEmployee: canAssign,
     canChangeStatus,
     canChangePriority: canUpdateLead,
     canUpdateExpectedValue: canUpdateLead,

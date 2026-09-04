@@ -4,7 +4,7 @@ import Modal from "../../../shared/components/Modal";
 import Select from "../../../shared/forms/Select";
 import TextInput from "../../../shared/forms/TextInput";
 import Textarea from "../../../shared/forms/Textarea";
-import { BACKEND_ROLES, normalizeRoleName } from "../../../shared/constants";
+import { BACKEND_ROLES, MANAGER_TIER_ROLES, normalizeRoleName } from "../../../shared/constants";
 import { useAuth } from "../../../core/auth";
 import { EMPLOYEE_STATUS, useEmployeeList, useMyTeam, employeeOptionLabel } from "../../employees";
 import { useProductList } from "../../products";
@@ -214,11 +214,18 @@ export function AssignmentDialog({ assignmentType = "employee", isOpen, lead, on
   const isManagerAssignment = assignmentType === "manager";
   const currentAssignment = isManagerAssignment ? lead?.assignedManager : lead?.assignedEmployee;
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
+  // ORG-HIERARCHY MIGRATION (Phase F09) — was gated to the legacy
+  // SALES_MANAGER/SUPER_ADMIN role names only, meaning a GM/RM/ASM (or
+  // the new SA) assigning an employee to a lead saw an empty candidate
+  // list — neither query below was ever enabled for them. Widened to
+  // MANAGER_TIER_ROLES (already defined in roles.constants.js
+  // specifically for populating candidate-manager pickers like this one).
+  const isManagerTierActor = MANAGER_TIER_ROLES.includes(normalizedRole);
   const allEmployeesState = useEmployeeList(activeEmployeeQuery, {
-    enabled: isOpen && (isManagerAssignment || normalizedRole === BACKEND_ROLES.SUPER_ADMIN),
+    enabled: isOpen && (isManagerAssignment || !isManagerTierActor),
   });
   const myTeamState = useMyTeam(activeEmployeeQuery, {
-    enabled: isOpen && !isManagerAssignment && normalizedRole === BACKEND_ROLES.SALES_MANAGER,
+    enabled: isOpen && !isManagerAssignment && isManagerTierActor,
   });
   const actions = useLeadDialogActions({ onClose, onSuccess });
 
@@ -228,14 +235,16 @@ export function AssignmentDialog({ assignmentType = "employee", isOpen, lead, on
 
   const candidates = useMemo(() => {
     const source =
-      !isManagerAssignment && normalizedRole === BACKEND_ROLES.SALES_MANAGER
+      !isManagerAssignment && isManagerTierActor
         ? myTeamState.data?.employees || []
         : allEmployeesState.data?.employees || [];
     if (isManagerAssignment) {
-      return source.filter((employee) => getEmployeeRole(employee) === BACKEND_ROLES.SALES_MANAGER);
+      return source.filter((employee) => MANAGER_TIER_ROLES.includes(getEmployeeRole(employee)));
     }
-    return source.filter((employee) => getEmployeeRole(employee) !== BACKEND_ROLES.SUPER_ADMIN);
-  }, [allEmployeesState.data, isManagerAssignment, myTeamState.data, normalizedRole]);
+    return source.filter(
+      (employee) => ![BACKEND_ROLES.SUPER_ADMIN, BACKEND_ROLES.SA].includes(getEmployeeRole(employee)),
+    );
+  }, [allEmployeesState.data, isManagerAssignment, isManagerTierActor, myTeamState.data]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();

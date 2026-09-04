@@ -58,4 +58,13 @@ export const orderApi = {
     const payload = pickCancelOrderPayload(reason);
     return post(API_ENDPOINTS.ORDERS.CANCEL(orderId), payload);
   },
+
+  // Org-hierarchy migration (backend Phase 11) — the backend's own scope
+  // engine already picks the correct bucket for whoever calls this (an
+  // RM gets their regional total, a GM gets company-wide, etc.); this
+  // just returns whatever it sends back, no role branching here.
+  async getAttributionRollup() {
+    const response = await apiClient.get(API_ENDPOINTS.ORDERS.ATTRIBUTION);
+    return unwrapApiData(response);
+  },
 };

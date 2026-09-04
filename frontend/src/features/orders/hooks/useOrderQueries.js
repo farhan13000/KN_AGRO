@@ -19,6 +19,12 @@ export const useOrderDetail = (orderId, options) => {
   });
 };
 
+export const useOrderAttributionRollup = (options) => {
+  const request = useCallback(() => orderApi.getAttributionRollup(), []);
+  const state = useAsyncResource(orderQueryKeys.attribution, request, options);
+  return { ...state, rollup: state.data || null };
+};
+
 // One mutation per backend lifecycle action. Prompt 14 requires that after
 // any state-changing action the consumer waits for the backend, then
 // refetches the Order, the relevant Inventory, and the related Quotation/

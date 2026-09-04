@@ -1,9 +1,11 @@
 import {
   AlertTriangle,
   CalendarCheck,
+  ClipboardList,
   CreditCard,
   FileText,
   LayoutDashboard,
+  Lightbulb,
   PhoneCall,
   Receipt,
   ShoppingCart,
@@ -35,6 +37,18 @@ export const employeeNavigation = [
     route: ROUTES.EMPLOYEE.FOLLOW_UPS,
     icon: CalendarCheck,
     permission: PERMISSIONS.LEADS_READ,
+  },
+  {
+    label: "My DSRs",
+    route: ROUTES.EMPLOYEE.DSR_ME,
+    icon: ClipboardList,
+    permission: PERMISSIONS.DSR_READ_SELF,
+  },
+  {
+    label: "Product Recommendations",
+    route: ROUTES.EMPLOYEE.PRODUCT_RECOMMENDATIONS,
+    icon: Lightbulb,
+    permission: PERMISSIONS.PRODUCTS_READ,
   },
   {
     label: "Quotations",

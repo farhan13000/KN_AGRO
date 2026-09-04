@@ -68,6 +68,9 @@ export const ROUTES = Object.freeze({
     INVOICE_DETAIL: "/super-admin/invoices/:invoiceId",
     INVOICE_PRINT: "/super-admin/invoices/:invoiceId/print",
     PAYMENTS: "/super-admin/payments",
+    DSR: "/super-admin/dsr",
+    PRODUCT_RECOMMENDATIONS: "/super-admin/product-recommendations",
+    AUDIT_LOG: "/super-admin/audit-log",
   },
   SALES_MANAGER: {
     DASHBOARD: "/manager/dashboard",
@@ -101,6 +104,10 @@ export const ROUTES = Object.freeze({
     INVOICE_DETAIL: "/manager/invoices/:invoiceId",
     INVOICE_PRINT: "/manager/invoices/:invoiceId/print",
     PAYMENTS: "/manager/payments",
+    DSR_SUBMIT: "/manager/dsr/submit",
+    DSR_ME: "/manager/dsr/me",
+    DSR_TEAM: "/manager/dsr/team",
+    PRODUCT_RECOMMENDATIONS: "/manager/product-recommendations",
   },
   EMPLOYEE: {
     DASHBOARD: "/employee/dashboard",
@@ -122,6 +129,9 @@ export const ROUTES = Object.freeze({
     INVOICE_DETAIL: "/employee/invoices/:invoiceId",
     INVOICE_PRINT: "/employee/invoices/:invoiceId/print",
     PAYMENTS: "/employee/payments",
+    DSR_SUBMIT: "/employee/dsr/submit",
+    DSR_ME: "/employee/dsr/me",
+    PRODUCT_RECOMMENDATIONS: "/employee/product-recommendations",
   },
   ERROR: {
     UNAUTHORIZED: "/unauthorized",

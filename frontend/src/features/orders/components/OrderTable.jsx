@@ -2,7 +2,7 @@ import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatBusinessDateTime } from "../../../shared/utils";
 import { ORDER_STATUS } from "../constants";
-import { formatOrderAmount } from "../utils";
+import { formatGeoSummary, formatOrderAmount } from "../utils";
 import OrderStatusBadge from "./OrderStatusBadge";
 
 // "Dispatch State" is derived only from backend-provided fields
@@ -27,6 +27,8 @@ export default function OrderTable({ detailPath, orders = [] }) {
               <th className="px-4 py-3">Order Number</th>
               <th className="px-4 py-3">Customer</th>
               <th className="px-4 py-3">Quotation</th>
+              <th className="px-4 py-3">Region</th>
+              <th className="px-4 py-3">District</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3 text-right">Order Value</th>
               <th className="px-4 py-3">Created At</th>
@@ -40,6 +42,8 @@ export default function OrderTable({ detailPath, orders = [] }) {
                 <td className="px-4 py-3 font-black text-forest">{order.orderNumber}</td>
                 <td className="px-4 py-3 text-ink">{order.customer?.name || "Not Set"}</td>
                 <td className="px-4 py-3 text-muted">{order.quotation?.quotationNumber || "Not Set"}</td>
+                <td className="px-4 py-3 text-muted">{formatGeoSummary(order.region)}</td>
+                <td className="px-4 py-3 text-muted">{formatGeoSummary(order.district)}</td>
                 <td className="px-4 py-3">
                   <OrderStatusBadge status={order.orderStatus} />
                 </td>

@@ -1,10 +1,19 @@
 import { BACKEND_ROLES, ROLE_LABELS, normalizeRoleName, ROUTES } from "../../shared/constants";
 
-export const getPortalRouteForRole = (roleName) => {
+/**
+ * The single source of truth for "which portal's ROUTES block does this
+ * role belong to" — matches each portal route file's own allowedRoles
+ * list exactly (routes/SuperAdminRoutes.jsx, SalesManagerRoutes.jsx,
+ * EmployeeRoutes.jsx). `getPortalRouteForRole` (login/unauthorized
+ * redirects) and Phase F13's notification deep-linking (features/
+ * notifications/utils/notificationDestination.js) both build on this one
+ * mapping rather than each maintaining its own copy.
+ */
+export const getPortalRoutesForRole = (roleName) => {
   const normalizedRole = normalizeRoleName(roleName);
 
   if (normalizedRole === BACKEND_ROLES.SUPER_ADMIN || normalizedRole === BACKEND_ROLES.SA || normalizedRole === BACKEND_ROLES.OA) {
-    return ROUTES.SUPER_ADMIN.DASHBOARD;
+    return ROUTES.SUPER_ADMIN;
   }
 
   if (
@@ -14,15 +23,17 @@ export const getPortalRouteForRole = (roleName) => {
     normalizedRole === BACKEND_ROLES.ASM ||
     normalizedRole === BACKEND_ROLES.SO
   ) {
-    return ROUTES.SALES_MANAGER.DASHBOARD;
+    return ROUTES.SALES_MANAGER;
   }
 
   if (normalizedRole === BACKEND_ROLES.EMPLOYEE || normalizedRole === BACKEND_ROLES.FO) {
-    return ROUTES.EMPLOYEE.DASHBOARD;
+    return ROUTES.EMPLOYEE;
   }
 
-  return ROUTES.ERROR.UNAUTHORIZED;
+  return null;
 };
+
+export const getPortalRouteForRole = (roleName) => getPortalRoutesForRole(roleName)?.DASHBOARD || ROUTES.ERROR.UNAUTHORIZED;
 
 // Role-appropriate portal title for the sidebar/header (e.g. "General
 // Manager Portal" for a GM, "Sales Manager Portal" for the legacy role) —

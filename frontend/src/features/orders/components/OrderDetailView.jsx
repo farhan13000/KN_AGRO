@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Button from "../../../shared/components/Button";
 import Card from "../../../shared/components/Card";
 import { formatBusinessDateTime } from "../../../shared/utils";
+import { formatGeoSummary } from "../utils";
 import OrderAmountSummary from "./OrderAmountSummary";
 import OrderHeader from "./OrderHeader";
 import OrderInventoryReservationSummary from "./OrderInventoryReservationSummary";
@@ -55,7 +56,7 @@ export default function OrderDetailView({
 
       <OrderLifecycleActions onSuccess={onMutationSuccess} order={order} />
 
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
         <Card className="p-5">
           <h2 className="text-lg font-black text-ink">Customer</h2>
           <dl className="mt-4 grid gap-3">
@@ -84,6 +85,17 @@ export default function OrderDetailView({
               View Quotation
             </Link>
           ) : null}
+        </Card>
+
+        {/* Captured once at order creation, never recomputed on a later
+            transfer of the owning employee — same "snapshot, don't
+            recompute" rule Lead's own region/district already follows. */}
+        <Card className="p-5">
+          <h2 className="text-lg font-black text-ink">Location</h2>
+          <dl className="mt-4 grid gap-3">
+            <DetailRow label="Region" value={formatGeoSummary(order.region)} />
+            <DetailRow label="District" value={formatGeoSummary(order.district)} />
+          </dl>
         </Card>
       </div>
 

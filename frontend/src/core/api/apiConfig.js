@@ -159,6 +159,10 @@ export const API_ENDPOINTS = Object.freeze({
   ORDERS: {
     BASE: "/orders",
     FROM_QUOTATION: (quotationId) => `/orders/from-quotation/${quotationId}`,
+    // Fixed-segment route, must resolve before /:orderId server-side —
+    // mirrored here only for the request path, no ordering concern on
+    // the frontend since these are separate config entries, not routes.
+    ATTRIBUTION: "/orders/attribution",
     DETAIL: (orderId) => `/orders/${orderId}`,
     CONFIRM: (orderId) => `/orders/${orderId}/confirm`,
     PROCESS: (orderId) => `/orders/${orderId}/process`,
@@ -179,6 +183,40 @@ export const API_ENDPOINTS = Object.freeze({
   },
   PAYMENTS: {
     BASE: "/payments",
+  },
+  PRODUCT_RECOMMENDATIONS: {
+    BASE: "/product-recommendations",
+    APPROVE: (recommendationId) => `/product-recommendations/${recommendationId}/approve`,
+    ARCHIVE: (recommendationId) => `/product-recommendations/${recommendationId}/archive`,
+  },
+  DSR: {
+    BASE: "/dsr",
+    ME: "/dsr/me",
+    TEAM: "/dsr/team",
+    REVIEW: (dsrId) => `/dsr/${dsrId}/review`,
+    ACKNOWLEDGE: (dsrId) => `/dsr/${dsrId}/acknowledge`,
+  },
+  // The central per-role-tier dashboard module (Phase F12) — pre-existing
+  // (Phase 8) and already extended for the new hierarchy (Phase 14): GM/
+  // RM/ASM all share MANAGER_DASHBOARD (identical shape, different scoped
+  // numbers); SO gets its own lighter SO_DASHBOARD; FO/legacy EMPLOYEE get
+  // EMPLOYEE_DASHBOARD; SA/legacy SUPER_ADMIN get ADMIN_DASHBOARD.
+  ANALYTICS: {
+    ADMIN_DASHBOARD: "/analytics/admin/dashboard",
+    MANAGER_DASHBOARD: "/analytics/manager/dashboard",
+    EMPLOYEE_DASHBOARD: "/analytics/employee/dashboard",
+    SO_DASHBOARD: "/analytics/so/dashboard",
+  },
+  NOTIFICATIONS: {
+    BASE: "/notifications",
+    UNREAD_COUNT: "/notifications/unread-count",
+    READ_ALL: "/notifications/read-all",
+    READ: (notificationId) => `/notifications/${notificationId}/read`,
+    ARCHIVE: (notificationId) => `/notifications/${notificationId}/archive`,
+  },
+  AUDIT: {
+    BASE: "/audit",
+    DETAIL: (auditId) => `/audit/${auditId}`,
   },
   PUBLIC: {
     CATEGORIES: "/public/categories",

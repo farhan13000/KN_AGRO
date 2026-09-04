@@ -2,7 +2,7 @@ import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatBusinessDateTime } from "../../../shared/utils";
 import { LeadPriorityBadge, LeadSourceBadge, LeadStatusBadge } from "./LeadBadges";
-import { formatEmployeeSummary, formatPipelineValue } from "../utils";
+import { formatEmployeeSummary, formatGeoSummary, formatPipelineValue } from "../utils";
 
 export default function LeadTable({
   detailPath,
@@ -10,6 +10,13 @@ export default function LeadTable({
   showAssignments = true,
   showSource = true,
   showPipelineValue = true,
+  // Org-hierarchy migration (Phase F09) — region/district, captured once
+  // at lead creation and never recomputed on transfer (see the backend's
+  // own Phase 10 design note). Defaults to mirroring showAssignments: the
+  // two describe the same "who/where this belongs to" context, so any
+  // view that already hides assignments for being redundant (e.g. an
+  // employee's own lead list) hides location too, unless overridden.
+  showLocation = showAssignments,
 }) {
   return (
     <div className="overflow-hidden rounded-lg border border-forest/10 bg-white shadow-sm">
@@ -26,6 +33,8 @@ export default function LeadTable({
               <th className="px-4 py-3">Status</th>
               {showAssignments ? <th className="px-4 py-3">Manager</th> : null}
               {showAssignments ? <th className="px-4 py-3">Employee</th> : null}
+              {showLocation ? <th className="px-4 py-3">Region</th> : null}
+              {showLocation ? <th className="px-4 py-3">District</th> : null}
               {showPipelineValue ? <th className="px-4 py-3">Expected Value</th> : null}
               <th className="px-4 py-3">Next Follow-Up</th>
               <th className="px-4 py-3 text-right">Actions</th>
@@ -55,6 +64,8 @@ export default function LeadTable({
                 {showAssignments ? (
                   <td className="px-4 py-3 text-muted">{formatEmployeeSummary(lead.assignedEmployee)}</td>
                 ) : null}
+                {showLocation ? <td className="px-4 py-3 text-muted">{formatGeoSummary(lead.region)}</td> : null}
+                {showLocation ? <td className="px-4 py-3 text-muted">{formatGeoSummary(lead.district)}</td> : null}
                 {showPipelineValue ? (
                   <td className="px-4 py-3 font-bold text-ink">{formatPipelineValue(lead.expectedValue)}</td>
                 ) : null}

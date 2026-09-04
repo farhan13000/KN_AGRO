@@ -32,6 +32,13 @@ export const PERMISSIONS = Object.freeze({
   PRODUCTS_CREATE: "products.create",
   PRODUCTS_UPDATE: "products.update",
   PRODUCTS_MANAGE: "products.manage",
+  // Product Recommendations (backend Phase 13, verified). Deferred by
+  // Phase F01 until this phase actually built the UI. GET / (the "visible
+  // to me" list) is gated PRODUCTS_READ, not this — every role that can
+  // see the catalog can see recommendations too; only manager-tier roles
+  // additionally hold PRODUCTS_RECOMMEND to create/archive one. Approve
+  // reuses the existing, broader PRODUCTS_MANAGE — no new constant for it.
+  PRODUCTS_RECOMMEND: "products.recommend",
   INVENTORY_READ: "inventory.read",
   INVENTORY_STOCK_IN: "inventory.stock_in",
   INVENTORY_STOCK_OUT: "inventory.stock_out",
@@ -39,6 +46,21 @@ export const PERMISSIONS = Object.freeze({
   INVENTORY_MANAGE: "inventory.manage",
   INVENTORY_TRANSACTIONS_READ: "inventory.transactions.read",
   ANALYTICS_READ: "analytics.read",
+  // The central /analytics/* dashboard module's own TIER permissions
+  // (Phase F12) — layered on top of, never replacing, each domain's own
+  // *_ANALYTICS_READ above. ANALYTICS_ADMIN gates GET /analytics/admin/
+  // dashboard (SA), ANALYTICS_MANAGER gates GET /analytics/manager/
+  // dashboard (GM/RM/ASM, and SO — narrowed to GET /analytics/so/
+  // dashboard in-service via the SAME ANALYTICS_EMPLOYEE permission SO
+  // also holds), ANALYTICS_EMPLOYEE gates GET /analytics/employee/
+  // dashboard (FO).
+  ANALYTICS_ADMIN: "analytics.admin",
+  ANALYTICS_MANAGER: "analytics.manager",
+  ANALYTICS_EMPLOYEE: "analytics.employee",
+  // Gates whether the Employee Dashboard's optional payroll section is
+  // shown — the backend omits it entirely for a caller without this,
+  // never returns a redacted version.
+  PAYROLL_READ_SELF: "payroll.read_self",
   QUOTATIONS_READ: "quotations.read",
   QUOTATIONS_CREATE: "quotations.create",
   QUOTATIONS_UPDATE: "quotations.update",
@@ -50,6 +72,7 @@ export const PERMISSIONS = Object.freeze({
   CUSTOMERS_CREATE: "customers.create",
   CUSTOMERS_UPDATE: "customers.update",
   ORDERS_READ: "orders.read",
+  ORDERS_ANALYTICS_READ: "orders.analytics.read",
   ORDERS_CREATE: "orders.create",
   ORDERS_CONFIRM: "orders.confirm",
   // ORDERS_FULFILL gates all four fulfillment actions: Processing (Prompt
@@ -124,5 +147,34 @@ export const PERMISSIONS = Object.freeze({
   SALARY_PROPOSAL_RECOMMEND: "salary_proposal.recommend",
   SALARY_PROPOSAL_APPROVE: "salary_proposal.approve",
   SALARY_PROPOSAL_FINALIZE: "salary_proposal.finalize",
+
+  // DSR (Daily Sales Report) workflow (backend Phase 12, verified). A
+  // light two-step review chain (SUBMITTED -> REVIEWED -> ACKNOWLEDGED),
+  // deliberately not a formal approve/reject — DSR_REVIEW gates BOTH the
+  // review and acknowledge actions on the backend, same permission for
+  // both stages (see dsr.routes.js).
+  DSR_CREATE: "dsr.create",
+  DSR_READ_SELF: "dsr.read_self",
+  DSR_READ_TEAM: "dsr.read_team",
+  DSR_READ_ALL: "dsr.read_all",
+  DSR_REVIEW: "dsr.review",
+
+  // Notifications (backend Phase 9, verified; Phase F13 built the first
+  // frontend consumer). NOTIFICATIONS_READ gates all five routes
+  // (list/unread-count/read/read-all/archive) — mutating your OWN
+  // notification is self-service, same tier as viewing it.
+  // NOTIFICATIONS_MANAGE exists on the backend but has no route yet
+  // (manually creating one, or acting on someone else's) — not mirrored
+  // here since there is nothing for it to gate on the frontend.
+  NOTIFICATIONS_READ: "notifications.read",
+
+  // Audit log (backend Phase 9, extended Phase 16; Phase F14 built the
+  // first frontend consumer). Gates BOTH /audit routes (list + single
+  // entry). Verified against seedRoles.js — held ONLY via the SA/legacy
+  // SUPER_ADMIN ALL_PERMISSIONS wildcard; not even OA holds it directly,
+  // despite OA otherwise sharing the Super Admin portal. AUDIT_EXPORT
+  // exists on the backend's permission list but has no route to gate —
+  // not mirrored here.
+  AUDIT_READ: "audit.read",
 });
 

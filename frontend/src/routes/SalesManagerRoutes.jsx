@@ -86,6 +86,14 @@ const SalesManagerInvoicePrintPage = lazy(
 const SalesManagerPaymentListPage = lazy(
   () => import("../sales-manager/pages/payments/SalesManagerPaymentListPage"),
 );
+const SalesManagerDSRSubmitPage = lazy(() => import("../sales-manager/pages/dsr/SalesManagerDSRSubmitPage"));
+const SalesManagerMyDSRListPage = lazy(() => import("../sales-manager/pages/dsr/SalesManagerMyDSRListPage"));
+const SalesManagerTeamDSRListPage = lazy(
+  () => import("../sales-manager/pages/dsr/SalesManagerTeamDSRListPage"),
+);
+const SalesManagerProductRecommendationsPage = lazy(
+  () => import("../sales-manager/pages/productRecommendations/SalesManagerProductRecommendationsPage"),
+);
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -227,6 +235,22 @@ export const salesManagerRouteConfig = {
         {
           path: ROUTES.SALES_MANAGER.PAYMENTS,
           element: withPermission(PERMISSIONS.PAYMENTS_READ, <SalesManagerPaymentListPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.DSR_SUBMIT,
+          element: withPermission(PERMISSIONS.DSR_CREATE, <SalesManagerDSRSubmitPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.DSR_ME,
+          element: withPermission(PERMISSIONS.DSR_READ_SELF, <SalesManagerMyDSRListPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.DSR_TEAM,
+          element: withPermission(PERMISSIONS.DSR_READ_TEAM, <SalesManagerTeamDSRListPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.PRODUCT_RECOMMENDATIONS,
+          element: withPermission(PERMISSIONS.PRODUCTS_READ, <SalesManagerProductRecommendationsPage />),
         },
         { path: "/manager/*", element: <InternalNotFoundPage /> },
       ],

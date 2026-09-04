@@ -5,6 +5,7 @@ import EmptyState from "../../../shared/components/EmptyState";
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
 import { ALL_PERMISSIONS, PERMISSIONS } from "../../../shared/constants";
+import { AuditTrailToggle } from "../../audit";
 import {
   HIRING_REJECT_STAGE_ROLES,
   HIRING_STAGE_ROLES,
@@ -200,6 +201,10 @@ export default function HiringPipelineView({ createHref, description, portalLabe
                       </button>
                     ))}
                   </div>
+                ) : null}
+
+                {hasPermission(PERMISSIONS.AUDIT_READ) ? (
+                  <AuditTrailToggle entityId={request._id} entityType="HiringRequest" />
                 ) : null}
               </li>
             );

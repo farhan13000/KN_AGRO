@@ -95,3 +95,80 @@ ASM, and confirm the status transitions correctly at each step in the UI.
 - Attendance/Leave/ReportRequest team views are confirmed to show the full downline.
 - DSR submit/review/acknowledge is fully operable through the UI, matching the backend's light
   two-step (not formal approve/reject) review chain.
+
+---
+
+## IMPLEMENTED AND VERIFIED
+
+### Prompt 10.1 — doc/reality conflict found, resolved with the user before proceeding
+
+Prompt 10.1 assumes the existing "team attendance"/"team leave requests"/"team reports" views
+already render the backend's now-fixed scope, and asks only to confirm they don't re-narrow it.
+**No such views exist anywhere in this frontend.** A repo-wide search found zero references to
+Attendance/Leave/ReportRequest outside one placeholder string on the Employee dashboard itself:
+*"Attendance, DSR, leave, and payroll arrive in later phases."* No `src/features/attendance/`,
+`leave/`, or `reportRequests/` module; no routes; no components. This is a different scale of gap
+than Phase F08's single missing display — it's three entire missing feature modules, each roughly
+DSR-sized on its own.
+
+Flagged this to the user before proceeding (rather than silently either ballooning this phase's
+scope by building three unplanned modules, or silently skipping verification work the doc assigned).
+**Decision: DSR only this phase** (Prompts 10.2-10.4, as the doc's own "one wholly new module" framing
+already anticipates), with this finding reported honestly instead of a fabricated pass. **Building
+real Attendance/Leave/ReportRequest UI remains a real, open gap for a dedicated future phase** — not
+absorbed into this one.
+
+### Prompts 10.2-10.4 — DSR module
+
+No `features/attendance/` or `features/reportRequests/` existed to use as a structural template
+either (per the doc's own fallback instructions), so DSR was modeled on this migration's own most
+recent, closest-shaped precedent instead: `features/salaryProposals/` (a permission-gated,
+multi-stage status workflow) and `features/hiring/`'s `createHref`-button-on-the-list-page
+convention for the submit action.
+
+**Built:** `src/features/dsr/` — `dsrApi.js` (submit/listMyDSRs/listTeamDSRs/listAllDSRs/review/
+acknowledge, matching `dsr.routes.js` exactly); `useMyDSRList`/`useTeamDSRList`/`useAllDSRList`/
+`useDSRActions`; `DSRStatusBadge`, `DSRCard`, `DSRSubmitForm` (grouped Field Activity/Lead Activity/
+Sales/Notes sections, every field optional per `dsr.model.js`'s own defaults — nothing guessed),
+`DSRReviewDialog` (comment optional, matching `reviewDSRSchema`), `MyDSRListView`/`TeamDSRListView`/
+`AllDSRListView`. Acknowledge needs no dialog (the backend accepts no body) — driven by the shared
+`ConfirmDialog`, same pattern `SalaryProposalPipelineView`'s Approve/Finalize already established.
+`salesAmount` needed no paise/rupees conversion — confirmed via `dsr.serializer.js` that, unlike
+SalaryProposal's own responses, DSR's are already converted with `toRupees` consistently.
+
+**Permission-to-page mapping, confirmed against `seedRoles.js` before wiring anything** (not
+assumed): `DSR_CREATE`/`DSR_READ_SELF` → SO, FO only. `DSR_READ_TEAM` → GM, RM, ASM, SO.
+`DSR_REVIEW` → ASM, SO only (GM/RM get read-only team visibility, no review/acknowledge actions —
+matches the original design note: SO reviews their own FO's submissions, ASM acknowledges after).
+`DSR_READ_ALL` → nobody directly seeded; reachable only via the SA wildcard. Pages built accordingly:
+Employee portal gets Submit + My DSRs (FO); Sales Manager portal gets Submit + My DSRs + Team DSRs
+(SO/ASM/RM/GM, with Review/Acknowledge only actually offered where `DSR_REVIEW` is held); Super Admin
+portal gets one company-wide `AllDSRListPage` (SA in practice, per the confirmed permission
+distribution — disclosed on the page itself, not left unexplained).
+
+### Verification
+
+Real browser (Playwright/Chromium) against the live dev backend and the real Phase 17 seeded org (a
+full real FO→SO→ASM chain: Ishaan→Kabir→Aditya, plus their RM Vivaan and an entirely unrelated
+different-branch ASM) — **14/14 checks passed**, walking one real DSR through the full chain exactly
+as the Stop-and-report asks:
+
+- FO submits a real DSR; a same-day resubmission attempt shows the backend's own specific 409
+  ("already submitted"), not a generic error.
+- An unrelated, different-branch ASM's own team list doesn't show this FO's DSR at all — confirming
+  the backend's scope filtering, not a frontend hide.
+- RM (holds `DSR_READ_TEAM` only) sees the DSR in their team list but has no Review action at all
+  (lacks `DSR_REVIEW`) — read-only oversight, exactly as the seeded bundle intends.
+- SO (the FO's real manager) reviews it: SUBMITTED → REVIEWED.
+- **The actual point of the acceptance criteria — the backend gate confirmed real, not just a hidden
+  button**: the SAME SO who just reviewed it is still *offered* the Acknowledge button (the frontend
+  only checks permission + status, never "was it specifically me" — that's the backend's job) and
+  clicking it produces the backend's real 403 ("the same manager who reviewed this DSR cannot also
+  acknowledge it"), rendered inline, not swallowed.
+- ASM (a different actor, SO's own manager) acknowledges it: REVIEWED → ACKNOWLEDGED, completing the
+  full chain.
+- Zero uncaught page errors across the whole run.
+
+**Cleanup confirmed:** every test-created DSR document removed after verification; the FO's one
+genuinely pre-existing DSR (from earlier Phase 18 regression testing, a different calendar day) was
+left untouched. `npm run build` — clean, no errors.

@@ -1,4 +1,5 @@
 export { default as OrderAmountSummary } from "./OrderAmountSummary";
+export { default as OrderAttributionWidget } from "./OrderAttributionWidget";
 export { default as OrderDetailRouteView } from "./OrderDetailRouteView";
 export { default as OrderDetailView } from "./OrderDetailView";
 export { default as OrderHeader } from "./OrderHeader";

@@ -1,7 +1,7 @@
 import { CalendarClock, Mail, MapPin, Phone, UserRound } from "lucide-react";
 import Card from "../../../shared/components/Card";
 import { formatBusinessDateTime, getFollowUpPresentationState } from "../../../shared/utils";
-import { formatEmployeeSummary, formatPipelineValue } from "../utils";
+import { formatEmployeeSummary, formatGeoSummary, formatPipelineValue } from "../utils";
 
 const toneClasses = {
   danger: "text-red-700",
@@ -43,6 +43,17 @@ export const LeadAssignmentSummary = ({ lead }) => (
       <div className="rounded-lg border border-forest/10 bg-mint/50 px-4 py-3">
         <dt className="text-xs font-black uppercase tracking-[0.12em] text-muted">Employee</dt>
         <dd className="mt-1 text-sm font-semibold text-ink">{formatEmployeeSummary(lead?.assignedEmployee)}</dd>
+      </div>
+      {/* Captured once at creation, never recomputed on a later transfer
+          of the owning employee — see backend lead.service.js's own
+          Phase 10 comment on this. */}
+      <div className="rounded-lg border border-forest/10 bg-mint/50 px-4 py-3">
+        <dt className="text-xs font-black uppercase tracking-[0.12em] text-muted">Region</dt>
+        <dd className="mt-1 text-sm font-semibold text-ink">{formatGeoSummary(lead?.region)}</dd>
+      </div>
+      <div className="rounded-lg border border-forest/10 bg-mint/50 px-4 py-3">
+        <dt className="text-xs font-black uppercase tracking-[0.12em] text-muted">District</dt>
+        <dd className="mt-1 text-sm font-semibold text-ink">{formatGeoSummary(lead?.district)}</dd>
       </div>
     </dl>
   </Card>
