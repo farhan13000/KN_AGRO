@@ -47,6 +47,15 @@ const SuperAdminDistrictDetailPage = lazy(
 const SuperAdminDistrictEditPage = lazy(
   () => import("../super-admin/pages/districts/SuperAdminDistrictEditPage"),
 );
+const SuperAdminHiringListPage = lazy(
+  () => import("../super-admin/pages/hiring/SuperAdminHiringListPage"),
+);
+const SuperAdminHiringCreatePage = lazy(
+  () => import("../super-admin/pages/hiring/SuperAdminHiringCreatePage"),
+);
+const SuperAdminPromotionApprovalsPage = lazy(
+  () => import("../super-admin/pages/promotions/SuperAdminPromotionApprovalsPage"),
+);
 const SuperAdminCategoryListPage = lazy(
   () => import("../super-admin/pages/categories/SuperAdminCategoryListPage"),
 );
@@ -182,6 +191,18 @@ export const superAdminRouteConfig = {
         {
           path: ROUTES.SUPER_ADMIN.DISTRICT_EDIT,
           element: withPermission(PERMISSIONS.DISTRICT_UPDATE, <SuperAdminDistrictEditPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.HIRING_CREATE,
+          element: withPermission(PERMISSIONS.HIRING_CREATE, <SuperAdminHiringCreatePage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.HIRING,
+          element: withPermission(PERMISSIONS.HIRING_READ, <SuperAdminHiringListPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.PROMOTION_APPROVALS,
+          element: withPermission(PERMISSIONS.PROMOTION_READ, <SuperAdminPromotionApprovalsPage />),
         },
         {
           path: ROUTES.SUPER_ADMIN.CATEGORIES,

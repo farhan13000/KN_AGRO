@@ -28,13 +28,6 @@ const actionConfig = {
     description: "This is a high-risk lifecycle action. The backend controls final status and account policy.",
     tone: "danger",
   },
-  promote: {
-    title: "Promote to Sales Manager",
-    confirmLabel: "Promote",
-    description:
-      "This will ask the backend to change the linked user role to Sales Manager. No separate manager entity is created.",
-    tone: "success",
-  },
 };
 
 const getMutation = (actions, action) => {
@@ -42,7 +35,6 @@ const getMutation = (actions, action) => {
   if (action === "reactivate") return actions.reactivateEmployee;
   if (action === "resign") return actions.resignEmployee;
   if (action === "terminate") return actions.terminateEmployee;
-  if (action === "promote") return actions.promoteToManager;
   return null;
 };
 
@@ -52,7 +44,6 @@ export default function EmployeeLifecycleDialog({
   isOpen,
   onClose,
   onSuccess,
-  salesManagerRoleId = "",
 }) {
   const [confirmationText, setConfirmationText] = useState("");
   const actions = useEmployeeActions({
@@ -62,7 +53,6 @@ export default function EmployeeLifecycleDialog({
   });
   const config = actionConfig[action] || actionConfig.deactivate;
   const mutation = getMutation(actions, action);
-  const isPromotionBlocked = action === "promote" && !salesManagerRoleId;
   const requiresTypedConfirmation = action === "terminate";
   const isTypedConfirmationValid = !requiresTypedConfirmation || confirmationText === "TERMINATE";
 
@@ -73,14 +63,9 @@ export default function EmployeeLifecycleDialog({
   }, [isOpen, action]);
 
   const handleConfirm = async () => {
-    if (!employee?._id || !mutation || isPromotionBlocked || !isTypedConfirmationValid) return;
+    if (!employee?._id || !mutation || !isTypedConfirmationValid) return;
 
-    if (action === "promote") {
-      await mutation.mutate(employee._id, salesManagerRoleId);
-    } else {
-      await mutation.mutate(employee._id);
-    }
-
+    await mutation.mutate(employee._id);
     onClose();
   };
 
@@ -96,13 +81,6 @@ export default function EmployeeLifecycleDialog({
           {config.description} Target employee:{" "}
           <span className="font-black text-ink">{getEmployeeDisplayName(employee)}</span>.
         </p>
-
-        {isPromotionBlocked ? (
-          <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-900">
-            Promotion requires `VITE_SALES_MANAGER_ROLE_ID` because the backend promote endpoint accepts a roleId
-            and no roles listing endpoint is exposed.
-          </p>
-        ) : null}
 
         {mutation?.isError ? (
           <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800">
@@ -134,7 +112,7 @@ export default function EmployeeLifecycleDialog({
           </button>
           <button
             className={`inline-flex min-h-11 items-center justify-center rounded-lg px-5 py-3 text-sm font-bold shadow-sm transition disabled:opacity-60 ${confirmClass}`}
-            disabled={mutation?.isLoading || isPromotionBlocked || !isTypedConfirmationValid}
+            disabled={mutation?.isLoading || !isTypedConfirmationValid}
             onClick={handleConfirm}
             type="button"
           >

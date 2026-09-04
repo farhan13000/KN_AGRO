@@ -81,10 +81,6 @@ export const employeeApi = {
     return patch(API_ENDPOINTS.EMPLOYEES.TERMINATE(employeeId));
   },
 
-  async promoteToManager(employeeId, roleId) {
-    return patch(API_ENDPOINTS.EMPLOYEES.PROMOTE(employeeId), { roleId });
-  },
-
   async requestPromotion(employeeId, reason) {
     return post(API_ENDPOINTS.EMPLOYEES.PROMOTION_REQUEST(employeeId), { reason });
   },
@@ -106,10 +102,6 @@ export const employeeApi = {
 
   async getEmployeeSummary() {
     return get(API_ENDPOINTS.EMPLOYEES.SUMMARY);
-  },
-
-  async registerEmployee(payload) {
-    return post(API_ENDPOINTS.EMPLOYEES.REGISTER, payload);
   },
 
   async getActionRequests(query) {

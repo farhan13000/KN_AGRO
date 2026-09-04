@@ -21,6 +21,15 @@ const SalesManagerDistrictListPage = lazy(
 const SalesManagerDistrictDetailPage = lazy(
   () => import("../sales-manager/pages/districts/SalesManagerDistrictDetailPage"),
 );
+const SalesManagerHiringListPage = lazy(
+  () => import("../sales-manager/pages/hiring/SalesManagerHiringListPage"),
+);
+const SalesManagerHiringCreatePage = lazy(
+  () => import("../sales-manager/pages/hiring/SalesManagerHiringCreatePage"),
+);
+const SalesManagerPromotionApprovalsPage = lazy(
+  () => import("../sales-manager/pages/promotions/SalesManagerPromotionApprovalsPage"),
+);
 const SalesManagerLeadListPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerLeadListPage"));
 const SalesManagerLeadDetailPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerLeadDetailPage"));
 const SalesManagerFollowUpsPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerFollowUpsPage"));
@@ -115,6 +124,18 @@ export const salesManagerRouteConfig = {
         {
           path: ROUTES.SALES_MANAGER.DISTRICT_DETAIL,
           element: withPermission(PERMISSIONS.DISTRICT_READ, <SalesManagerDistrictDetailPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.HIRING_CREATE,
+          element: withPermission(PERMISSIONS.HIRING_CREATE, <SalesManagerHiringCreatePage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.HIRING,
+          element: withPermission(PERMISSIONS.HIRING_READ, <SalesManagerHiringListPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.PROMOTION_APPROVALS,
+          element: withPermission(PERMISSIONS.PROMOTION_READ, <SalesManagerPromotionApprovalsPage />),
         },
         {
           path: ROUTES.SALES_MANAGER.CRM,

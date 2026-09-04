@@ -10,6 +10,8 @@ import {
   PhoneCall,
   Receipt,
   ShoppingCart,
+  TrendingUp,
+  UserPlus,
   Users,
 } from "lucide-react";
 import { PERMISSIONS, ROUTES } from "../../shared/constants";
@@ -37,6 +39,18 @@ export const salesManagerNavigation = [
     route: ROUTES.SALES_MANAGER.DISTRICTS,
     icon: GitBranch,
     permission: PERMISSIONS.DISTRICT_READ,
+  },
+  {
+    label: "Hiring Requests",
+    route: ROUTES.SALES_MANAGER.HIRING,
+    icon: UserPlus,
+    permission: PERMISSIONS.HIRING_READ,
+  },
+  {
+    label: "Promotion Approvals",
+    route: ROUTES.SALES_MANAGER.PROMOTION_APPROVALS,
+    icon: TrendingUp,
+    permission: PERMISSIONS.PROMOTION_READ,
   },
   {
     label: "CRM",

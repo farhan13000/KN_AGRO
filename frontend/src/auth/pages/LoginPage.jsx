@@ -184,12 +184,6 @@ export default function LoginPage() {
                 >
                   {submitting ? "Signing in..." : "Sign in"}
                 </button>
-                <p className="text-center text-sm font-semibold text-muted">
-                  Need employee access?{" "}
-                  <Link className="font-black text-forest hover:text-agriculture" to={ROUTES.AUTH.REGISTER}>
-                    Register for approval
-                  </Link>
-                </p>
               </form>
             </div>
           </div>

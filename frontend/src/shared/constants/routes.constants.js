@@ -13,8 +13,6 @@ export const ROUTES = Object.freeze({
   },
   AUTH: {
     LOGIN: "/login",
-    REGISTER: "/register",
-    REGISTRATION_PENDING: "/registration-pending",
     CHANGE_PASSWORD: "/change-password",
   },
   SUPER_ADMIN: {
@@ -54,6 +52,9 @@ export const ROUTES = Object.freeze({
     DISTRICT_CREATE: "/super-admin/districts/create",
     DISTRICT_DETAIL: "/super-admin/districts/:districtId",
     DISTRICT_EDIT: "/super-admin/districts/:districtId/edit",
+    PROMOTION_APPROVALS: "/super-admin/promotion-approvals",
+    HIRING: "/super-admin/hiring-requests",
+    HIRING_CREATE: "/super-admin/hiring-requests/create",
     CUSTOMERS: "/super-admin/customers",
     CUSTOMER_CREATE: "/super-admin/customers/create",
     CUSTOMER_DETAIL: "/super-admin/customers/:customerId",
@@ -74,6 +75,9 @@ export const ROUTES = Object.freeze({
     REGIONS: "/manager/regions",
     DISTRICTS: "/manager/districts",
     DISTRICT_DETAIL: "/manager/districts/:districtId",
+    PROMOTION_APPROVALS: "/manager/promotion-approvals",
+    HIRING: "/manager/hiring-requests",
+    HIRING_CREATE: "/manager/hiring-requests/create",
     CRM: "/manager/crm",
     LEADS: "/manager/leads",
     LEAD_DETAIL: "/manager/leads/:leadId",

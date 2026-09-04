@@ -12,6 +12,8 @@ import {
   MapPin,
   Package,
   PhoneCall,
+  TrendingUp,
+  UserPlus,
   Receipt,
   ShoppingCart,
   Users,
@@ -54,6 +56,18 @@ export const superAdminNavigation = [
     route: ROUTES.SUPER_ADMIN.DISTRICTS,
     icon: GitBranch,
     permission: PERMISSIONS.DISTRICT_READ,
+  },
+  {
+    label: "Hiring Requests",
+    route: ROUTES.SUPER_ADMIN.HIRING,
+    icon: UserPlus,
+    permission: PERMISSIONS.HIRING_READ,
+  },
+  {
+    label: "Promotion Approvals",
+    route: ROUTES.SUPER_ADMIN.PROMOTION_APPROVALS,
+    icon: TrendingUp,
+    permission: PERMISSIONS.PROMOTION_READ,
   },
   {
     label: "Categories",

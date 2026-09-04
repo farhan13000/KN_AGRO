@@ -28,15 +28,6 @@ export const pickSelfUpdatePayload = (values) => ({
   emergencyContact: values.emergencyContact,
 });
 
-export const pickRegistrationPayload = (values) => ({
-  name: values.name,
-  email: values.email,
-  password: values.password,
-  phone: values.phone,
-  requestedDepartment: values.requestedDepartment || undefined,
-  requestedDesignation: values.requestedDesignation || undefined,
-});
-
 export const pickApprovalPayload = (values) => ({
   department: values.department || undefined,
   designation: values.designation || undefined,

@@ -103,20 +103,6 @@ export const validateApprovalForm = (values = {}) => {
   return result(errors);
 };
 
-export const validateRegistrationForm = (values = {}) => {
-  const errors = {};
-
-  requireField(errors, values, "name", "Name is required.");
-  validateEmail(errors, values);
-  requireField(errors, values, "password", "Password is required.");
-  if (hasValue(values.password) && String(values.password).length < 8) {
-    errors.password = "Password must be at least 8 characters.";
-  }
-  validatePhone(errors, values);
-
-  return result(errors);
-};
-
 export const validateRejectionForm = (values = {}) => {
   const errors = {};
 

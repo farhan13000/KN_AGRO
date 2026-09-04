@@ -103,3 +103,78 @@ if this page's underlying fetch isn't already scoped correctly by the backend fo
 - The old hardcoded single-role promote action is fully removed.
 - Recommend/approve/reject/cancel are all operable through the UI, showing the backend's specific
   error messages rather than swallowing them.
+
+---
+
+## IMPLEMENTED AND VERIFIED
+
+### A backend endpoint had to be added first
+
+The role picker this phase depends on was **impossible to build**: the backend had no roles API at
+all (`src/modules/roles/` held only `role.model.js` + `role.service.js`, with no controller, no
+routes, and nothing mounted in `routes/index.js`). Role ids aren't obtainable anywhere else either —
+`employee.serializer.js` returns `role: {name, permissions}` with **no `_id`**. That is exactly why
+the code being replaced used a hardcoded `VITE_SALES_MANAGER_ROLE_ID`; the original author left the
+reason in a comment: *"no roles listing endpoint is exposed."*
+
+Added (approved before touching the backend): `role.controller.js`, `role.routes.js`, and a two-line
+mount. `GET /api/v1/roles` returns **`{_id, name, description}` only** — deliberately omitting the
+`permissions` array, since nothing that *picks* a role needs the authorization model. Gated by
+`authenticate` alone rather than a new permission: every actor who can start a promotion or hiring
+flow needs it, role *names* are already visible on every employee record, and a `ROLES_READ`
+permission would have meant editing `seedRoles.js` to grant it to nearly every role anyway. Verified
+live: 401 unauthenticated, correct narrowed payload when authenticated.
+
+**This also unblocks F07** — `hiring.validation.js` requires a `proposedRoleId` from the client too.
+
+### Backend gap found — "My Recommendations" was deliberately NOT built
+
+`promotionListQuerySchema` accepts only `page`, `limit`, `status`, `employee` — **no
+`recommendedBy`** — and `PromotionService.list()` isn't actor-scoped, so it returns every promotion
+matching the filter regardless of who is asking. Building the page anyway would have meant fetching
+all promotions and filtering in the browser, putting other users' recommendations on the client.
+Per this prompt's own instruction, that is reported rather than worked around. **Two things for the
+backend: add a `recommendedBy` filter, and consider whether `GET /promotions` should be actor-scoped
+at all.**
+
+### What was built
+
+`features/promotions/` — `promotionApi.js`, `usePromotionQueries.js` (incl. `useRoleOptions`), and
+components: `PromotionRecommendDialog`, `PromotionDecisionDialog`, `PromotionCard`,
+`PromotionStatusBadge`, `PromotionHistorySection`, `PendingApprovalsView`. Approvals pages wired
+into both portals with nav entries; `PromotionHistorySection` added to the employee detail page.
+
+The role picker offers **all** roles rather than computing "the next tier up" — the approver matrix
+lives only in the backend, and an invalid pair returns its own message. The approvals queue
+deliberately does **not** hide rows the actor might not be able to decide: the list endpoint isn't
+actor-scoped, so guessing would only hide legitimate work; the real gate is the per-action 403,
+shown inline.
+
+**Old path fully removed:** the `promote` lifecycle action, its `actionConfig` entry, its mutation
+branch, `EMPLOYEE_LIFECYCLE_ACTIONS.PROMOTE`, its `canShowEmployeeLifecycleAction` branch, the
+`salesManagerRoleId` prop, `env.salesManagerRoleId`, the `VITE_SALES_MANAGER_ROLE_ID` entry in
+`.env.example`, and the now-callerless `employeeApi.promoteToManager` + its mutation.
+
+### Bugs I introduced and caught
+
+Two dangling-reference bugs, both of which **`npm run build` passed straight through** and only a
+real browser caught (the same failure mode as Phase F02's orphaned mock helpers):
+
+1. `TrendingUp` used in both navigation files but never imported — a guard in my own edit script
+   skipped the import because the icon name was already present in the line it had just inserted.
+   Every nav file's icons are now checked.
+2. `isPromotionBlocked` still referenced in a `disabled` prop after its declaration was deleted.
+
+Both crashed the whole page via React Router's error boundary. Afterwards I grepped every identifier
+removed this phase to confirm nothing else dangles.
+
+### Verification
+
+Real browser (Playwright/Chromium) against the live dev backend, on a purpose-built
+`GM → RM → ASM → SO → FO` chain. **13/13 checks passed, zero page errors:** old action gone, new
+action present, history empty for a fresh employee, role picker populated from the new endpoint,
+**tier-skip rejected with the backend's own wording** (*"No configured promotion path from fo to
+rm"*), valid FO→SO recommendation succeeds, history shows it awaiting approval, it appears in the
+approvals queue, **reject without a comment is blocked**, approve completes it, and history shows
+Completed. Confirmed directly in the database afterwards: the FO's role really is `so`, with exactly
+one promotion record in `COMPLETED`. All test data removed.

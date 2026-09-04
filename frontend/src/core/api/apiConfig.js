@@ -101,6 +101,27 @@ export const API_ENDPOINTS = Object.freeze({
     CANCEL: (quotationId) => `/quotations/${quotationId}/cancel`,
     REVISE: (quotationId) => `/quotations/${quotationId}/revise`,
   },
+  ROLES: {
+    BASE: "/roles",
+  },
+  // Mounted at /hiring-requests in the backend's routes/index.js — the
+  // module is named `hiring`, the path is not.
+  HIRING: {
+    BASE: "/hiring-requests",
+    DETAIL: (requestId) => `/hiring-requests/${requestId}`,
+    PROCESS: (requestId) => `/hiring-requests/${requestId}/process`,
+    REVIEW: (requestId) => `/hiring-requests/${requestId}/review`,
+    APPROVE: (requestId) => `/hiring-requests/${requestId}/approve`,
+    REJECT: (requestId) => `/hiring-requests/${requestId}/reject`,
+    COMPLETE: (requestId) => `/hiring-requests/${requestId}/complete`,
+  },
+  PROMOTIONS: {
+    BASE: "/promotions",
+    DETAIL: (promotionId) => `/promotions/${promotionId}`,
+    APPROVE: (promotionId) => `/promotions/${promotionId}/approve`,
+    REJECT: (promotionId) => `/promotions/${promotionId}/reject`,
+    CANCEL: (promotionId) => `/promotions/${promotionId}/cancel`,
+  },
   REGIONS: {
     BASE: "/regions",
     DETAIL: (regionId) => `/regions/${regionId}`,

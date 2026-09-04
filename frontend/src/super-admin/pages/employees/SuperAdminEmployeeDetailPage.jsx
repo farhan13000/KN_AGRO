@@ -8,7 +8,6 @@ import PageLoader from "../../../shared/components/PageLoader";
 import { PERMISSIONS, ROUTES } from "../../../shared/constants";
 import { PermissionGuard } from "../../../core/auth";
 import { useAuth } from "../../../core/auth";
-import { env } from "../../../core/config";
 import {
   DirectReportsList,
   EmployeeApprovalDialog,
@@ -23,6 +22,7 @@ import {
   getEmployeeDisplayName,
   useEmployeeDetail,
 } from "../../../features/employees";
+import { PromotionHistorySection, PromotionRecommendDialog } from "../../../features/promotions";
 
 export default function SuperAdminEmployeeDetailPage() {
   const { employeeId } = useParams();
@@ -33,6 +33,7 @@ export default function SuperAdminEmployeeDetailPage() {
   const [rejectionOpen, setRejectionOpen] = useState(false);
   const [managerOpen, setManagerOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
+  const [recommendOpen, setRecommendOpen] = useState(false);
   const [lifecycleAction, setLifecycleAction] = useState("");
   const [message, setMessage] = useState("");
 
@@ -174,16 +175,14 @@ export default function SuperAdminEmployeeDetailPage() {
                 </button>
               ) : null}
             </PermissionGuard>
-            <PermissionGuard permission={PERMISSIONS.EMPLOYEES_PROMOTE}>
-              {canShow(EMPLOYEE_LIFECYCLE_ACTIONS.PROMOTE) ? (
-                <button
-                  className="inline-flex min-h-11 items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-forest ring-1 ring-forest/15 transition hover:bg-mint"
-                  onClick={() => setLifecycleAction("promote")}
-                  type="button"
-                >
-                  Promote to Sales Manager
-                </button>
-              ) : null}
+            <PermissionGuard permission={PERMISSIONS.PROMOTION_RECOMMEND}>
+              <button
+                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-forest ring-1 ring-forest/15 transition hover:bg-mint"
+                onClick={() => setRecommendOpen(true)}
+                type="button"
+              >
+                Recommend for Promotion
+              </button>
             </PermissionGuard>
           </div>
         </div>
@@ -195,6 +194,8 @@ export default function SuperAdminEmployeeDetailPage() {
       </section>
 
       <TransferHistoryList employeeId={employeeId} />
+
+      <PromotionHistorySection employeeId={employeeId} />
 
       <EmployeeApprovalDialog
         employee={employee}
@@ -220,13 +221,18 @@ export default function SuperAdminEmployeeDetailPage() {
         onClose={() => setTransferOpen(false)}
         onSuccess={() => refetchWithMessage("Employee transferred successfully.")}
       />
+      <PromotionRecommendDialog
+        employee={employee}
+        isOpen={recommendOpen}
+        onClose={() => setRecommendOpen(false)}
+        onSuccess={() => refetchWithMessage("Promotion recommended.")}
+      />
       <EmployeeLifecycleDialog
         action={lifecycleAction}
         employee={employee}
         isOpen={Boolean(lifecycleAction)}
         onClose={() => setLifecycleAction("")}
         onSuccess={() => refetchWithMessage("Employee lifecycle action completed.")}
-        salesManagerRoleId={env.salesManagerRoleId}
       />
     </div>
   );

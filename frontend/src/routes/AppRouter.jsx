@@ -9,12 +9,6 @@ import { salesManagerRouteConfig } from "./SalesManagerRoutes";
 import { superAdminRouteConfig } from "./SuperAdminRoutes";
 
 const LoginPage = lazy(() => import("../auth/pages/LoginPage"));
-const EmployeeRegistrationPage = lazy(
-  () => import("../auth/pages/EmployeeRegistration/EmployeeRegistrationPage"),
-);
-const RegistrationPendingPage = lazy(
-  () => import("../auth/pages/RegistrationPending/RegistrationPendingPage"),
-);
 const UnauthorizedPage = lazy(() => import("./UnauthorizedPage"));
 
 function PageFallback() {
@@ -38,8 +32,6 @@ const withSuspense = (route) => ({
 export const router = createBrowserRouter(
   [
     { path: ROUTES.AUTH.LOGIN, element: <LoginPage /> },
-    { path: ROUTES.AUTH.REGISTER, element: <EmployeeRegistrationPage /> },
-    { path: ROUTES.AUTH.REGISTRATION_PENDING, element: <RegistrationPendingPage /> },
     { path: ROUTES.ERROR.UNAUTHORIZED, element: <UnauthorizedPage /> },
     accountRouteConfig,
     superAdminRouteConfig,

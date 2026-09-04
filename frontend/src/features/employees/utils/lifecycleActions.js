@@ -1,7 +1,12 @@
 import { PERMISSIONS } from "../../../shared/constants";
-import { BACKEND_ROLES } from "../../../shared/constants/roles.constants";
 import { EMPLOYEE_STATUS } from "../constants";
 
+/**
+ * PROMOTE is deliberately absent. Promotion is no longer a one-click
+ * lifecycle action against a single hardcoded target role — it is the
+ * backend's recommend -> approve/reject workflow, surfaced through
+ * `features/promotions` (PromotionRecommendDialog + the approvals queue).
+ */
 export const EMPLOYEE_LIFECYCLE_ACTIONS = Object.freeze({
   APPROVE: "approve",
   REJECT: "reject",
@@ -10,14 +15,12 @@ export const EMPLOYEE_LIFECYCLE_ACTIONS = Object.freeze({
   REACTIVATE: "reactivate",
   RESIGN: "resign",
   TERMINATE: "terminate",
-  PROMOTE: "promote",
 });
 
 export const canShowEmployeeLifecycleAction = ({ employee, action, hasPermission }) => {
   if (!employee || !action || typeof hasPermission !== "function") return false;
 
   const status = employee.employeeStatus;
-  const roleName = employee.user?.role?.name;
 
   if (action === EMPLOYEE_LIFECYCLE_ACTIONS.APPROVE || action === EMPLOYEE_LIFECYCLE_ACTIONS.REJECT) {
     return status === EMPLOYEE_STATUS.PENDING_APPROVAL && hasPermission(PERMISSIONS.EMPLOYEES_APPROVE);
@@ -39,14 +42,6 @@ export const canShowEmployeeLifecycleAction = ({ employee, action, hasPermission
 
   if (action === EMPLOYEE_LIFECYCLE_ACTIONS.REACTIVATE) {
     return status === EMPLOYEE_STATUS.INACTIVE && hasPermission(PERMISSIONS.EMPLOYEES_UPDATE);
-  }
-
-  if (action === EMPLOYEE_LIFECYCLE_ACTIONS.PROMOTE) {
-    return (
-      status === EMPLOYEE_STATUS.ACTIVE &&
-      roleName !== BACKEND_ROLES.SALES_MANAGER &&
-      hasPermission(PERMISSIONS.EMPLOYEES_PROMOTE)
-    );
   }
 
   return false;

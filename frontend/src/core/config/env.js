@@ -10,5 +10,4 @@ export const env = Object.freeze({
     viteEnv.VITE_PUBLIC_SITE_URL || globalThis.window?.location?.origin || "http://localhost:5173",
   ),
   businessTimezone: viteEnv.VITE_BUSINESS_TIMEZONE || "Asia/Kolkata",
-  salesManagerRoleId: viteEnv.VITE_SALES_MANAGER_ROLE_ID || "",
 });

@@ -95,5 +95,14 @@ export const PERMISSIONS = Object.freeze({
   PROMOTION_RECOMMEND: "promotion.recommend",
   PROMOTION_APPROVE: "promotion.approve",
   PROMOTION_REJECT: "promotion.reject",
+
+  // Hiring workflow (backend Phase 8, verified). HIRING_RECOMMEND gates
+  // both the Process and Review steps; the actual OA-vs-GM narrowing
+  // happens inside HiringService, not here.
+  HIRING_READ: "hiring.read",
+  HIRING_CREATE: "hiring.create",
+  HIRING_RECOMMEND: "hiring.recommend",
+  HIRING_APPROVE: "hiring.approve",
+  HIRING_REJECT: "hiring.reject",
 });
 
