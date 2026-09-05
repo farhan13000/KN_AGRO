@@ -1,7 +1,10 @@
 import {
   AlertTriangle,
   CalendarCheck,
+  CalendarRange,
   ClipboardList,
+  ClipboardSignature,
+  Clock,
   CreditCard,
   FileText,
   LayoutDashboard,
@@ -90,5 +93,23 @@ export const employeeNavigation = [
     route: ROUTES.EMPLOYEE.PAYMENTS,
     icon: CreditCard,
     permission: PERMISSIONS.PAYMENTS_READ,
+  },
+  {
+    label: "My Attendance",
+    route: ROUTES.EMPLOYEE.ATTENDANCE_ME,
+    icon: Clock,
+    permission: PERMISSIONS.ATTENDANCE_READ_SELF,
+  },
+  {
+    label: "My Leaves",
+    route: ROUTES.EMPLOYEE.LEAVES_ME,
+    icon: CalendarRange,
+    permission: PERMISSIONS.LEAVES_READ_SELF,
+  },
+  {
+    label: "My Reports",
+    route: ROUTES.EMPLOYEE.REPORT_REQUESTS_ME,
+    icon: ClipboardSignature,
+    permission: PERMISSIONS.REPORTS_READ_SELF,
   },
 ];

@@ -71,6 +71,9 @@ export const ROUTES = Object.freeze({
     DSR: "/super-admin/dsr",
     PRODUCT_RECOMMENDATIONS: "/super-admin/product-recommendations",
     AUDIT_LOG: "/super-admin/audit-log",
+    ATTENDANCE: "/super-admin/attendance",
+    LEAVES: "/super-admin/leaves",
+    REPORT_REQUESTS: "/super-admin/report-requests",
   },
   SALES_MANAGER: {
     DASHBOARD: "/manager/dashboard",
@@ -108,6 +111,12 @@ export const ROUTES = Object.freeze({
     DSR_ME: "/manager/dsr/me",
     DSR_TEAM: "/manager/dsr/team",
     PRODUCT_RECOMMENDATIONS: "/manager/product-recommendations",
+    ATTENDANCE_ME: "/manager/attendance/me",
+    ATTENDANCE_TEAM: "/manager/attendance/team",
+    LEAVES_ME: "/manager/leaves/me",
+    LEAVES_TEAM: "/manager/leaves/team",
+    REPORT_REQUESTS_ME: "/manager/report-requests/me",
+    REPORT_REQUESTS_TEAM: "/manager/report-requests/team",
   },
   EMPLOYEE: {
     DASHBOARD: "/employee/dashboard",
@@ -132,6 +141,9 @@ export const ROUTES = Object.freeze({
     DSR_SUBMIT: "/employee/dsr/submit",
     DSR_ME: "/employee/dsr/me",
     PRODUCT_RECOMMENDATIONS: "/employee/product-recommendations",
+    ATTENDANCE_ME: "/employee/attendance/me",
+    LEAVES_ME: "/employee/leaves/me",
+    REPORT_REQUESTS_ME: "/employee/report-requests/me",
   },
   ERROR: {
     UNAUTHORIZED: "/unauthorized",

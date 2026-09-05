@@ -31,6 +31,11 @@ const EmployeeMyDSRListPage = lazy(() => import("../employee/pages/dsr/EmployeeM
 const EmployeeProductRecommendationsPage = lazy(
   () => import("../employee/pages/productRecommendations/EmployeeProductRecommendationsPage"),
 );
+const EmployeeMyAttendancePage = lazy(() => import("../employee/pages/attendance/EmployeeMyAttendancePage"));
+const EmployeeMyLeavesPage = lazy(() => import("../employee/pages/leaves/EmployeeMyLeavesPage"));
+const EmployeeMyReportRequestsPage = lazy(
+  () => import("../employee/pages/reportRequests/EmployeeMyReportRequestsPage"),
+);
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -128,6 +133,18 @@ export const employeeRouteConfig = {
         {
           path: ROUTES.EMPLOYEE.PRODUCT_RECOMMENDATIONS,
           element: withPermission(PERMISSIONS.PRODUCTS_READ, <EmployeeProductRecommendationsPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.ATTENDANCE_ME,
+          element: withPermission(PERMISSIONS.ATTENDANCE_READ_SELF, <EmployeeMyAttendancePage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.LEAVES_ME,
+          element: withPermission(PERMISSIONS.LEAVES_READ_SELF, <EmployeeMyLeavesPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.REPORT_REQUESTS_ME,
+          element: withPermission(PERMISSIONS.REPORTS_READ_SELF, <EmployeeMyReportRequestsPage />),
         },
         { path: "/employee/*", element: <InternalNotFoundPage /> },
       ],

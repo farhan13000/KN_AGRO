@@ -4,6 +4,7 @@ import { PermissionGuard } from "../../core/auth";
 import { PERMISSIONS } from "../../shared/constants";
 import { OrderAttributionWidget } from "../../features/orders";
 import { ManagerDashboardContent, SalesOfficerDashboardContent } from "../../features/analytics";
+import { AttendanceTodayWidget } from "../../features/attendance";
 
 /**
  * GM/RM/ASM/legacy SALES_MANAGER (all hold ANALYTICS_MANAGER) get the full
@@ -29,6 +30,11 @@ export default function SalesManagerDashboardPage() {
           dashboard below. */}
       <PermissionGuard permission={PERMISSIONS.ORDERS_ANALYTICS_READ}>
         <OrderAttributionWidget />
+      </PermissionGuard>
+      {/* Org-hierarchy migration (Phase F17) — real check-in/check-out for
+          every manager-tier role (all hold ATTENDANCE_CHECK_IN). */}
+      <PermissionGuard permission={PERMISSIONS.ATTENDANCE_CHECK_IN}>
+        <AttendanceTodayWidget />
       </PermissionGuard>
       {hasPermission(PERMISSIONS.ANALYTICS_MANAGER) ? (
         <ManagerDashboardContent />

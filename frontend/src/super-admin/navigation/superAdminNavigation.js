@@ -1,10 +1,13 @@
 import {
   AlertTriangle,
   Boxes,
+  CalendarRange,
   ClipboardCheck,
   ClipboardList,
+  Clock,
   Columns3,
   CreditCard,
+  FileQuestion,
   FileText,
   FolderTree,
   GitBranch,
@@ -191,5 +194,23 @@ export const superAdminNavigation = [
     route: ROUTES.SUPER_ADMIN.AUDIT_LOG,
     icon: ScrollText,
     permission: PERMISSIONS.AUDIT_READ,
+  },
+  {
+    label: "Attendance",
+    route: ROUTES.SUPER_ADMIN.ATTENDANCE,
+    icon: Clock,
+    permission: PERMISSIONS.ATTENDANCE_READ_ALL,
+  },
+  {
+    label: "Leaves",
+    route: ROUTES.SUPER_ADMIN.LEAVES,
+    icon: CalendarRange,
+    permission: PERMISSIONS.LEAVES_READ_ALL,
+  },
+  {
+    label: "Report Requests",
+    route: ROUTES.SUPER_ADMIN.REPORT_REQUESTS,
+    icon: FileQuestion,
+    permission: PERMISSIONS.REPORTS_MANAGE,
   },
 ];

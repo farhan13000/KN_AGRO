@@ -146,6 +146,13 @@ const SuperAdminProductRecommendationsPage = lazy(
   () => import("../super-admin/pages/productRecommendations/SuperAdminProductRecommendationsPage"),
 );
 const SuperAdminAuditLogListPage = lazy(() => import("../super-admin/pages/audit/SuperAdminAuditLogListPage"));
+const SuperAdminAllAttendancePage = lazy(
+  () => import("../super-admin/pages/attendance/SuperAdminAllAttendancePage"),
+);
+const SuperAdminAllLeavesPage = lazy(() => import("../super-admin/pages/leaves/SuperAdminAllLeavesPage"));
+const SuperAdminAllReportRequestsPage = lazy(
+  () => import("../super-admin/pages/reportRequests/SuperAdminAllReportRequestsPage"),
+);
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -363,6 +370,18 @@ export const superAdminRouteConfig = {
         {
           path: ROUTES.SUPER_ADMIN.AUDIT_LOG,
           element: withPermission(PERMISSIONS.AUDIT_READ, <SuperAdminAuditLogListPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.ATTENDANCE,
+          element: withPermission(PERMISSIONS.ATTENDANCE_READ_ALL, <SuperAdminAllAttendancePage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.LEAVES,
+          element: withPermission(PERMISSIONS.LEAVES_READ_ALL, <SuperAdminAllLeavesPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.REPORT_REQUESTS,
+          element: withPermission(PERMISSIONS.REPORTS_MANAGE, <SuperAdminAllReportRequestsPage />),
         },
         { path: "/super-admin/*", element: <InternalNotFoundPage /> },
       ],

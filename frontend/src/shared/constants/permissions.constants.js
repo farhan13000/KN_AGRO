@@ -176,5 +176,42 @@ export const PERMISSIONS = Object.freeze({
   // exists on the backend's permission list but has no route to gate —
   // not mirrored here.
   AUDIT_READ: "audit.read",
+
+  // Attendance (backend Phase 12, verified; Phase F17 built the first
+  // frontend consumer). CHECK_IN/CHECK_OUT/READ_SELF held by every
+  // seeded role with an Employee record; READ_TEAM by legacy
+  // SALES_MANAGER/GM/RM/ASM/SO (not FO); CORRECT/READ_ALL held by
+  // nobody directly — SA wildcard only.
+  ATTENDANCE_CHECK_IN: "attendance.check_in",
+  ATTENDANCE_CHECK_OUT: "attendance.check_out",
+  ATTENDANCE_READ_SELF: "attendance.read_self",
+  ATTENDANCE_READ_TEAM: "attendance.read_team",
+  ATTENDANCE_CORRECT: "attendance.correct",
+  ATTENDANCE_READ_ALL: "attendance.read_all",
+
+  // Leaves (backend Phase 12, verified; Phase F17 built the first
+  // frontend consumer). CREATE/READ_SELF/CANCEL_SELF held by every
+  // seeded role with an Employee record; READ_TEAM/APPROVE by legacy
+  // SALES_MANAGER/GM/RM/ASM/SO (not FO); READ_ALL held by nobody
+  // directly — SA wildcard only.
+  LEAVES_CREATE: "leaves.create",
+  LEAVES_READ_SELF: "leaves.read_self",
+  LEAVES_CANCEL_SELF: "leaves.cancel_self",
+  LEAVES_READ_TEAM: "leaves.read_team",
+  LEAVES_APPROVE: "leaves.approve",
+  LEAVES_READ_ALL: "leaves.read_all",
+
+  // Report Requests — ask-then-answer, distinct from DSR (backend Phase
+  // 12, verified; Phase F18 built the first frontend consumer).
+  // READ_SELF/SUBMIT held by every seeded role with an Employee record;
+  // READ_TEAM/REQUEST/REVIEW by legacy SALES_MANAGER/GM/RM/ASM only —
+  // narrower than Attendance/Leave's team tier, SO does NOT hold these.
+  // MANAGE held by nobody directly — SA wildcard only.
+  REPORTS_READ_SELF: "reports.read_self",
+  REPORTS_SUBMIT: "reports.submit",
+  REPORTS_READ_TEAM: "reports.read_team",
+  REPORTS_REQUEST: "reports.request",
+  REPORTS_REVIEW: "reports.review",
+  REPORTS_MANAGE: "reports.manage",
 });
 

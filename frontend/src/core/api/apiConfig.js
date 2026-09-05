@@ -218,6 +218,38 @@ export const API_ENDPOINTS = Object.freeze({
     BASE: "/audit",
     DETAIL: (auditId) => `/audit/${auditId}`,
   },
+  ATTENDANCE: {
+    CHECK_IN: "/attendance/check-in",
+    CHECK_OUT: "/attendance/check-out",
+    ME_TODAY: "/attendance/me/today",
+    ME_SUMMARY: "/attendance/me/summary",
+    ME: "/attendance/me",
+    TEAM_SUMMARY: "/attendance/team/summary",
+    TEAM: "/attendance/team",
+    CORRECT: (attendanceId) => `/attendance/${attendanceId}/correct`,
+    BASE: "/attendance",
+  },
+  LEAVES: {
+    BASE: "/leaves",
+    ME: "/leaves/me",
+    TEAM: "/leaves/team",
+    APPROVE: (leaveId) => `/leaves/${leaveId}/approve`,
+    REJECT: (leaveId) => `/leaves/${leaveId}/reject`,
+    CANCEL: (leaveId) => `/leaves/${leaveId}/cancel`,
+  },
+  // Mounted at /reports in the backend's routes/index.js — the module is
+  // named `reportRequests`, the path is not.
+  REPORT_REQUESTS: {
+    BASE: "/reports/requests",
+    ME: "/reports/requests/me",
+    TEAM: "/reports/requests/team",
+    SUMMARY: "/reports/requests/summary",
+    START: (reportRequestId) => `/reports/requests/${reportRequestId}/start`,
+    SUBMIT: (reportRequestId) => `/reports/requests/${reportRequestId}/submit`,
+    RESUBMIT: (reportRequestId) => `/reports/requests/${reportRequestId}/resubmit`,
+    REVIEW: (reportRequestId) => `/reports/requests/${reportRequestId}/review`,
+    REJECT: (reportRequestId) => `/reports/requests/${reportRequestId}/reject`,
+  },
   PUBLIC: {
     CATEGORIES: "/public/categories",
     PRODUCTS: "/public/products",

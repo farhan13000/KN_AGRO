@@ -94,6 +94,20 @@ const SalesManagerTeamDSRListPage = lazy(
 const SalesManagerProductRecommendationsPage = lazy(
   () => import("../sales-manager/pages/productRecommendations/SalesManagerProductRecommendationsPage"),
 );
+const SalesManagerMyAttendancePage = lazy(
+  () => import("../sales-manager/pages/attendance/SalesManagerMyAttendancePage"),
+);
+const SalesManagerTeamAttendancePage = lazy(
+  () => import("../sales-manager/pages/attendance/SalesManagerTeamAttendancePage"),
+);
+const SalesManagerMyLeavesPage = lazy(() => import("../sales-manager/pages/leaves/SalesManagerMyLeavesPage"));
+const SalesManagerTeamLeavesPage = lazy(() => import("../sales-manager/pages/leaves/SalesManagerTeamLeavesPage"));
+const SalesManagerMyReportRequestsPage = lazy(
+  () => import("../sales-manager/pages/reportRequests/SalesManagerMyReportRequestsPage"),
+);
+const SalesManagerReportRequestsPage = lazy(
+  () => import("../sales-manager/pages/reportRequests/SalesManagerReportRequestsPage"),
+);
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -251,6 +265,30 @@ export const salesManagerRouteConfig = {
         {
           path: ROUTES.SALES_MANAGER.PRODUCT_RECOMMENDATIONS,
           element: withPermission(PERMISSIONS.PRODUCTS_READ, <SalesManagerProductRecommendationsPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.ATTENDANCE_ME,
+          element: withPermission(PERMISSIONS.ATTENDANCE_READ_SELF, <SalesManagerMyAttendancePage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.ATTENDANCE_TEAM,
+          element: withPermission(PERMISSIONS.ATTENDANCE_READ_TEAM, <SalesManagerTeamAttendancePage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.LEAVES_ME,
+          element: withPermission(PERMISSIONS.LEAVES_READ_SELF, <SalesManagerMyLeavesPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.LEAVES_TEAM,
+          element: withPermission(PERMISSIONS.LEAVES_READ_TEAM, <SalesManagerTeamLeavesPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.REPORT_REQUESTS_ME,
+          element: withPermission(PERMISSIONS.REPORTS_READ_SELF, <SalesManagerMyReportRequestsPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.REPORT_REQUESTS_TEAM,
+          element: withPermission(PERMISSIONS.REPORTS_READ_TEAM, <SalesManagerReportRequestsPage />),
         },
         { path: "/manager/*", element: <InternalNotFoundPage /> },
       ],
