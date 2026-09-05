@@ -108,6 +108,12 @@ const SalesManagerMyReportRequestsPage = lazy(
 const SalesManagerReportRequestsPage = lazy(
   () => import("../sales-manager/pages/reportRequests/SalesManagerReportRequestsPage"),
 );
+const SalesManagerMyPayrollPage = lazy(
+  () => import("../sales-manager/pages/payroll/SalesManagerMyPayrollPage"),
+);
+const SalesManagerMyProfilePage = lazy(
+  () => import("../sales-manager/pages/profile/SalesManagerMyProfilePage"),
+);
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -289,6 +295,14 @@ export const salesManagerRouteConfig = {
         {
           path: ROUTES.SALES_MANAGER.REPORT_REQUESTS_TEAM,
           element: withPermission(PERMISSIONS.REPORTS_READ_TEAM, <SalesManagerReportRequestsPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.MY_PAYROLL,
+          element: withPermission(PERMISSIONS.PAYROLL_READ_SELF, <SalesManagerMyPayrollPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.MY_PROFILE,
+          element: withPermission(PERMISSIONS.EMPLOYEES_READ_SELF, <SalesManagerMyProfilePage />),
         },
         { path: "/manager/*", element: <InternalNotFoundPage /> },
       ],

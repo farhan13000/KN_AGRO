@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+import { getPortalRoutesForRole, useAuth } from "../../../core/auth";
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
 import { formatBusinessDateTime, formatMoney } from "../../../shared/utils";
@@ -12,7 +14,11 @@ import { KeyValueRow, Section, Stat, StatGrid } from "./DashboardPrimitives";
  * sales, attendance, DSR, performance.
  */
 export default function EmployeeDashboardContent() {
+  const { role } = useAuth();
   const state = useEmployeeDashboard();
+  // Phase F19 added a full payroll history view; this readout now links to
+  // it rather than being the only payroll surface an employee has.
+  const myPayrollRoute = getPortalRoutesForRole(role)?.MY_PAYROLL || null;
 
   if (state.isLoading) return <PageLoader message="Loading your dashboard..." />;
   if (state.isError) return <ErrorState message={state.errorMessage} title="Unable to load your dashboard" />;
@@ -82,6 +88,14 @@ export default function EmployeeDashboardContent() {
               <KeyValueRow label="Period" value={`${d.payroll.latest.month}/${d.payroll.latest.year}`} />
               <KeyValueRow label="Net Salary" value={formatMoney(d.payroll.latest.netSalary)} />
               <KeyValueRow label="Status" value={d.payroll.latest.status} />
+              {myPayrollRoute ? (
+                <Link
+                  className="inline-block pt-1 text-sm font-black text-forest hover:text-agriculture"
+                  to={myPayrollRoute}
+                >
+                  View full payroll history
+                </Link>
+              ) : null}
             </div>
           ) : (
             <p className="text-sm text-muted">No payroll processed yet.</p>

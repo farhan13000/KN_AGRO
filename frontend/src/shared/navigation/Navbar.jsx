@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { primaryNavigation } from "../../modules/public/data/navigation.data";
 import logoImage from "../../assets/KN_AGRO_LOGO.png";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { ROUTES } from "../constants";
 import Button from "../components/Button";
 import Icon from "../components/Icon";
 import LanguageToggle from "./LanguageToggle";
@@ -58,6 +59,11 @@ export default function Navbar() {
 
         <div className="hidden items-center gap-3 lg:flex">
           <LanguageToggle />
+          {/* Staff entry point. Deliberately `secondary` so it never competes
+              with the customer-facing enquiry CTA beside it. */}
+          <Button className="rounded-lg px-5" to={ROUTES.AUTH.LOGIN} icon="LogIn" variant="secondary">
+            Login
+          </Button>
           <Button className="rounded-lg px-6" to="/enquiry" icon="ArrowRight">
             Request Enquiry
           </Button>
@@ -83,7 +89,10 @@ export default function Navbar() {
               </NavLink>
             ))}
             <LanguageToggle />
-            <Button className="mt-2" to="/enquiry" icon="ArrowRight">
+            <Button className="mt-2" to={ROUTES.AUTH.LOGIN} icon="LogIn" variant="secondary">
+              Login
+            </Button>
+            <Button to="/enquiry" icon="ArrowRight">
               Request Enquiry
             </Button>
           </nav>

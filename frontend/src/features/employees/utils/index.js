@@ -1,3 +1,4 @@
+export { isMissingEmployeeProfileError } from "./employeeErrors";
 export {
   employeeOptionLabel,
   formatEmployeeCode,

@@ -1,4 +1,5 @@
 import {
+  Wallet,
   AlertTriangle,
   CalendarCheck,
   CalendarRange,
@@ -111,5 +112,11 @@ export const employeeNavigation = [
     route: ROUTES.EMPLOYEE.REPORT_REQUESTS_ME,
     icon: ClipboardSignature,
     permission: PERMISSIONS.REPORTS_READ_SELF,
+  },
+  {
+    label: "My Payroll",
+    route: ROUTES.EMPLOYEE.MY_PAYROLL,
+    icon: Wallet,
+    permission: PERMISSIONS.PAYROLL_READ_SELF,
   },
 ];

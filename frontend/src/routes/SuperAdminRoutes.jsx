@@ -153,6 +153,13 @@ const SuperAdminAllLeavesPage = lazy(() => import("../super-admin/pages/leaves/S
 const SuperAdminAllReportRequestsPage = lazy(
   () => import("../super-admin/pages/reportRequests/SuperAdminAllReportRequestsPage"),
 );
+const SuperAdminPayrollPage = lazy(() => import("../super-admin/pages/payroll/SuperAdminPayrollPage"));
+const SuperAdminMyPayrollPage = lazy(
+  () => import("../super-admin/pages/payroll/SuperAdminMyPayrollPage"),
+);
+const SuperAdminMyProfilePage = lazy(
+  () => import("../super-admin/pages/profile/SuperAdminMyProfilePage"),
+);
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -176,7 +183,13 @@ export const superAdminRouteConfig = {
         { path: ROUTES.SUPER_ADMIN.EMPLOYEES, element: <SuperAdminEmployeeListPage /> },
         { path: ROUTES.SUPER_ADMIN.EMPLOYEE_PENDING, element: <SuperAdminPendingEmployeesPage /> },
         { path: ROUTES.SUPER_ADMIN.EMPLOYEE_HIERARCHY, element: <SuperAdminEmployeeHierarchyPage /> },
-        { path: ROUTES.SUPER_ADMIN.EMPLOYEE_CREATE, element: <SuperAdminEmployeeCreatePage /> },
+        {
+          path: ROUTES.SUPER_ADMIN.EMPLOYEE_CREATE,
+          // Was the one unguarded route in this block, which let OA reach
+          // a form it could never submit (OA holds no employees.create).
+          // Hiding the button alone is not enough — the URL is typeable.
+          element: withPermission(PERMISSIONS.EMPLOYEES_CREATE, <SuperAdminEmployeeCreatePage />),
+        },
         { path: ROUTES.SUPER_ADMIN.EMPLOYEE_EDIT, element: <SuperAdminEmployeeEditPage /> },
         { path: ROUTES.SUPER_ADMIN.EMPLOYEE_DETAIL, element: <SuperAdminEmployeeDetailPage /> },
         {
@@ -382,6 +395,18 @@ export const superAdminRouteConfig = {
         {
           path: ROUTES.SUPER_ADMIN.REPORT_REQUESTS,
           element: withPermission(PERMISSIONS.REPORTS_MANAGE, <SuperAdminAllReportRequestsPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.PAYROLL,
+          element: withPermission(PERMISSIONS.PAYROLL_READ, <SuperAdminPayrollPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.MY_PAYROLL,
+          element: withPermission(PERMISSIONS.PAYROLL_READ_SELF, <SuperAdminMyPayrollPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.MY_PROFILE,
+          element: withPermission(PERMISSIONS.EMPLOYEES_READ_SELF, <SuperAdminMyProfilePage />),
         },
         { path: "/super-admin/*", element: <InternalNotFoundPage /> },
       ],

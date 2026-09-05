@@ -36,6 +36,7 @@ const EmployeeMyLeavesPage = lazy(() => import("../employee/pages/leaves/Employe
 const EmployeeMyReportRequestsPage = lazy(
   () => import("../employee/pages/reportRequests/EmployeeMyReportRequestsPage"),
 );
+const EmployeeMyPayrollPage = lazy(() => import("../employee/pages/payroll/EmployeeMyPayrollPage"));
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -145,6 +146,10 @@ export const employeeRouteConfig = {
         {
           path: ROUTES.EMPLOYEE.REPORT_REQUESTS_ME,
           element: withPermission(PERMISSIONS.REPORTS_READ_SELF, <EmployeeMyReportRequestsPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.MY_PAYROLL,
+          element: withPermission(PERMISSIONS.PAYROLL_READ_SELF, <EmployeeMyPayrollPage />),
         },
         { path: "/employee/*", element: <InternalNotFoundPage /> },
       ],

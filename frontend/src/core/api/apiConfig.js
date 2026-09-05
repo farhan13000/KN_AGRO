@@ -106,6 +106,13 @@ export const API_ENDPOINTS = Object.freeze({
   },
   // Mounted at /hiring-requests in the backend's routes/index.js — the
   // module is named `hiring`, the path is not.
+  // Uploads for the only two files this system stores: employee profile
+  // photos and hiring resumes. `kind` is one of the backend's MEDIA_KIND
+  // values and decides folder, allowed types, size cap and permission.
+  MEDIA: {
+    UPLOAD: (kind) => `/media/uploads/${kind}`,
+  },
+
   HIRING: {
     BASE: "/hiring-requests",
     DETAIL: (requestId) => `/hiring-requests/${requestId}`,
@@ -115,6 +122,15 @@ export const API_ENDPOINTS = Object.freeze({
     REJECT: (requestId) => `/hiring-requests/${requestId}/reject`,
     COMPLETE: (requestId) => `/hiring-requests/${requestId}/complete`,
   },
+  PAYROLL: {
+    BASE: "/payroll",
+    ME: "/payroll/me",
+    GENERATE: "/payroll/generate",
+    GENERATE_BULK: "/payroll/generate-bulk",
+    DETAIL: (payrollId) => `/payroll/${payrollId}`,
+    PROCESS: (payrollId) => `/payroll/${payrollId}/process`,
+    MARK_PAID: (payrollId) => `/payroll/${payrollId}/mark-paid`,
+  },
   PROMOTIONS: {
     BASE: "/promotions",
     DETAIL: (promotionId) => `/promotions/${promotionId}`,
@@ -122,13 +138,19 @@ export const API_ENDPOINTS = Object.freeze({
     REJECT: (promotionId) => `/promotions/${promotionId}/reject`,
     CANCEL: (promotionId) => `/promotions/${promotionId}/cancel`,
   },
-  // Existing (pre-migration) live SalaryStructure module — only the
-  // single read-only "current structure" endpoint is used here, as the
-  // prerequisite CurrentSalaryCard needs (see Phase F08's own note on
-  // this). setSalaryStructure/history are NOT wired here; this phase
-  // doesn't build salary-management UI, only the proposal workflow.
+  // Existing (pre-migration) live SalaryStructure module. F08 wired only
+  // the read-only "current structure" endpoint its CurrentSalaryCard
+  // needed; F21 added the two self-service/history reads below. The
+  // write endpoint (POST /salary/:employeeId, SALARY_MANAGE) is still
+  // deliberately unwired — salary changes go through the proposal
+  // workflow, not a direct edit form.
   SALARY: {
+    // Self-service (SALARY_READ_SELF) vs. viewing someone else's
+    // (SALARY_READ — OA + SA wildcard only, deliberately NOT widened to
+    // manager tiers).
+    ME: "/salary/me",
     CURRENT: (employeeId) => `/salary/${employeeId}/current`,
+    HISTORY: (employeeId) => `/salary/${employeeId}/history`,
   },
   SALARY_PROPOSALS: {
     BASE: "/salary-proposals",

@@ -6,6 +6,7 @@ export const translations = {
     "Categories": "श्रेणियां",
     "Contact": "संपर्क",
     "Request Enquiry": "पूछताछ करें",
+    "Login": "लॉगिन",
     "Quick Links": "त्वरित लिंक",
     "Newsletter": "न्यूज़लेटर",
     "Subscribe for product updates and farming tips.": "उत्पाद अपडेट और खेती सुझावों के लिए सदस्यता लें.",

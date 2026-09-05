@@ -1,10 +1,11 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, UserPlus } from "lucide-react";
+import { useAuth } from "../../../core/auth";
 import EmptyState from "../../../shared/components/EmptyState";
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
 import Pagination from "../../../shared/components/Pagination";
-import { ROUTES } from "../../../shared/constants";
+import { PERMISSIONS, ROUTES } from "../../../shared/constants";
 import {
   EMPLOYEE_STATUS,
   EMPLOYMENT_TYPE,
@@ -16,7 +17,34 @@ import {
   useEmployeeSummary,
 } from "../../../features/employees";
 
+/**
+ * Two different ways to add a person exist here, and they are NOT
+ * interchangeable — each is gated on its own permission so a role only
+ * ever sees the one it can actually complete:
+ *
+ * - "Add Employee" (hiring.create) opens the hiring request form, which
+ *   is the canonical path for the 7-role hierarchy: it captures the
+ *   Role, Region, District and reporting Manager, then runs
+ *   Request -> Process (OA) -> Review (GM) -> Approve (SA) -> Complete,
+ *   and only that final step creates the real User + Employee. This is
+ *   the path OA has, since OA deliberately never holds HIRING_APPROVE.
+ *
+ * - "Create Directly" (employees.create) is the legacy one-shot create.
+ *   It bypasses approval entirely and is effectively SA-only. Note it
+ *   cannot express the new hierarchy at all: EmployeeService.
+ *   createEmployee still hardcodes the legacy `employee` role and its
+ *   schema accepts no role/region/district. That is a known backend gap,
+ *   not something this page can paper over — which is exactly why the
+ *   hiring flow, not this button, is the primary action.
+ *
+ * Before this, both the button and its route were ungated, so OA saw a
+ * "Create Employee" button, filled in the whole form, and got a 403 on
+ * submit — OA has never held employees.create.
+ */
 export default function SuperAdminEmployeeListPage() {
+  const { hasPermission } = useAuth();
+  const canRequestHire = hasPermission(PERMISSIONS.HIRING_CREATE);
+  const canCreateDirectly = hasPermission(PERMISSIONS.EMPLOYEES_CREATE);
   const { query, updateQuery } = useEmployeeListQuery();
   const [searchParams] = useSearchParams();
   const searchInput = searchParams.get("search") || "";
@@ -41,13 +69,28 @@ export default function SuperAdminEmployeeListPage() {
             Search and manage employee profiles using backend pagination and scoped permissions.
           </p>
         </div>
-        <Link
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-forest px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-agriculture"
-          to={ROUTES.SUPER_ADMIN.EMPLOYEE_CREATE}
-        >
-          <Plus className="h-4 w-4" />
-          Create Employee
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          {canCreateDirectly ? (
+            <Link
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-bold text-forest ring-1 ring-forest/15 transition hover:bg-mint"
+              title="Creates the account immediately, without the hiring approval workflow."
+              to={ROUTES.SUPER_ADMIN.EMPLOYEE_CREATE}
+            >
+              <Plus className="h-4 w-4" />
+              Create Directly
+            </Link>
+          ) : null}
+          {canRequestHire ? (
+            <Link
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-forest px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-agriculture"
+              title="Raise a hiring request with role, region, district and reporting manager."
+              to={ROUTES.SUPER_ADMIN.HIRING_CREATE}
+            >
+              <UserPlus className="h-4 w-4" />
+              Add Employee
+            </Link>
+          ) : null}
+        </div>
       </div>
 
       <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
@@ -126,8 +169,14 @@ export default function SuperAdminEmployeeListPage() {
       {employeesState.isError ? <ErrorState message={employeesState.errorMessage} title="Unable to load employees" /> : null}
       {!employeesState.isLoading && !employeesState.isError && !employees.length ? (
         <EmptyState
-          actionLabel="Create Employee"
-          actionTo={ROUTES.SUPER_ADMIN.EMPLOYEE_CREATE}
+          actionLabel={canRequestHire ? "Add Employee" : canCreateDirectly ? "Create Directly" : undefined}
+          actionTo={
+            canRequestHire
+              ? ROUTES.SUPER_ADMIN.HIRING_CREATE
+              : canCreateDirectly
+                ? ROUTES.SUPER_ADMIN.EMPLOYEE_CREATE
+                : undefined
+          }
           description="No employee records matched the current filters."
           title="No employees found"
         />

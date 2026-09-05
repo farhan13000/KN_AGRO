@@ -68,6 +68,14 @@ apiClient.interceptors.request.use((config) => {
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
+  // The instance sets Content-Type: application/json for every request,
+  // which is right for all of them but file uploads. A multipart body
+  // needs a boundary parameter in the header, and only the browser knows
+  // it — so drop ours and let the browser write the whole header. Left
+  // in place, multer sees no boundary and rejects the request.
+  if (typeof FormData !== "undefined" && config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+  }
   return config;
 });
 

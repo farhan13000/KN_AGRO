@@ -108,3 +108,101 @@ snapshotted figures.
 - SA can generate (single + bulk), process, and mark payroll paid.
 - OA can see the company-wide payroll list (read-only) without seeing admin action buttons it
   doesn't hold permission for.
+
+---
+
+## IMPLEMENTED AND VERIFIED
+
+### Money units — verified, not assumed (Prompt 19.1's explicit requirement)
+
+`payroll.serializer.js` runs **every** money field through `toRupees()` on the way out, and
+`PayrollService.updatePayrollDraft` applies `toPaise()` to incoming values. So payroll is **rupees
+in both directions** and the frontend performs **no conversion at all** — different from
+SalaryProposal (F08, no auto-convert) and matching DSR (F10). This is recorded in `payrollApi.js`
+itself so the next module doesn't copy the wrong precedent.
+
+### Routes
+
+`POST /generate`, `POST /generate-bulk`, `GET /me`, `GET /`, `POST /:id/process`,
+`POST /:id/mark-paid`, plus `PATCH /:id` (DRAFT-only privileged edit — exists but wasn't in the
+prompt's list) and `GET /:id`, which carries **no `authorize()` middleware**: `getPayrollById`
+checks in-service for `PAYROLL_READ`/wildcard *or* `PAYROLL_READ_SELF` limited to the caller's own
+record.
+
+`generateBulkPayrollSchema` takes `{month, year, manager?, department?}` — **omitting both filters
+targets every ACTIVE employee**, which the dialog states in plain words before you submit, since
+that is a large action. Neither generate endpoint accepts any financial field; everything is
+server-computed.
+
+### Built
+
+`features/payroll/` (api, hooks, constants, `PayrollStatusBadge`, `PayslipBreakdown`,
+`MyPayrollView`, `AllPayrollView`, `PayrollGenerateDialog`), plus pages: **My Payroll in all three
+portals** (every seeded role holds `PAYROLL_READ_SELF`) and **Payroll Runs** in the Super Admin
+portal. Nav entries and `PAYROLL_READ`/`PAYROLL_PROCESS`/`PAYROLL_MARK_PAID`/`PAYROLL_MANAGE`
+constants added.
+
+`PayslipBreakdown` renders the record's **own frozen** `salaryStructureSnapshot` /
+`attendanceSummary` — never the employee's currently-active structure, which would misrepresent what
+they were actually paid if their salary has since changed.
+
+**Two gaps closed as a side effect:**
+- The F12 dashboard "Latest Payroll" readout now **links to** the full history (kept, not replaced,
+  as the prompt required).
+- `VIEW_PAYROLL` notifications had **no destination** — a gap F10 flagged and F13 re-confirmed.
+  They now resolve to the recipient's own My Payroll.
+
+### Verification
+
+Real browser (Playwright/Chromium), live backend. **19/19 checks passed, zero page errors.**
+
+- **SA**: generated a payroll (DRAFT) → gross ₹45,000 matching the snapshotted structure →
+  **Process** → Process button disappears → **Mark Paid** → record shows Paid.
+- **OA**: sees the company-wide list but **none** of Generate / Process / Mark Paid — gated purely
+  by permission, with no role-name special-casing anywhere in the view.
+- **The employee**: opened My Payroll and saw March 2026 with correct snapshotted figures — Basic
+  ₹30,000, HRA ₹12,000, Travel ₹3,000, gross ₹45,000, PF ₹3,600, **net ₹41,400**.
+
+Two checks failed on the first run. **Both were bad test data, not app defects:** the seeded
+SalaryStructure used a `fixedDeductions` field, but the model's field is **`deductions`** — Mongoose
+silently dropped it, so the structure genuinely had no deductions to snapshot. (The backend's own
+mapping, `fixedDeductions: structure.deductions`, is correct.) After fixing the seed, all 19 passed.
+All test scaffolding (payroll, salary structure, employee record) was removed; the permanent
+`fo-demo` demo login was kept.
+
+### Follow-up — "no employee profile" is not an error (2026-09-05)
+
+Reported from a live session: signing in as `fo-demo` and opening **My Payroll** produced a red
+**"Unable to load payroll — No employee profile exists for this account"** banner.
+
+The data and the backend were both correct. Every `*-demo` login (`sa`/`oa`/`gm`/`rm`/`asm`/`so`/`fo`)
+is a login-only fixture with no Employee record, so `GET /payroll/me` rightly answers 404. The
+defect was **presentational and inconsistent**: Phase 21 had already established that this exact 404
+is a legitimate state (My Profile renders a calm empty state for it), but this screen still treated
+it as a failure.
+
+`GET /employees/me`, `/payroll/me` and `/salary/me` all throw the identical 404, so the test for it
+now lives in one place — `features/employees/utils/employeeErrors.js` —
+rather than being repeated as a literal status check in three components:
+
+```js
+export const isMissingEmployeeProfileError = (error) => error?.status === 404;
+```
+
+(`error.status`, not `error.response.status`: apiClient normalizes every failure into a
+`FrontendApiError`.)
+
+`MyPayrollView` now renders an EmptyState for that case and reserves `ErrorState` for genuine
+failures. The two empty states stay distinct and must not be collapsed into one — they answer
+different questions:
+
+- **no employee record** → "No employee profile for this account"
+- **an employee with no payslips yet** → "No payroll records"
+
+**IMPLEMENTED AND VERIFIED.** Real browser (Playwright/Chromium), live backend, **10/10 checks
+passed, zero page errors** — covering this doc's screen and Phase 21's:
+
+- **`fo-demo`** (no Employee record): My Payroll shows the calm no-profile state, no red banner, and
+  does *not* additionally render "No payroll records".
+- **A real FO** (`yash.menon@demo.knagro.local`, who has an Employee record but no payslips): still
+  gets "No payroll records" — confirming the new branch does not swallow the ordinary empty case.

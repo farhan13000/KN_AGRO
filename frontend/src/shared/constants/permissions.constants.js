@@ -61,6 +61,15 @@ export const PERMISSIONS = Object.freeze({
   // shown — the backend omits it entirely for a caller without this,
   // never returns a redacted version.
   PAYROLL_READ_SELF: "payroll.read_self",
+  // Payroll run management (Phase F19). Deliberately NARROW: PAYROLL_READ
+  // (company-wide list) is OA + SA wildcard only — not GM/RM/ASM/SO, since
+  // payroll is company-financial data, not sales-hierarchy data. PROCESS /
+  // MARK_PAID / MANAGE are SA-wildcard only; OA holds READ but none of the
+  // action permissions, which is exactly what gates its buttons off.
+  PAYROLL_READ: "payroll.read",
+  PAYROLL_PROCESS: "payroll.process",
+  PAYROLL_MARK_PAID: "payroll.mark_paid",
+  PAYROLL_MANAGE: "payroll.manage",
   QUOTATIONS_READ: "quotations.read",
   QUOTATIONS_CREATE: "quotations.create",
   QUOTATIONS_UPDATE: "quotations.update",

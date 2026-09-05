@@ -22,6 +22,7 @@ import {
   UserPlus,
   Receipt,
   ShoppingCart,
+  UserCircle,
   Users,
   Wallet,
   Warehouse,
@@ -212,5 +213,23 @@ export const superAdminNavigation = [
     route: ROUTES.SUPER_ADMIN.REPORT_REQUESTS,
     icon: FileQuestion,
     permission: PERMISSIONS.REPORTS_MANAGE,
+  },
+  {
+    label: "Payroll Runs",
+    route: ROUTES.SUPER_ADMIN.PAYROLL,
+    icon: Wallet,
+    permission: PERMISSIONS.PAYROLL_READ,
+  },
+  {
+    label: "My Payroll",
+    route: ROUTES.SUPER_ADMIN.MY_PAYROLL,
+    icon: Wallet,
+    permission: PERMISSIONS.PAYROLL_READ_SELF,
+  },
+  {
+    label: "My Profile",
+    route: ROUTES.SUPER_ADMIN.MY_PROFILE,
+    icon: UserCircle,
+    permission: PERMISSIONS.EMPLOYEES_READ_SELF,
   },
 ];

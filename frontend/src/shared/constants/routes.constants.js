@@ -74,6 +74,9 @@ export const ROUTES = Object.freeze({
     ATTENDANCE: "/super-admin/attendance",
     LEAVES: "/super-admin/leaves",
     REPORT_REQUESTS: "/super-admin/report-requests",
+    PAYROLL: "/super-admin/payroll",
+    MY_PAYROLL: "/super-admin/my-payroll",
+    MY_PROFILE: "/super-admin/my-profile",
   },
   SALES_MANAGER: {
     DASHBOARD: "/manager/dashboard",
@@ -117,6 +120,8 @@ export const ROUTES = Object.freeze({
     LEAVES_TEAM: "/manager/leaves/team",
     REPORT_REQUESTS_ME: "/manager/report-requests/me",
     REPORT_REQUESTS_TEAM: "/manager/report-requests/team",
+    MY_PAYROLL: "/manager/my-payroll",
+    MY_PROFILE: "/manager/my-profile",
   },
   EMPLOYEE: {
     DASHBOARD: "/employee/dashboard",
@@ -144,6 +149,7 @@ export const ROUTES = Object.freeze({
     ATTENDANCE_ME: "/employee/attendance/me",
     LEAVES_ME: "/employee/leaves/me",
     REPORT_REQUESTS_ME: "/employee/report-requests/me",
+    MY_PAYROLL: "/employee/my-payroll",
   },
   ERROR: {
     UNAUTHORIZED: "/unauthorized",

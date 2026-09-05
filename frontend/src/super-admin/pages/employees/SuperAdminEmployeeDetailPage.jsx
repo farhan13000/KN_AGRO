@@ -23,7 +23,7 @@ import {
   useEmployeeDetail,
 } from "../../../features/employees";
 import { PromotionHistorySection, PromotionRecommendDialog } from "../../../features/promotions";
-import { CurrentSalaryCard } from "../../../features/salary";
+import { CurrentSalaryCard, SalaryHistoryList } from "../../../features/salary";
 import { SalaryProposalCreateDialog, SalaryProposalHistorySection } from "../../../features/salaryProposals";
 import { AuditTrailSection } from "../../../features/audit";
 
@@ -212,6 +212,7 @@ export default function SuperAdminEmployeeDetailPage() {
 
       <PermissionGuard permission={PERMISSIONS.SALARY_READ}>
         <CurrentSalaryCard employeeId={employeeId} />
+        <SalaryHistoryList employeeId={employeeId} />
       </PermissionGuard>
 
       <SalaryProposalHistorySection employeeId={employeeId} />

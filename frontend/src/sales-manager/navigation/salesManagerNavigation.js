@@ -18,6 +18,7 @@ import {
   ShoppingCart,
   TrendingUp,
   UserPlus,
+  UserCircle,
   Users,
   Wallet,
 } from "lucide-react";
@@ -177,5 +178,17 @@ export const salesManagerNavigation = [
     route: ROUTES.SALES_MANAGER.REPORT_REQUESTS_TEAM,
     icon: FileQuestion,
     permission: PERMISSIONS.REPORTS_READ_TEAM,
+  },
+  {
+    label: "My Payroll",
+    route: ROUTES.SALES_MANAGER.MY_PAYROLL,
+    icon: Wallet,
+    permission: PERMISSIONS.PAYROLL_READ_SELF,
+  },
+  {
+    label: "My Profile",
+    route: ROUTES.SALES_MANAGER.MY_PROFILE,
+    icon: UserCircle,
+    permission: PERMISSIONS.EMPLOYEES_READ_SELF,
   },
 ];

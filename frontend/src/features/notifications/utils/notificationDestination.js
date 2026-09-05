@@ -8,13 +8,14 @@ import { getPortalRoutesForRole } from "../../../core/auth";
  * notification's `referenceId`, and returns a real route or null.
  *
  * Deliberately absent: VIEW_LEAVE_REQUEST, VIEW_REPORT_REQUEST,
- * VIEW_PAYROLL, VIEW_CONVERSATION. These actionKeys are real (the backend
- * sets them), but Frontend Phase F10 already found — and this phase
- * confirms again — that no Leave/ReportRequest/Payroll/Messaging UI
+ * VIEW_CONVERSATION. These actionKeys are real (the backend sets them),
+ * but Frontend Phase F10 found that no Leave/ReportRequest/Messaging UI
  * exists anywhere in this frontend to link to. Per this codebase's own
  * rule (report a gap rather than fabricate a destination), these
- * notifications render with their icon/label/text but no click-through;
- * see this phase's own "Stop and report" writeup.
+ * notifications render with their icon/label/text but no click-through.
+ *
+ * VIEW_PAYROLL was in that list until Phase F19 built the payroll UI —
+ * it now resolves, closing one of the gaps F10 flagged.
  */
 const ACTION_ROUTE_BUILDERS = Object.freeze({
   VIEW_LEAD: (routes, id) => (routes.LEAD_DETAIL && id ? routes.LEAD_DETAIL.replace(":leadId", id) : null),
@@ -29,10 +30,10 @@ const ACTION_ROUTE_BUILDERS = Object.freeze({
     routes.INVENTORY_DETAIL && id ? routes.INVENTORY_DETAIL.replace(":productId", id) : null,
   VIEW_EMPLOYEE_APPLICATION: (routes, id) =>
     routes.EMPLOYEE_DETAIL && id ? routes.EMPLOYEE_DETAIL.replace(":employeeId", id) : null,
-  // Only the Employee portal has a genuine "my own profile" page — SA/
-  // manager-tier portals have no equivalent, so this resolves to null
-  // for them rather than guessing at an unconfirmed self-view route.
-  VIEW_MY_PROFILE: (routes) => routes.PROFILE || null,
+  // Phase F21 gave the Super Admin and Sales Manager portals their own
+  // My Profile pages, so this now resolves in every portal — closing the
+  // gap Phase F13 disclosed rather than guessed around.
+  VIEW_MY_PROFILE: (routes) => routes.PROFILE || routes.MY_PROFILE || null,
   VIEW_DISTRICT: (routes, id) =>
     routes.DISTRICT_DETAIL && id ? routes.DISTRICT_DETAIL.replace(":districtId", id) : null,
   REVIEW_DISTRICT_ASSIGNMENT: (routes, id) =>
@@ -45,6 +46,10 @@ const ACTION_ROUTE_BUILDERS = Object.freeze({
   REVIEW_SALARY_PROPOSAL: (routes) => routes.SALARY_PROPOSAL_APPROVALS || null,
   VIEW_HIRING_REQUEST: (routes) => routes.HIRING || null,
   REVIEW_HIRING_REQUEST: (routes) => routes.HIRING || null,
+  // A payroll notification is always about the recipient's OWN payslip,
+  // so it goes to their My Payroll history (every portal has one) rather
+  // than the admin-only company-wide run list.
+  VIEW_PAYROLL: (routes) => routes.MY_PAYROLL || null,
 });
 
 /**

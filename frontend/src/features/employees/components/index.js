@@ -9,6 +9,7 @@ export { default as EmployeeRejectionDialog } from "./EmployeeRejectionDialog";
 export { default as EmployeeSummaryCards } from "./EmployeeSummaryCards";
 export { default as EmployeeTable } from "./EmployeeTable";
 export { default as EmploymentTypeText } from "./EmploymentTypeText";
+export { default as MyProfileView } from "./MyProfileView";
 export { default as ManagerAssignmentDialog } from "./ManagerAssignmentDialog";
 export { default as PendingApplicationsTable } from "./PendingApplicationsTable";
 export { default as TeamMembersTable } from "./TeamMembersTable";
