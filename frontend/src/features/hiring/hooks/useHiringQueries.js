@@ -25,8 +25,6 @@ export const useHiringRequestDetail = (requestId, options) => {
 
 export const useHiringActions = ({ onSuccess } = {}) => ({
   createHiringRequest: useAsyncMutation(hiringApi.createHiringRequest, { onSuccess }),
-  processHiringRequest: useAsyncMutation(hiringApi.processHiringRequest, { onSuccess }),
-  reviewHiringRequest: useAsyncMutation(hiringApi.reviewHiringRequest, { onSuccess }),
   approveHiringRequest: useAsyncMutation(hiringApi.approveHiringRequest, { onSuccess }),
   rejectHiringRequest: useAsyncMutation(hiringApi.rejectHiringRequest, { onSuccess }),
   completeHiringRequest: useAsyncMutation(hiringApi.completeHiringRequest, { onSuccess }),

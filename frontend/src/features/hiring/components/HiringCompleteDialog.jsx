@@ -18,10 +18,10 @@ const initialValues = {
 };
 
 /**
- * The final step: everything `completeHiring` needs that the original
- * request didn't capture. This is what actually creates the Employee +
- * User pair, so the temporary password is handed to the new hire out of
- * band — the API never echoes it back.
+ * The Super Admin's approval, which is also what creates the account —
+ * so it collects everything the original request didn't capture. The
+ * temporary password is handed to the new hire out of band; the API never
+ * echoes it back.
  *
  * This is also where a profile photo belongs: the Employee record is
  * born here, so attaching it now avoids creating the person and then
@@ -76,7 +76,7 @@ export default function HiringCompleteDialog({ isOpen, onClose, onSuccess, reque
     };
 
     try {
-      await actions.completeHiringRequest.mutate(request._id, payload);
+      await actions.approveHiringRequest.mutate(request._id, payload);
       onClose();
     } catch (error) {
       setFormError(getApiErrorMessage(error));
@@ -84,11 +84,11 @@ export default function HiringCompleteDialog({ isOpen, onClose, onSuccess, reque
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Complete hire — ${request?.candidate?.name || ""}`}>
+    <Modal isOpen={isOpen} onClose={onClose} title={`Approve hire — ${request?.candidate?.name || ""}`}>
       <form className="space-y-4" onSubmit={handleSubmit}>
         <p className="rounded-lg bg-mint/60 p-4 text-sm font-semibold text-forest">
-          This creates the real employee record and login account. Share the temporary password with
-          the new hire directly — it is never shown again.
+          Approving creates the real employee record and login account in one step. Share the
+          temporary password with the new hire directly — it is never shown again.
         </p>
 
         <PhotoUploadField
@@ -166,10 +166,10 @@ export default function HiringCompleteDialog({ isOpen, onClose, onSuccess, reque
           </button>
           <button
             className="inline-flex min-h-11 items-center justify-center rounded-lg bg-forest px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-agriculture disabled:opacity-60"
-            disabled={actions.completeHiringRequest.isLoading}
+            disabled={actions.approveHiringRequest.isLoading}
             type="submit"
           >
-            {actions.completeHiringRequest.isLoading ? "Creating account..." : "Create Employee Account"}
+            {actions.approveHiringRequest.isLoading ? "Approving..." : "Approve & Create Account"}
           </button>
         </div>
       </form>

@@ -176,7 +176,7 @@ const withPermission = (permission, element) => (
 
 export const superAdminRouteConfig = {
   element: (
-    <ProtectedRoute allowedRoles={[BACKEND_ROLES.SUPER_ADMIN, BACKEND_ROLES.SA, BACKEND_ROLES.OA]} />
+    <ProtectedRoute allowedRoles={[BACKEND_ROLES.SA, BACKEND_ROLES.OA]} />
   ),
   children: [
     {

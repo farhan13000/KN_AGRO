@@ -242,7 +242,7 @@ export function AssignmentDialog({ assignmentType = "employee", isOpen, lead, on
       return source.filter((employee) => MANAGER_TIER_ROLES.includes(getEmployeeRole(employee)));
     }
     return source.filter(
-      (employee) => ![BACKEND_ROLES.SUPER_ADMIN, BACKEND_ROLES.SA].includes(getEmployeeRole(employee)),
+      (employee) => getEmployeeRole(employee) !== BACKEND_ROLES.SA,
     );
   }, [allEmployeesState.data, isManagerAssignment, isManagerTierActor, myTeamState.data]);
 

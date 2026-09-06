@@ -54,7 +54,7 @@ const withPermission = (permission, element) => (
 
 export const employeeRouteConfig = {
   element: (
-    <ProtectedRoute allowedRoles={[BACKEND_ROLES.EMPLOYEE, BACKEND_ROLES.FO]} />
+    <ProtectedRoute allowedRoles={[BACKEND_ROLES.FO]} />
   ),
   children: [
     {

@@ -29,7 +29,7 @@ export const getInvoiceCapabilities = ({ hasPermission, invoice, role }) => {
       hasPermission(PERMISSIONS.INVOICES_CANCEL) &&
       [INVOICE_STATUS.DRAFT, INVOICE_STATUS.ISSUED].includes(status) &&
       paidAmount === 0 &&
-      (status === INVOICE_STATUS.DRAFT || role === BACKEND_ROLES.SUPER_ADMIN),
+      (status === INVOICE_STATUS.DRAFT || role === BACKEND_ROLES.SA),
     canRecordPayment:
       hasPermission(PERMISSIONS.PAYMENTS_CREATE) && status === INVOICE_STATUS.ISSUED && dueAmount > 0,
   };

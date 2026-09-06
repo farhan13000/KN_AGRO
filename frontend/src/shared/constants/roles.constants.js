@@ -1,13 +1,15 @@
+/**
+ * The complete set of roles — the 7-role sales hierarchy, and nothing
+ * else. SA and OA sit outside the sales chain; GM -> RM -> ASM -> SO ->
+ * FO is the reporting line.
+ *
+ * The legacy 3-role model (super_admin / sales_manager / employee) has
+ * been removed from the backend outright, its role documents deleted and
+ * every account migrated off them. Do not reintroduce those names here:
+ * a role string with no matching Role document grants nothing, so a
+ * stale reference would silently deny access rather than fail loudly.
+ */
 export const ROLE_KEYS = Object.freeze({
-  // Legacy 3-role model — kept as-is until the backend's own Phase 17
-  // data migration moves every existing account off these.
-  SUPER_ADMIN: "SUPER_ADMIN",
-  SALES_MANAGER: "SALES_MANAGER",
-  EMPLOYEE: "EMPLOYEE",
-
-  // New 7-role sales hierarchy (org-hierarchy migration). SA/OA sit
-  // outside the sales chain; GM -> RM -> ASM -> SO -> FO is the
-  // reporting line.
   SA: "SA",
   OA: "OA",
   GM: "GM",
@@ -18,10 +20,6 @@ export const ROLE_KEYS = Object.freeze({
 });
 
 export const BACKEND_ROLES = Object.freeze({
-  [ROLE_KEYS.SUPER_ADMIN]: "super_admin",
-  [ROLE_KEYS.SALES_MANAGER]: "sales_manager",
-  [ROLE_KEYS.EMPLOYEE]: "employee",
-
   [ROLE_KEYS.SA]: "sa",
   [ROLE_KEYS.OA]: "oa",
   [ROLE_KEYS.GM]: "gm",
@@ -32,13 +30,9 @@ export const BACKEND_ROLES = Object.freeze({
 });
 
 export const ROLE_LABELS = Object.freeze({
-  [BACKEND_ROLES.SUPER_ADMIN]: "Super Admin",
-  [BACKEND_ROLES.SALES_MANAGER]: "Sales Manager",
-  [BACKEND_ROLES.EMPLOYEE]: "Employee",
-
-  [BACKEND_ROLES.SA]: "State Admin",
-  [BACKEND_ROLES.OA]: "Operations Admin",
-  [BACKEND_ROLES.GM]: "General Manager",
+  [BACKEND_ROLES.SA]: "Super Admin",
+  [BACKEND_ROLES.OA]: "Office Admin",
+  [BACKEND_ROLES.GM]: "Global Manager",
   [BACKEND_ROLES.RM]: "Regional Manager",
   [BACKEND_ROLES.ASM]: "Area Sales Manager",
   [BACKEND_ROLES.SO]: "Sales Officer",
@@ -54,7 +48,6 @@ export const normalizeRoleName = (roleName) => String(roleName || "").trim().toL
 // ONLY to populate candidate-manager pickers, never for an actual
 // access-control decision — that rule lives on the backend.
 export const MANAGER_TIER_ROLES = Object.freeze([
-  BACKEND_ROLES.SALES_MANAGER,
   BACKEND_ROLES.GM,
   BACKEND_ROLES.RM,
   BACKEND_ROLES.ASM,
@@ -78,8 +71,8 @@ export const REQUIRED_MANAGER_ROLE = Object.freeze({
 /**
  * Which roles should be offered as reporting-manager candidates for a
  * given role name. Roles with a fixed one-tier-up rule (FO/SO/ASM/RM)
- * resolve to exactly that one role; every other role (GM/OA/SA/legacy,
- * or no role picked yet) falls back to the full MANAGER_TIER_ROLES list,
+ * resolve to exactly that one role; every other role (GM/OA/SA, or no
+ * role picked yet) falls back to the full MANAGER_TIER_ROLES list,
  * matching the picker's original unfiltered behavior.
  */
 export const getEligibleManagerRoles = (roleName) => {

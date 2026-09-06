@@ -5,7 +5,7 @@ export default function SalesManagerHiringListPage() {
   return (
     <HiringPipelineView
       createHref={ROUTES.SALES_MANAGER.HIRING_CREATE}
-      description="Hiring requests for your team. Raise a request here; Office Admin processes it, a General Manager reviews it, and the Super Admin gives final approval."
+      description="Hiring requests for your team. Raise a request here; the Super Admin approves it, and that approval is what creates the account."
       portalLabel="My Team"
     />
   );

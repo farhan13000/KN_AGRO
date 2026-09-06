@@ -109,7 +109,7 @@ function HierarchyNode({ childrenByManagerId, depth, employee }) {
  * Built client-side from the ordinary employee list rather than the
  * backend's /employees/hierarchy endpoint: that endpoint still hardcodes
  * the legacy two-level model (it classifies managers by
- * `role === "sales_manager"` and returns {managers, unassignedEmployees}),
+ * one hardcoded manager role and returns {managers, unassignedEmployees}),
  * so under the new 7-role hierarchy every GM/RM/ASM/SO would come back
  * misfiled as unassigned staff.
  */

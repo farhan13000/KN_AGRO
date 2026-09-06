@@ -22,16 +22,21 @@ export const HIRING_STATUS_LABELS = Object.freeze({
  * checks. Used ONLY to decide whether to render a button — the backend
  * remains the authority and its 403 is surfaced if the two disagree.
  */
+/**
+ * The workflow is two steps: anyone with hiring.create raises a request,
+ * and the Super Admin decides it — approving is also what creates the
+ * account. The old Process (OA) and Review (GM) stages are gone.
+ */
 export const HIRING_STAGE_ROLES = Object.freeze({
-  PROCESS: ["oa"],
-  REVIEW: ["gm"],
   APPROVE: ["sa"],
-  COMPLETE: ["sa", "oa"],
 });
 
-// Reject is only possible while a stage owner exists for the current
-// status (see the backend's STAGE_OWNER_ROLE map).
+// Mirrors the backend's STAGE_OWNER_ROLE: the Super Admin is the only
+// decider, so the only rejecter. The two legacy statuses are here so a
+// request left mid-flight by the old multi-stage workflow can still be
+// rejected rather than being stuck forever.
 export const HIRING_REJECT_STAGE_ROLES = Object.freeze({
-  [HIRING_STATUS.PROCESSING]: "oa",
-  [HIRING_STATUS.UNDER_REVIEW]: "gm",
+  [HIRING_STATUS.REQUESTED]: "sa",
+  [HIRING_STATUS.PROCESSING]: "sa",
+  [HIRING_STATUS.UNDER_REVIEW]: "sa",
 });

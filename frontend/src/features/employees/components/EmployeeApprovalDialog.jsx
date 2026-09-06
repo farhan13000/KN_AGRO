@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Modal from "../../../shared/components/Modal";
+import { MANAGER_TIER_ROLES } from "../../../shared/constants";
 import TextInput from "../../../shared/forms/TextInput";
 import { useEmployeeActions, useEmployeeList } from "../hooks";
 import { pickApprovalPayload, validateApprovalForm } from "../schemas";
@@ -48,7 +49,9 @@ export default function EmployeeApprovalDialog({ employee, isOpen, onClose, onSu
       candidate._id !== employee?._id &&
       candidate.employeeStatus === EMPLOYEE_STATUS.ACTIVE &&
       candidate.user?.status === "ACTIVE" &&
-      candidate.user?.role?.name === "sales_manager",
+      // Was hardcoded to the removed legacy "sales_manager" role, which
+      // would now match nobody and leave this picker permanently empty.
+      MANAGER_TIER_ROLES.includes(candidate.user?.role?.name),
   );
 
   const handleChange = (event) => {

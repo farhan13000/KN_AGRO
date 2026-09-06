@@ -19,20 +19,13 @@ export const hiringApi = {
     return unwrapApiData(await apiClient.get(API_ENDPOINTS.HIRING.DETAIL(requestId)));
   },
 
-  // Stage transitions. Each is additionally narrowed by actor role inside
-  // HiringService (process = OA, review = GM, approve = SA, complete =
-  // SA/OA, reject = whoever owns the current stage), so a 403 here is an
-  // expected outcome for a permitted-but-wrong-tier user.
-  async processHiringRequest(requestId, notes) {
-    return post(API_ENDPOINTS.HIRING.PROCESS(requestId), { notes });
-  },
-
-  async reviewHiringRequest(requestId, comment) {
-    return post(API_ENDPOINTS.HIRING.REVIEW(requestId), { comment });
-  },
-
-  async approveHiringRequest(requestId) {
-    return post(API_ENDPOINTS.HIRING.APPROVE(requestId), {});
+  // Two decisions only, both the Super Admin's: approve (which also
+  // creates the account) or reject. Narrowed again by actor role inside
+  // HiringService, so a 403 here is the expected outcome for anyone else.
+  // Approving IS creating the account, so this carries the same payload
+  // the old separate "complete" call used to.
+  async approveHiringRequest(requestId, payload) {
+    return post(API_ENDPOINTS.HIRING.APPROVE(requestId), payload || {});
   },
 
   async rejectHiringRequest(requestId, reason) {

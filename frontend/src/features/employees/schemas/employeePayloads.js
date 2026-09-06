@@ -14,6 +14,11 @@ export const pickCreateEmployeePayload = (values) => ({
   department: values.department,
   designation: values.designation,
   manager: values.manager || undefined,
+  // Omitted rather than sent empty: the backend treats a missing roleId
+  // as "the default FO", and an empty string would fail id validation.
+  roleId: values.roleId || undefined,
+  region: values.region || undefined,
+  district: values.district || undefined,
   dateOfJoining: values.dateOfJoining,
   employmentType: values.employmentType || undefined,
   photo: values.photo || undefined,

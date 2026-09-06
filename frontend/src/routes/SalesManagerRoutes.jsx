@@ -133,7 +133,6 @@ export const salesManagerRouteConfig = {
   element: (
     <ProtectedRoute
       allowedRoles={[
-        BACKEND_ROLES.SALES_MANAGER,
         BACKEND_ROLES.GM,
         BACKEND_ROLES.RM,
         BACKEND_ROLES.ASM,

@@ -18,33 +18,26 @@ import {
 } from "../../../features/employees";
 
 /**
- * Two different ways to add a person exist here, and they are NOT
- * interchangeable — each is gated on its own permission so a role only
- * ever sees the one it can actually complete:
+ * Adding a person takes one of two forms, and which one you get is
+ * decided by whether you may create an account outright:
  *
- * - "Add Employee" (hiring.create) opens the hiring request form, which
- *   is the canonical path for the 7-role hierarchy: it captures the
- *   Role, Region, District and reporting Manager, then runs
- *   Request -> Process (OA) -> Review (GM) -> Approve (SA) -> Complete,
- *   and only that final step creates the real User + Employee. This is
- *   the path OA has, since OA deliberately never holds HIRING_APPROVE.
+ * - "Add Employee" (employees.create) creates the account immediately,
+ *   with the role, region, district and manager chosen on the form. This
+ *   is the Super Admin's path; nobody else holds employees.create.
  *
- * - "Create Directly" (employees.create) is the legacy one-shot create.
- *   It bypasses approval entirely and is effectively SA-only. Note it
- *   cannot express the new hierarchy at all: EmployeeService.
- *   createEmployee still hardcodes the legacy `employee` role and its
- *   schema accepts no role/region/district. That is a known backend gap,
- *   not something this page can paper over — which is exactly why the
- *   hiring flow, not this button, is the primary action.
+ * - "Request Employee" (hiring.create) raises a hiring request instead.
+ *   The Super Admin approves it, and THAT approval is what creates the
+ *   account — there is no separate completion step.
  *
- * Before this, both the button and its route were ungated, so OA saw a
- * "Create Employee" button, filled in the whole form, and got a 403 on
- * submit — OA has never held employees.create.
+ * They are shown exclusively rather than side by side: someone who can
+ * create directly has no reason to request, and showing both invited the
+ * question of which one to use.
  */
 export default function SuperAdminEmployeeListPage() {
   const { hasPermission } = useAuth();
-  const canRequestHire = hasPermission(PERMISSIONS.HIRING_CREATE);
   const canCreateDirectly = hasPermission(PERMISSIONS.EMPLOYEES_CREATE);
+  // Only offered to people who cannot create outright — see the note above.
+  const canRequestHire = !canCreateDirectly && hasPermission(PERMISSIONS.HIRING_CREATE);
   const { query, updateQuery } = useEmployeeListQuery();
   const [searchParams] = useSearchParams();
   const searchInput = searchParams.get("search") || "";
@@ -72,22 +65,22 @@ export default function SuperAdminEmployeeListPage() {
         <div className="flex flex-wrap gap-3">
           {canCreateDirectly ? (
             <Link
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-bold text-forest ring-1 ring-forest/15 transition hover:bg-mint"
-              title="Creates the account immediately, without the hiring approval workflow."
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-forest px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-agriculture"
+              title="Creates the account immediately, with no approval step."
               to={ROUTES.SUPER_ADMIN.EMPLOYEE_CREATE}
             >
-              <Plus className="h-4 w-4" />
-              Create Directly
+              <UserPlus className="h-4 w-4" />
+              Add Employee
             </Link>
           ) : null}
           {canRequestHire ? (
             <Link
               className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-forest px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-agriculture"
-              title="Raise a hiring request with role, region, district and reporting manager."
+              title="Raises a hiring request for the Super Admin to approve."
               to={ROUTES.SUPER_ADMIN.HIRING_CREATE}
             >
-              <UserPlus className="h-4 w-4" />
-              Add Employee
+              <Plus className="h-4 w-4" />
+              Request Employee
             </Link>
           ) : null}
         </div>
@@ -169,12 +162,12 @@ export default function SuperAdminEmployeeListPage() {
       {employeesState.isError ? <ErrorState message={employeesState.errorMessage} title="Unable to load employees" /> : null}
       {!employeesState.isLoading && !employeesState.isError && !employees.length ? (
         <EmptyState
-          actionLabel={canRequestHire ? "Add Employee" : canCreateDirectly ? "Create Directly" : undefined}
+          actionLabel={canCreateDirectly ? "Add Employee" : canRequestHire ? "Request Employee" : undefined}
           actionTo={
-            canRequestHire
-              ? ROUTES.SUPER_ADMIN.HIRING_CREATE
-              : canCreateDirectly
-                ? ROUTES.SUPER_ADMIN.EMPLOYEE_CREATE
+            canCreateDirectly
+              ? ROUTES.SUPER_ADMIN.EMPLOYEE_CREATE
+              : canRequestHire
+                ? ROUTES.SUPER_ADMIN.HIRING_CREATE
                 : undefined
           }
           description="No employee records matched the current filters."

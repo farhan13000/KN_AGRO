@@ -15,6 +15,7 @@ import {
 } from "../constants";
 import { useHiringActions, useHiringRequestList } from "../hooks";
 import HiringCompleteDialog from "./HiringCompleteDialog";
+import HiringRequestDetailsDialog from "./HiringRequestDetailsDialog";
 import HiringStatusBadge from "./HiringStatusBadge";
 
 const formatDate = (value) => {
@@ -33,6 +34,7 @@ export default function HiringPipelineView({ createHref, description, portalLabe
   const { hasPermission, role } = useAuth();
   const [statusFilter, setStatusFilter] = useState("");
   const [completing, setCompleting] = useState(null);
+  const [viewing, setViewing] = useState(null);
   const [message, setMessage] = useState("");
   const [actionError, setActionError] = useState("");
 
@@ -57,26 +59,26 @@ export default function HiringPipelineView({ createHref, description, portalLabe
     const steps = [];
     const status = request.status;
 
-    if (status === HIRING_STATUS.REQUESTED && hasPermission(PERMISSIONS.HIRING_RECOMMEND) && atTier(HIRING_STAGE_ROLES.PROCESS)) {
-      steps.push({
-        label: "Process",
-        run: () => run(actions.processHiringRequest.mutate, "Request moved to processing.", request._id, ""),
-      });
-    }
-    if (status === HIRING_STATUS.PROCESSING && hasPermission(PERMISSIONS.HIRING_RECOMMEND) && atTier(HIRING_STAGE_ROLES.REVIEW)) {
-      steps.push({
-        label: "Review",
-        run: () => run(actions.reviewHiringRequest.mutate, "Request moved to review.", request._id, ""),
-      });
-    }
-    if (status === HIRING_STATUS.UNDER_REVIEW && hasPermission(PERMISSIONS.HIRING_APPROVE) && atTier(HIRING_STAGE_ROLES.APPROVE)) {
-      steps.push({
-        label: "Approve",
-        run: () => run(actions.approveHiringRequest.mutate, "Request approved.", request._id),
-      });
-    }
-    if (status === HIRING_STATUS.APPROVED && hasPermission(PERMISSIONS.HIRING_CREATE) && atTier(HIRING_STAGE_ROLES.COMPLETE)) {
-      steps.push({ label: "Complete Hire", run: () => setCompleting(request), primary: true });
+    // One decision, one button. Approving opens the dialog that collects
+    // what creating the account needs (temporary password, joining date),
+    // because approval and account creation are now the same act. The two
+    // legacy statuses are still approvable so requests left mid-flight by
+    // the old multi-stage workflow are not stranded.
+    const awaitingDecision = [
+      HIRING_STATUS.REQUESTED,
+      HIRING_STATUS.PROCESSING,
+      HIRING_STATUS.UNDER_REVIEW,
+      HIRING_STATUS.APPROVED,
+    ].includes(status);
+
+    // Always first: deciding on a person without being able to read their
+    // details is the one thing this screen must never require. Offered to
+    // anyone who can see the card, not just the approver — a requester
+    // checking what they submitted is as legitimate a need.
+    steps.push({ label: "View Details", run: () => setViewing(request) });
+
+    if (awaitingDecision && hasPermission(PERMISSIONS.HIRING_APPROVE) && atTier(HIRING_STAGE_ROLES.APPROVE)) {
+      steps.push({ label: "Approve & Create Account", run: () => setCompleting(request), primary: true });
     }
 
     // Reject only exists while the backend has a stage owner for this status.
@@ -233,6 +235,12 @@ export default function HiringPipelineView({ createHref, description, portalLabe
           })}
         </ul>
       ) : null}
+
+      <HiringRequestDetailsDialog
+        isOpen={Boolean(viewing)}
+        onClose={() => setViewing(null)}
+        request={viewing}
+      />
 
       <HiringCompleteDialog
         isOpen={Boolean(completing)}

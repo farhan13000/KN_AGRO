@@ -13,7 +13,7 @@ export default function SuperAdminHiringCreatePage() {
         <h1 className="mt-2 text-3xl font-black text-ink">Request a Hire</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
           Raise a hiring request. The account itself is only created at the final Complete step, once
-          the request has been processed, reviewed, and approved.
+          the Super Admin approves this request.
         </p>
       </div>
       <Card className="p-5">
