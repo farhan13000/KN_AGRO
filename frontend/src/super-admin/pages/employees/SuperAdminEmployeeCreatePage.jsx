@@ -13,6 +13,7 @@ import {
   useEmployeeActions,
   validateCreateEmployeeForm,
 } from "../../../features/employees";
+import { PhotoUploadField } from "../../../features/media";
 
 const initialValues = {
   name: "",
@@ -23,6 +24,7 @@ const initialValues = {
   designation: "",
   dateOfJoining: "",
   employmentType: "",
+  photo: null,
   address: {},
   emergencyContact: {},
 };
@@ -72,6 +74,16 @@ export default function SuperAdminEmployeeCreatePage() {
             <h2 className="text-lg font-black text-ink">Employee Profile</h2>
             <div className="mt-4">
               <EmployeeProfileFields errors={errors} onChange={handleChange} values={values} />
+            </div>
+          </section>
+          <section>
+            <h2 className="text-lg font-black text-ink">Profile Photo</h2>
+            <div className="mt-4">
+              <PhotoUploadField
+                label=""
+                onChange={(asset) => setValues((current) => ({ ...current, photo: asset }))}
+                value={values.photo}
+              />
             </div>
           </section>
           <section>

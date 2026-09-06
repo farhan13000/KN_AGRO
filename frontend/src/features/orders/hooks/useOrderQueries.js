@@ -33,6 +33,7 @@ export const useOrderAttributionRollup = (options) => {
 // screen), exactly like Quotations' `useQuotationActions`. This layer
 // itself never optimistically rewrites stock or status locally.
 export const useOrderActions = ({ onError, onSuccess } = {}) => ({
+  createDirectOrder: useAsyncMutation(orderApi.createDirectOrder, { onError, onSuccess }),
   createOrderFromQuotation: useAsyncMutation(orderApi.createOrderFromQuotation, { onError, onSuccess }),
   confirmOrder: useAsyncMutation(orderApi.confirmOrder, { onError, onSuccess }),
   markProcessing: useAsyncMutation(orderApi.markProcessing, { onError, onSuccess }),

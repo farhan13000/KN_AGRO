@@ -4,6 +4,7 @@ import Modal from "../../../shared/components/Modal";
 import Select from "../../../shared/forms/Select";
 import TextInput from "../../../shared/forms/TextInput";
 import { EMPLOYMENT_TYPE } from "../../employees/constants";
+import { PhotoUploadField } from "../../media";
 import { useHiringActions } from "../hooks";
 
 const initialValues = {
@@ -13,6 +14,7 @@ const initialValues = {
   department: "",
   designation: "",
   employmentType: "",
+  photo: null,
 };
 
 /**
@@ -20,6 +22,10 @@ const initialValues = {
  * request didn't capture. This is what actually creates the Employee +
  * User pair, so the temporary password is handed to the new hire out of
  * band — the API never echoes it back.
+ *
+ * This is also where a profile photo belongs: the Employee record is
+ * born here, so attaching it now avoids creating the person and then
+ * immediately editing them just to add a picture.
  */
 export default function HiringCompleteDialog({ isOpen, onClose, onSuccess, request }) {
   const [values, setValues] = useState(initialValues);
@@ -61,6 +67,7 @@ export default function HiringCompleteDialog({ isOpen, onClose, onSuccess, reque
       ...(values.department.trim() ? { department: values.department.trim() } : {}),
       ...(values.designation.trim() ? { designation: values.designation.trim() } : {}),
       ...(values.employmentType ? { employmentType: values.employmentType } : {}),
+      ...(values.photo ? { photo: { url: values.photo.url, publicId: values.photo.publicId } } : {}),
     };
 
     try {
@@ -78,6 +85,11 @@ export default function HiringCompleteDialog({ isOpen, onClose, onSuccess, reque
           This creates the real employee record and login account. Share the temporary password with
           the new hire directly — it is never shown again.
         </p>
+
+        <PhotoUploadField
+          onChange={(asset) => setValues((current) => ({ ...current, photo: asset }))}
+          value={values.photo}
+        />
 
         <TextInput
           error={fieldErrors.temporaryPassword}

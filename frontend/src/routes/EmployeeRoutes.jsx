@@ -9,6 +9,7 @@ const EmployeeDashboardPage = lazy(() => import("../employee/dashboard/EmployeeD
 const EmployeeProfilePage = lazy(() => import("../employee/pages/profile/EmployeeProfilePage"));
 const EmployeeProfileEditPage = lazy(() => import("../employee/pages/profile/EmployeeProfileEditPage"));
 const EmployeeLeadListPage = lazy(() => import("../employee/pages/crm/EmployeeLeadListPage"));
+const EmployeeLeadCreatePage = lazy(() => import("../employee/pages/crm/EmployeeLeadCreatePage"));
 const EmployeeLeadDetailPage = lazy(() => import("../employee/pages/crm/EmployeeLeadDetailPage"));
 const EmployeeFollowUpsPage = lazy(() => import("../employee/pages/crm/EmployeeFollowUpsPage"));
 const EmployeeQuotationListPage = lazy(() => import("../employee/pages/quotations/EmployeeQuotationListPage"));
@@ -17,6 +18,9 @@ const EmployeeQuotationPrintPage = lazy(() => import("../employee/pages/quotatio
 const EmployeeCustomerListPage = lazy(() => import("../employee/pages/customers/EmployeeCustomerListPage"));
 const EmployeeCustomerDetailPage = lazy(() => import("../employee/pages/customers/EmployeeCustomerDetailPage"));
 const EmployeeOrderListPage = lazy(() => import("../employee/pages/orders/EmployeeOrderListPage"));
+const EmployeeOrderCreatePage = lazy(
+  () => import("../employee/pages/orders/EmployeeOrderCreatePage"),
+);
 const EmployeeOrderDetailPage = lazy(() => import("../employee/pages/orders/EmployeeOrderDetailPage"));
 const EmployeeOrderPrintPage = lazy(() => import("../employee/pages/orders/EmployeeOrderPrintPage"));
 const EmployeeInvoiceListPage = lazy(() => import("../employee/pages/invoices/EmployeeInvoiceListPage"));
@@ -64,6 +68,13 @@ export const employeeRouteConfig = {
           element: withPermission(PERMISSIONS.LEADS_READ, <EmployeeLeadListPage />),
         },
         {
+          // Registered BEFORE :leadId — otherwise /employee/leads/create
+          // matches the detail route with leadId="create", which is what
+          // used to render "Unable to load lead — Validation error" here.
+          path: ROUTES.EMPLOYEE.LEAD_CREATE,
+          element: withPermission(PERMISSIONS.LEADS_CREATE, <EmployeeLeadCreatePage />),
+        },
+        {
           path: ROUTES.EMPLOYEE.LEAD_DETAIL,
           element: withPermission(PERMISSIONS.LEADS_READ, <EmployeeLeadDetailPage />),
         },
@@ -94,6 +105,12 @@ export const employeeRouteConfig = {
         {
           path: ROUTES.EMPLOYEE.ORDERS,
           element: withPermission(PERMISSIONS.ORDERS_READ, <EmployeeOrderListPage />),
+        },
+        {
+          // Before :orderId — otherwise /orders/create matches the detail
+          // route with orderId="create".
+          path: ROUTES.EMPLOYEE.ORDER_CREATE,
+          element: withPermission(PERMISSIONS.ORDERS_CREATE, <EmployeeOrderCreatePage />),
         },
         {
           path: ROUTES.EMPLOYEE.ORDER_DETAIL,

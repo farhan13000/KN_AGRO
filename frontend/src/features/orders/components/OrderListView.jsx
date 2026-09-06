@@ -1,5 +1,7 @@
-import { Search } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { Plus, Search } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { useAuth } from "../../../core/auth";
+import { PERMISSIONS } from "../../../shared/constants";
 import EmptyState from "../../../shared/components/EmptyState";
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
@@ -11,16 +13,26 @@ import OrderTable from "./OrderTable";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
-// No Create button on this list — unlike Customers/Products, an Order has
-// no standalone "create blank" flow. Every Order originates from an
-// ACCEPTED Quotation's own "Create Order" action (Prompt 23,
-// QuotationLifecycleActions) — never from this page.
+// Orders now have TWO origins, and both are real:
+//
+//   1. An ACCEPTED Quotation's own "Create Order" action
+//      (QuotationLifecycleActions) — the quoted, negotiated path.
+//   2. "Take Order" here — a direct order written straight against a
+//      lead, with no quotation, for a field officer standing in front of
+//      the customer (POST /orders, OrderService.createDirectOrder).
+//
+// The button is derived from the real `orders.create` permission, the
+// same way QuotationListView and LeadListView derive theirs, rather than
+// a flag each role page has to remember to pass.
 export default function OrderListView({
+  createPath = "",
   detailPath,
   roleLabel = "CRM",
   subtitle = "Review orders with server pagination, filters, and search.",
   title = "Orders",
 }) {
+  const { hasPermission } = useAuth();
+  const showCreate = hasPermission(PERMISSIONS.ORDERS_CREATE) && Boolean(createPath);
   const [searchParams, setSearchParams] = useSearchParams();
   const searchInput = getQueryValue(searchParams, "search");
   const debouncedSearch = useDebouncedValue(searchInput);
@@ -51,10 +63,21 @@ export default function OrderListView({
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{roleLabel}</p>
-        <h1 className="mt-2 text-3xl font-black text-ink">{title}</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{subtitle}</p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{roleLabel}</p>
+          <h1 className="mt-2 text-3xl font-black text-ink">{title}</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{subtitle}</p>
+        </div>
+        {showCreate ? (
+          <Link
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-forest px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-agriculture"
+            to={createPath}
+          >
+            <Plus className="h-4 w-4" />
+            Take Order
+          </Link>
+        ) : null}
       </div>
 
       <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">

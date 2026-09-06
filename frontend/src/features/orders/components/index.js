@@ -12,3 +12,4 @@ export { default as OrderPrintRouteView } from "./OrderPrintRouteView";
 export { default as OrderPrintView } from "./OrderPrintView";
 export { default as OrderStatusBadge } from "./OrderStatusBadge";
 export { default as OrderTable } from "./OrderTable";
+export { default as OrderLeadSelector } from "./OrderLeadSelector";

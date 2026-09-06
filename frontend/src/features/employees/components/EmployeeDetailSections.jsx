@@ -1,3 +1,4 @@
+import { User } from "lucide-react";
 import { useEmployeeLocations } from "../hooks/useEmployeeLocations";
 import { formatEmploymentType, toDateInputValue } from "../utils";
 import EmployeeDualStatus from "./EmployeeDualStatus";
@@ -35,6 +36,30 @@ export default function EmployeeDetailSections({
 
   return (
     <div className="space-y-5">
+      <section className="flex flex-wrap items-center gap-5 rounded-lg border border-forest/10 bg-white p-5 shadow-sm">
+        {/* A record with no photo still gets the same frame, so the
+            layout does not shift between employees who have one and
+            employees who don't. */}
+        <span className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-forest/15 bg-mint">
+          {employee?.photo?.url ? (
+            <img
+              alt={`${employee?.user?.name || "Employee"} profile photo`}
+              className="h-full w-full object-cover"
+              src={employee.photo.url}
+            />
+          ) : (
+            <User aria-hidden className="h-8 w-8 text-forest/40" />
+          )}
+        </span>
+        <div>
+          <p className="text-xl font-black text-ink">{employee?.user?.name || "Not Available"}</p>
+          <p className="mt-1 text-sm font-semibold text-muted">
+            {employee?.designation || "No designation"}
+            {employee?.department ? ` · ${employee.department}` : ""}
+          </p>
+        </div>
+      </section>
+
       <Section title="Identity">
         <DetailItem label="Employee Code" value={employee?.employeeCode} />
         <DetailItem label="Name" value={employee?.user?.name} />

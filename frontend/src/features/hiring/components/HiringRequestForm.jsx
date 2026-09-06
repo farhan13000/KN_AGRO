@@ -5,6 +5,7 @@ import Select from "../../../shared/forms/Select";
 import TextInput from "../../../shared/forms/TextInput";
 import { useEligibleManagerCandidates, useEmployeeLocations } from "../../employees/hooks";
 import { employeeOptionLabel } from "../../employees/utils/employeeFormatters";
+import { FileUploadField, MEDIA_KIND } from "../../media";
 import { useRoleOptions } from "../../promotions/hooks";
 import { useHiringActions } from "../hooks";
 
@@ -12,7 +13,7 @@ const initialValues = {
   name: "",
   email: "",
   phone: "",
-  resumeUrl: "",
+  resume: null,
   proposedRoleId: "",
   proposedRegion: "",
   proposedDistrict: "",
@@ -26,8 +27,11 @@ const initialValues = {
  * at the Complete step — matching the backend's split between
  * createRequest and completeHiring.
  *
- * `resumeUrl` is a plain URL field on purpose: this codebase builds no
- * file-upload infrastructure, per the backend's own note on the field.
+ * The resume is a real upload (Cloudinary, via POST /media/uploads/
+ * RESUME). The file is stored the moment it is picked, so what this form
+ * submits is a { url, publicId } reference — the request body never
+ * carries bytes, and a half-filled form that is abandoned costs nothing
+ * but an unreferenced file.
  */
 export default function HiringRequestForm({ cancelTo, onCreated }) {
   const [values, setValues] = useState(initialValues);
@@ -66,7 +70,9 @@ export default function HiringRequestForm({ cancelTo, onCreated }) {
         name: values.name.trim(),
         email: values.email.trim().toLowerCase(),
         phone: values.phone.trim(),
-        ...(values.resumeUrl.trim() ? { resumeUrl: values.resumeUrl.trim() } : {}),
+        ...(values.resume?.url
+          ? { resumeUrl: values.resume.url, resumePublicId: values.resume.publicId }
+          : {}),
       },
       proposedRoleId: values.proposedRoleId,
       ...(values.proposedRegion ? { proposedRegion: values.proposedRegion } : {}),
@@ -114,16 +120,13 @@ export default function HiringRequestForm({ cancelTo, onCreated }) {
             required
             value={values.phone}
           />
-          <TextInput
-            id="hiring-resume"
-            label="Resume URL (optional)"
-            name="resumeUrl"
-            onChange={handleChange}
-            placeholder="https://..."
-            type="url"
-            value={values.resumeUrl}
-          />
         </div>
+        <FileUploadField
+          kind={MEDIA_KIND.RESUME}
+          label="Resume (optional)"
+          onChange={(asset) => setValues((current) => ({ ...current, resume: asset }))}
+          value={values.resume}
+        />
       </section>
 
       <section className="space-y-4">

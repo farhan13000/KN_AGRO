@@ -4,6 +4,7 @@ import { LeadListView } from "../../../features/leads";
 export default function SalesManagerLeadListPage() {
   return (
     <LeadListView
+      createPath={ROUTES.SALES_MANAGER.LEAD_CREATE}
       detailPath={(lead) => `${ROUTES.SALES_MANAGER.LEADS}/${lead._id}`}
       roleLabel="Manager CRM"
       showAssignments

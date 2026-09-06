@@ -1,5 +1,6 @@
 import { Plus, Search } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useAuth } from "../../../core/auth";
 import EmptyState from "../../../shared/components/EmptyState";
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
@@ -14,22 +15,31 @@ import {
   LEAD_STATUS_LABELS,
 } from "../constants";
 import { useLeadList } from "../hooks";
+import { getLeadCapabilities } from "../utils/leadCapabilities";
 import LeadTable from "./LeadTable";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
+// The Create button is derived from the real `leads.create` permission,
+// exactly as QuotationListView does (Prompt 46), rather than a `showCreate`
+// flag each role page had to remember to set. The flag was the bug: only
+// the Super Admin page ever passed it, so GM/RM/ASM — who all genuinely
+// hold leads.create — had no way to create a lead anywhere in the app,
+// while SO/FO/OA correctly have neither the permission nor the button.
 export default function LeadListView({
   createPath = "",
   detailPath,
   emptyActionLabel = "",
   roleLabel = "CRM",
   showAssignments = true,
-  showCreate = false,
   showPipelineValue = true,
   showSource = true,
   subtitle = "Review backend-scoped leads with server pagination, filters, and search.",
   title = "Leads",
 }) {
+  const { hasPermission } = useAuth();
+  const { canCreateLead } = getLeadCapabilities({ hasPermission });
+  const showCreate = canCreateLead && Boolean(createPath);
   const [searchParams, setSearchParams] = useSearchParams();
   const searchInput = getQueryValue(searchParams, "search");
   const debouncedSearch = useDebouncedValue(searchInput);
@@ -68,7 +78,7 @@ export default function LeadListView({
           <h1 className="mt-2 text-3xl font-black text-ink">{title}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{subtitle}</p>
         </div>
-        {showCreate && createPath ? (
+        {showCreate ? (
           <Link
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-forest px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-agriculture"
             to={createPath}

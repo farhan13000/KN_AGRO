@@ -47,7 +47,23 @@ const shouldAttemptRefresh = (error) => {
   );
 };
 
-const refreshAccessToken = async () => {
+/**
+ * The ONE place a refresh request is made.
+ *
+ * The backend rotates the refresh token on every call — issuing the new
+ * one immediately invalidates the old (see AuthService.refreshToken). So
+ * two refreshes that both carry the pre-rotation cookie are fatal: the
+ * second is answered 401 "Invalid refresh token", which the caller reads
+ * as a dead session and logs the user out.
+ *
+ * That is exactly what a page reload used to do. AuthContext's mount
+ * effect called authApi.refreshSession(), which posted to /auth/refresh
+ * directly and so never saw this module-level guard — and React
+ * StrictMode runs that effect twice in development. Everything that
+ * refreshes now shares this single in-flight promise instead, so
+ * concurrent callers get one request and one rotation between them.
+ */
+export const refreshAccessToken = async () => {
   if (!refreshPromise) {
     refreshPromise = refreshClient
       .post(API_ENDPOINTS.AUTH.REFRESH)

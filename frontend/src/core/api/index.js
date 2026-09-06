@@ -3,6 +3,7 @@ export {
   apiClient,
   clearAccessToken,
   getAccessToken,
+  refreshAccessToken,
   setAccessToken,
   unwrapApiData,
 } from "./apiClient";

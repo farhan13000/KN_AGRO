@@ -34,6 +34,7 @@ const SalesManagerSalaryProposalApprovalsPage = lazy(
   () => import("../sales-manager/pages/salaryProposals/SalesManagerSalaryProposalApprovalsPage"),
 );
 const SalesManagerLeadListPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerLeadListPage"));
+const SalesManagerLeadCreatePage = lazy(() => import("../sales-manager/pages/crm/SalesManagerLeadCreatePage"));
 const SalesManagerLeadDetailPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerLeadDetailPage"));
 const SalesManagerFollowUpsPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerFollowUpsPage"));
 const SalesManagerCrmPipelinePage = lazy(() => import("../sales-manager/pages/crm/SalesManagerCrmPipelinePage"));
@@ -65,6 +66,9 @@ const SalesManagerCustomerEditPage = lazy(
   () => import("../sales-manager/pages/customers/SalesManagerCustomerEditPage"),
 );
 const SalesManagerOrderListPage = lazy(() => import("../sales-manager/pages/orders/SalesManagerOrderListPage"));
+const SalesManagerOrderCreatePage = lazy(
+  () => import("../sales-manager/pages/orders/SalesManagerOrderCreatePage"),
+);
 const SalesManagerOrderDetailPage = lazy(
   () => import("../sales-manager/pages/orders/SalesManagerOrderDetailPage"),
 );
@@ -181,6 +185,12 @@ export const salesManagerRouteConfig = {
           element: withPermission(PERMISSIONS.LEADS_READ, <SalesManagerLeadListPage />),
         },
         {
+          // Registered BEFORE :leadId — otherwise /manager/leads/create
+          // matches the detail route with leadId="create".
+          path: ROUTES.SALES_MANAGER.LEAD_CREATE,
+          element: withPermission(PERMISSIONS.LEADS_CREATE, <SalesManagerLeadCreatePage />),
+        },
+        {
           path: ROUTES.SALES_MANAGER.LEAD_DETAIL,
           element: withPermission(PERMISSIONS.LEADS_READ, <SalesManagerLeadDetailPage />),
         },
@@ -227,6 +237,12 @@ export const salesManagerRouteConfig = {
         {
           path: ROUTES.SALES_MANAGER.ORDERS,
           element: withPermission(PERMISSIONS.ORDERS_READ, <SalesManagerOrderListPage />),
+        },
+        {
+          // Before :orderId — otherwise /orders/create matches the detail
+          // route with orderId="create".
+          path: ROUTES.SALES_MANAGER.ORDER_CREATE,
+          element: withPermission(PERMISSIONS.ORDERS_CREATE, <SalesManagerOrderCreatePage />),
         },
         {
           path: ROUTES.SALES_MANAGER.ORDER_DETAIL,

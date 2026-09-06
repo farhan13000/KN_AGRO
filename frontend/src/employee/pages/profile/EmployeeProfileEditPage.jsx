@@ -16,9 +16,11 @@ import {
   useMyEmployeeProfile,
   validateSelfUpdateEmployeeForm,
 } from "../../../features/employees";
+import { PhotoUploadField } from "../../../features/media";
 
 const toFormValues = (employee) => ({
   phone: employee?.phone || "",
+  photo: employee?.photo || null,
   address: employee?.address || {},
   emergencyContact: employee?.emergencyContact || {},
 });
@@ -71,7 +73,8 @@ export default function EmployeeProfileEditPage() {
         <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{getPortalLabelForRole(role)}</p>
         <h1 className="mt-2 text-3xl font-black text-ink">Edit My Profile</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          You can update only the self-editable fields allowed by the backend: phone, address, and emergency contact.
+          You can update only the self-editable fields allowed by the backend: your photo, phone,
+          address, and emergency contact.
         </p>
       </div>
 
@@ -111,6 +114,16 @@ export default function EmployeeProfileEditPage() {
             </div>
           </section>
 
+          <section>
+            <h2 className="text-lg font-black text-ink">Profile Photo</h2>
+            <div className="mt-4">
+              <PhotoUploadField
+                label=""
+                onChange={(asset) => setValues((current) => ({ ...current, photo: asset }))}
+                value={values.photo}
+              />
+            </div>
+          </section>
           <section>
             <h2 className="text-lg font-black text-ink">Address</h2>
             <div className="mt-4">

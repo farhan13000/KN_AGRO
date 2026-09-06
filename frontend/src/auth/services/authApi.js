@@ -2,6 +2,7 @@ import {
   API_ENDPOINTS,
   apiClient,
   clearAccessToken,
+  refreshAccessToken,
   setAccessToken,
   unwrapApiData,
 } from "../../core/api";
@@ -34,17 +35,19 @@ export const authApi = {
     }
   },
 
+  /**
+   * Deliberately goes through apiClient's shared refresh instead of
+   * posting to /auth/refresh itself. The backend rotates the refresh
+   * token on every call, so a second concurrent refresh carrying the
+   * pre-rotation cookie is answered 401 and reads as a dead session —
+   * see refreshAccessToken's own note. Sharing the in-flight promise is
+   * what keeps a page reload from logging the user out.
+   */
   async refreshSession() {
-    const response = await apiClient.post(API_ENDPOINTS.AUTH.REFRESH);
-    const payload = unwrapApiData(response);
-    const token = extractAccessToken(payload);
-
-    if (token) {
-      setAccessToken(token);
-    }
+    const token = await refreshAccessToken();
 
     return {
-      accessToken: token,
+      accessToken: token ?? null,
     };
   },
 

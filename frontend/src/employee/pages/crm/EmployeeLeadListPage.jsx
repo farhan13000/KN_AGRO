@@ -4,6 +4,7 @@ import { LeadListView } from "../../../features/leads";
 export default function EmployeeLeadListPage() {
   return (
     <LeadListView
+      createPath={ROUTES.EMPLOYEE.LEAD_CREATE}
       detailPath={(lead) => `${ROUTES.EMPLOYEE.LEADS}/${lead._id}`}
       roleLabel="Employee CRM"
       showAssignments={false}

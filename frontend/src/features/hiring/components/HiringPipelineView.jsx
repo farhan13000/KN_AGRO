@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FileText } from "lucide-react";
 import { useAuth } from "../../../core/auth";
 import { getApiErrorMessage } from "../../../core/api";
 import EmptyState from "../../../shared/components/EmptyState";
@@ -173,6 +174,21 @@ export default function HiringPipelineView({ createHref, description, portalLabe
                   </div>
                   <HiringStatusBadge status={request.status} />
                 </div>
+
+                {/* The whole point of collecting a resume is that whoever
+                    processes, reviews or approves this request can read it
+                    here, at the stage where they decide. */}
+                {request.candidate?.resumeUrl ? (
+                  <a
+                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-forest underline-offset-2 hover:underline"
+                    href={request.candidate.resumeUrl}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    <FileText className="h-4 w-4" />
+                    View resume
+                  </a>
+                ) : null}
 
                 <p className="mt-3 text-xs font-semibold text-muted">
                   {request.requestedBy?.name ? `Requested by ${request.requestedBy.name}` : null}

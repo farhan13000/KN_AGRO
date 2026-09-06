@@ -128,6 +128,9 @@ const SuperAdminCustomerEditPage = lazy(
   () => import("../super-admin/pages/customers/SuperAdminCustomerEditPage"),
 );
 const SuperAdminOrderListPage = lazy(() => import("../super-admin/pages/orders/SuperAdminOrderListPage"));
+const SuperAdminOrderCreatePage = lazy(
+  () => import("../super-admin/pages/orders/SuperAdminOrderCreatePage"),
+);
 const SuperAdminOrderDetailPage = lazy(() => import("../super-admin/pages/orders/SuperAdminOrderDetailPage"));
 const SuperAdminOrderPrintPage = lazy(() => import("../super-admin/pages/orders/SuperAdminOrderPrintPage"));
 const SuperAdminInvoiceListPage = lazy(() => import("../super-admin/pages/invoices/SuperAdminInvoiceListPage"));
@@ -343,6 +346,12 @@ export const superAdminRouteConfig = {
         {
           path: ROUTES.SUPER_ADMIN.ORDERS,
           element: withPermission(PERMISSIONS.ORDERS_READ, <SuperAdminOrderListPage />),
+        },
+        {
+          // Before :orderId — otherwise /orders/create matches the detail
+          // route with orderId="create".
+          path: ROUTES.SUPER_ADMIN.ORDER_CREATE,
+          element: withPermission(PERMISSIONS.ORDERS_CREATE, <SuperAdminOrderCreatePage />),
         },
         {
           path: ROUTES.SUPER_ADMIN.ORDER_DETAIL,

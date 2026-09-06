@@ -1,5 +1,9 @@
 import { API_ENDPOINTS, apiClient, unwrapApiData } from "../../../core/api";
-import { pickCancelOrderPayload, pickCreateOrderFromQuotationPayload } from "../schemas";
+import {
+  pickCancelOrderPayload,
+  pickCreateDirectOrderPayload,
+  pickCreateOrderFromQuotationPayload,
+} from "../schemas";
 import { cleanOrderQuery } from "../utils";
 
 // No dev-mock gate: the Phase 6 orders backend module is fully implemented
@@ -27,6 +31,10 @@ export const orderApi = {
 
   async getOrderById(orderId) {
     return get(API_ENDPOINTS.ORDERS.DETAIL(orderId));
+  },
+
+  async createDirectOrder(values) {
+    return post(API_ENDPOINTS.ORDERS.BASE, pickCreateDirectOrderPayload(values));
   },
 
   async createOrderFromQuotation(quotationId, values) {

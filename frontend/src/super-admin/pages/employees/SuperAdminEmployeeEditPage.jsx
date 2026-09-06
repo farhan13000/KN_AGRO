@@ -16,6 +16,7 @@ import {
   useEmployeeDetail,
   validateUpdateEmployeeForm,
 } from "../../../features/employees";
+import { PhotoUploadField } from "../../../features/media";
 
 const toFormValues = (employee) => ({
   phone: employee?.phone || "",
@@ -23,6 +24,7 @@ const toFormValues = (employee) => ({
   designation: employee?.designation || "",
   dateOfJoining: toDateInputValue(employee?.dateOfJoining),
   employmentType: employee?.employmentType || "",
+  photo: employee?.photo || null,
   address: employee?.address || {},
   emergencyContact: employee?.emergencyContact || {},
 });
@@ -100,6 +102,16 @@ export default function SuperAdminEmployeeEditPage() {
             <h2 className="text-lg font-black text-ink">Editable Employee Profile</h2>
             <div className="mt-4">
               <EmployeeProfileFields errors={errors} onChange={handleChange} values={values} />
+            </div>
+          </section>
+          <section>
+            <h2 className="text-lg font-black text-ink">Profile Photo</h2>
+            <div className="mt-4">
+              <PhotoUploadField
+                label=""
+                onChange={(asset) => setValues((current) => ({ ...current, photo: asset }))}
+                value={values.photo}
+              />
             </div>
           </section>
           <section>
