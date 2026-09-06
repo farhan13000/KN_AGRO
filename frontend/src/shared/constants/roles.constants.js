@@ -61,3 +61,30 @@ export const MANAGER_TIER_ROLES = Object.freeze([
   BACKEND_ROLES.SO,
 ]);
 
+// Mirrors the backend's own REQUIRED_MANAGER_ROLE (also
+// core/authorization/hierarchy.service.js) — the fixed one-tier-up chain
+// for the 7-role sales hierarchy. Kept in sync by hand, same as
+// MANAGER_TIER_ROLES above. Use ONLY to narrow a manager picker to the
+// tier a given role structurally must report to, never for an actual
+// access-control decision — the backend's own validateReportingRelationship
+// is what actually enforces this at completeHiring/assignManager time.
+export const REQUIRED_MANAGER_ROLE = Object.freeze({
+  [BACKEND_ROLES.FO]: BACKEND_ROLES.SO,
+  [BACKEND_ROLES.SO]: BACKEND_ROLES.ASM,
+  [BACKEND_ROLES.ASM]: BACKEND_ROLES.RM,
+  [BACKEND_ROLES.RM]: BACKEND_ROLES.GM,
+});
+
+/**
+ * Which roles should be offered as reporting-manager candidates for a
+ * given role name. Roles with a fixed one-tier-up rule (FO/SO/ASM/RM)
+ * resolve to exactly that one role; every other role (GM/OA/SA/legacy,
+ * or no role picked yet) falls back to the full MANAGER_TIER_ROLES list,
+ * matching the picker's original unfiltered behavior.
+ */
+export const getEligibleManagerRoles = (roleName) => {
+  const normalized = normalizeRoleName(roleName);
+  const requiredRole = REQUIRED_MANAGER_ROLE[normalized];
+  return requiredRole ? [requiredRole] : MANAGER_TIER_ROLES;
+};
+

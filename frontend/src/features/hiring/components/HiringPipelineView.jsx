@@ -165,8 +165,14 @@ export default function HiringPipelineView({ createHref, description, portalLabe
                       <span className="font-semibold text-ink">
                         {request.proposedRole?.name?.toUpperCase() || "—"}
                       </span>
-                      {request.proposedRegion?.name ? ` · ${request.proposedRegion.name}` : ""}
-                      {request.proposedDistrict?.name ? ` / ${request.proposedDistrict.name}` : ""}
+                      {request.proposedRegions?.length
+                        ? ` · ${request.proposedRegions.map((region) => region.name).join(", ")}`
+                        : ""}
+                      {request.proposedDistricts?.length
+                        ? ` / ${request.proposedDistricts.map((district) => district.name).join(", ")}`
+                        : ""}
+                      {request.proposedDepartment ? ` · ${request.proposedDepartment}` : ""}
+                      {request.proposedEmploymentType ? ` · ${request.proposedEmploymentType}` : ""}
                       {request.proposedManager?.user?.name
                         ? ` · reports to ${request.proposedManager.user.name}`
                         : ""}

@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { getApiErrorMessage } from "../../../core/api";
 import Button from "../../../shared/components/Button";
-import Select from "../../../shared/forms/Select";
+import SearchableMultiSelect from "../../../shared/forms/SearchableMultiSelect";
+import SearchableSelect from "../../../shared/forms/SearchableSelect";
 import TextInput from "../../../shared/forms/TextInput";
+import { DEPARTMENT_OPTIONS } from "../../../shared/constants";
 import { useEligibleManagerCandidates, useEmployeeLocations } from "../../employees/hooks";
 import { employeeOptionLabel } from "../../employees/utils/employeeFormatters";
+import { EMPLOYMENT_TYPE, EMPLOYMENT_TYPE_LABELS } from "../../employees/constants";
 import { FileUploadField, MEDIA_KIND } from "../../media";
 import { useRoleOptions } from "../../promotions/hooks";
 import { useHiringActions } from "../hooks";
@@ -15,17 +18,27 @@ const initialValues = {
   phone: "",
   resume: null,
   proposedRoleId: "",
-  proposedRegion: "",
-  proposedDistrict: "",
+  proposedRegions: [],
+  proposedDistricts: [],
+  proposedDepartment: "",
+  proposedEmploymentType: "",
   proposedManager: "",
 };
 
+const departmentOptions = DEPARTMENT_OPTIONS.map((department) => ({ value: department, label: department }));
+const employmentTypeOptions = Object.values(EMPLOYMENT_TYPE).map((type) => ({
+  value: type,
+  label: EMPLOYMENT_TYPE_LABELS[type],
+}));
+
 /**
  * Only the candidate's identity and the proposed placement are captured
- * here. Everything needed to actually create the account
- * (temporaryPassword, dateOfJoining, department...) is collected later,
- * at the Complete step — matching the backend's split between
- * createRequest and completeHiring.
+ * here. What's still collected later, at the Complete step, is only what
+ * actually creates the account (temporaryPassword, dateOfJoining,
+ * designation...) — matching the backend's split between createRequest
+ * and completeHiring. Department and employment type are proposed here
+ * (they narrow the search for a candidate) but stay overridable at
+ * Complete, same as region/district/manager already were.
  *
  * The resume is a real upload (Cloudinary, via POST /media/uploads/
  * RESUME). The file is stored the moment it is picked, so what this form
@@ -40,16 +53,45 @@ export default function HiringRequestForm({ cancelTo, onCreated }) {
 
   const roleState = useRoleOptions();
   const locations = useEmployeeLocations();
-  const managerState = useEligibleManagerCandidates();
+  const selectedRole = roleState.roles.find((role) => role._id === values.proposedRoleId);
+  const managerState = useEligibleManagerCandidates({ forRoleName: selectedRole?.name });
   const actions = useHiringActions({ onSuccess: onCreated });
+
+  const districtOptionSource = values.proposedRegions.length
+    ? values.proposedRegions.flatMap((regionId) => locations.districtsForRegion(regionId))
+    : locations.districts;
+  const seenDistrictIds = new Set();
+  const districtOptions = districtOptionSource
+    .filter((district) => {
+      if (seenDistrictIds.has(district._id)) return false;
+      seenDistrictIds.add(district._id);
+      return true;
+    })
+    .map((district) => ({ value: district._id, label: `${district.name} (${district.code})` }));
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setValues((current) =>
-      name === "proposedRegion"
-        ? { ...current, proposedRegion: value, proposedDistrict: "" }
-        : { ...current, [name]: value },
-    );
+    setValues((current) => {
+      if (name === "proposedRegions") {
+        // Same-state rule: dropping a region should drop any already-
+        // picked district that only belonged to it — but clearing every
+        // region entirely removes the state filter, so leave existing
+        // district picks alone in that case (mirrors districtOptions'
+        // own "no region selected -> show every district" fallback).
+        const nextDistricts = value.length
+          ? current.proposedDistricts.filter((districtId) =>
+              value.some((regionId) =>
+                locations.districtsForRegion(regionId).some((district) => district._id === districtId),
+              ),
+            )
+          : current.proposedDistricts;
+        return { ...current, proposedRegions: value, proposedDistricts: nextDistricts };
+      }
+      if (name === "proposedRoleId") {
+        return { ...current, proposedRoleId: value, proposedManager: "" };
+      }
+      return { ...current, [name]: value };
+    });
     setFieldErrors((current) => ({ ...current, [name]: "" }));
   };
 
@@ -75,8 +117,10 @@ export default function HiringRequestForm({ cancelTo, onCreated }) {
           : {}),
       },
       proposedRoleId: values.proposedRoleId,
-      ...(values.proposedRegion ? { proposedRegion: values.proposedRegion } : {}),
-      ...(values.proposedDistrict ? { proposedDistrict: values.proposedDistrict } : {}),
+      ...(values.proposedRegions.length ? { proposedRegions: values.proposedRegions } : {}),
+      ...(values.proposedDistricts.length ? { proposedDistricts: values.proposedDistricts } : {}),
+      ...(values.proposedDepartment ? { proposedDepartment: values.proposedDepartment } : {}),
+      ...(values.proposedEmploymentType ? { proposedEmploymentType: values.proposedEmploymentType } : {}),
       ...(values.proposedManager ? { proposedManager: values.proposedManager } : {}),
     };
 
@@ -132,60 +176,64 @@ export default function HiringRequestForm({ cancelTo, onCreated }) {
       <section className="space-y-4">
         <h2 className="text-lg font-black text-ink">Proposed Placement</h2>
         <div className="grid gap-5 sm:grid-cols-2">
-          <Select
+          <SearchableSelect
             error={fieldErrors.proposedRoleId}
             id="hiring-role"
             label="Role"
             name="proposedRoleId"
             onChange={handleChange}
-            options={[
-              { value: "", label: roleState.isLoading ? "Loading roles..." : "Select a role" },
-              ...roleState.roles.map((role) => ({ value: role._id, label: role.name.toUpperCase() })),
-            ]}
+            options={roleState.roles.map((role) => ({ value: role._id, label: role.name.toUpperCase() }))}
+            placeholder={roleState.isLoading ? "Loading roles..." : "Search roles..."}
             required
             value={values.proposedRoleId}
           />
-          <Select
+          <SearchableSelect
             id="hiring-manager"
             label="Reporting Manager (optional)"
             name="proposedManager"
             onChange={handleChange}
-            options={[
-              { value: "", label: managerState.isLoading ? "Loading managers..." : "Not specified" },
-              ...managerState.candidates.map((candidate) => ({
-                value: candidate._id,
-                label: employeeOptionLabel(candidate),
-              })),
-            ]}
+            options={managerState.candidates.map((candidate) => ({
+              value: candidate._id,
+              label: employeeOptionLabel(candidate),
+            }))}
+            placeholder={managerState.isLoading ? "Loading managers..." : "Search managers..."}
             value={values.proposedManager}
           />
-          <Select
-            id="hiring-region"
-            label="Region (optional)"
-            name="proposedRegion"
+          <SearchableMultiSelect
+            id="hiring-regions"
+            label="Region / State (optional)"
+            name="proposedRegions"
             onChange={handleChange}
-            options={[
-              { value: "", label: locations.isLoading ? "Loading regions..." : "Not specified" },
-              ...locations.regions.map((region) => ({
-                value: region._id,
-                label: `${region.name} (${region.code})`,
-              })),
-            ]}
-            value={values.proposedRegion}
+            options={locations.regions.map((region) => ({ value: region._id, label: `${region.name} (${region.code})` }))}
+            placeholder={locations.isLoading ? "Loading regions..." : "Search states..."}
+            value={values.proposedRegions}
           />
-          <Select
-            id="hiring-district"
+          <SearchableMultiSelect
+            id="hiring-districts"
             label="District (optional)"
-            name="proposedDistrict"
+            name="proposedDistricts"
             onChange={handleChange}
-            options={[
-              { value: "", label: locations.isLoading ? "Loading districts..." : "Not specified" },
-              ...locations.districtsForRegion(values.proposedRegion).map((district) => ({
-                value: district._id,
-                label: `${district.name} (${district.code})`,
-              })),
-            ]}
-            value={values.proposedDistrict}
+            options={districtOptions}
+            placeholder={locations.isLoading ? "Loading districts..." : "Search districts..."}
+            value={values.proposedDistricts}
+          />
+          <SearchableSelect
+            id="hiring-department"
+            label="Department (optional)"
+            name="proposedDepartment"
+            onChange={handleChange}
+            options={departmentOptions}
+            placeholder="Search departments..."
+            value={values.proposedDepartment}
+          />
+          <SearchableSelect
+            id="hiring-employment-type"
+            label="Employment Type (optional)"
+            name="proposedEmploymentType"
+            onChange={handleChange}
+            options={employmentTypeOptions}
+            placeholder="Search employment types..."
+            value={values.proposedEmploymentType}
           />
         </div>
       </section>

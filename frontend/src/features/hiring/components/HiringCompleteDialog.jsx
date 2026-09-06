@@ -36,7 +36,12 @@ export default function HiringCompleteDialog({ isOpen, onClose, onSuccess, reque
 
   useEffect(() => {
     if (isOpen) {
-      setValues({ ...initialValues, phone: request?.candidate?.phone || "" });
+      setValues({
+        ...initialValues,
+        phone: request?.candidate?.phone || "",
+        department: request?.proposedDepartment || "",
+        employmentType: request?.proposedEmploymentType || "",
+      });
       setFieldErrors({});
       setFormError("");
     }
