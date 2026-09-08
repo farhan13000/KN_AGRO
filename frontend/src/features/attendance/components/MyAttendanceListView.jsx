@@ -7,10 +7,11 @@ import { ATTENDANCE_STATUS, ATTENDANCE_STATUS_LABELS } from "../constants";
 import { useMyAttendanceList } from "../hooks";
 import AttendanceTable from "./AttendanceTable";
 import AttendanceTodayWidget from "./AttendanceTodayWidget";
+import MyAttendanceCalendarSection from "./MyAttendanceCalendarSection";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
-export default function MyAttendanceListView({ description, portalLabel }) {
+export default function MyAttendanceListView({ description, portalLabel, showHeading = true }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = {
     page: Number(getQueryValue(searchParams, "page", "1")),
@@ -33,13 +34,17 @@ export default function MyAttendanceListView({ description, portalLabel }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
-        <h1 className="mt-2 text-3xl font-black text-ink">My Attendance</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
-      </div>
+      {showHeading ? (
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
+          <h1 className="mt-2 text-3xl font-black text-ink">My Attendance</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
+        </div>
+      ) : null}
 
       <AttendanceTodayWidget />
+
+      <MyAttendanceCalendarSection />
 
       <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
         <div className="grid gap-3 sm:grid-cols-3">

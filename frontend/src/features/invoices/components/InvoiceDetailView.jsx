@@ -47,7 +47,7 @@ export default function InvoiceDetailView({
   roleLabel = "CRM",
 }) {
   const { hasPermission, role } = useAuth();
-  const { canRecordPayment } = getInvoiceCapabilities({ hasPermission, invoice, role });
+  const { canRecordPayment } = getInvoiceCapabilities({ hasPermission, invoice });
 
   return (
     <div className="space-y-6">

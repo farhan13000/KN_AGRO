@@ -16,3 +16,7 @@ export { default as TeamMembersTable } from "./TeamMembersTable";
 export { default as TransferEmployeeDialog } from "./TransferEmployeeDialog";
 export { default as TransferHistoryList } from "./TransferHistoryList";
 export { default as UserAccountStatusBadge } from "./UserAccountStatusBadge";
+export { default as OrgChartTree } from "./OrgChartTree";
+export { default as EmployeePerformanceCard } from "./EmployeePerformanceCard";
+export { default as OrgFlowChart } from "./OrgFlowChart";
+export { default as PendingApplicationsView } from "./PendingApplicationsView";

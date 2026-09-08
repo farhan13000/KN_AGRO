@@ -23,20 +23,11 @@ const SuperAdminEmployeeDetailPage = lazy(
 const SuperAdminEmployeeEditPage = lazy(
   () => import("../super-admin/pages/employees/SuperAdminEmployeeEditPage"),
 );
-const SuperAdminPendingEmployeesPage = lazy(
-  () => import("../super-admin/pages/employees/SuperAdminPendingEmployeesPage"),
-);
-const SuperAdminRegionListPage = lazy(
-  () => import("../super-admin/pages/regions/SuperAdminRegionListPage"),
-);
 const SuperAdminRegionCreatePage = lazy(
   () => import("../super-admin/pages/regions/SuperAdminRegionCreatePage"),
 );
 const SuperAdminRegionEditPage = lazy(
   () => import("../super-admin/pages/regions/SuperAdminRegionEditPage"),
-);
-const SuperAdminDistrictListPage = lazy(
-  () => import("../super-admin/pages/districts/SuperAdminDistrictListPage"),
 );
 const SuperAdminDistrictCreatePage = lazy(
   () => import("../super-admin/pages/districts/SuperAdminDistrictCreatePage"),
@@ -47,29 +38,32 @@ const SuperAdminDistrictDetailPage = lazy(
 const SuperAdminDistrictEditPage = lazy(
   () => import("../super-admin/pages/districts/SuperAdminDistrictEditPage"),
 );
-const SuperAdminHiringListPage = lazy(
-  () => import("../super-admin/pages/hiring/SuperAdminHiringListPage"),
+const SuperAdminApprovalsPage = lazy(
+  () => import("../super-admin/pages/approvals/SuperAdminApprovalsPage"),
+);
+const SuperAdminBillingPage = lazy(
+  () => import("../super-admin/pages/billing/SuperAdminBillingPage"),
+);
+const SuperAdminStockPage = lazy(
+  () => import("../super-admin/pages/inventory/SuperAdminStockPage"),
+);
+const SuperAdminLeadsWorkspacePage = lazy(
+  () => import("../super-admin/pages/crm/SuperAdminLeadsWorkspacePage"),
+);
+const SuperAdminTerritoryPage = lazy(
+  () => import("../super-admin/pages/territory/SuperAdminTerritoryPage"),
+);
+const SuperAdminCataloguePage = lazy(
+  () => import("../super-admin/pages/catalogue/SuperAdminCataloguePage"),
 );
 const SuperAdminHiringCreatePage = lazy(
   () => import("../super-admin/pages/hiring/SuperAdminHiringCreatePage"),
-);
-const SuperAdminPromotionApprovalsPage = lazy(
-  () => import("../super-admin/pages/promotions/SuperAdminPromotionApprovalsPage"),
-);
-const SuperAdminSalaryProposalApprovalsPage = lazy(
-  () => import("../super-admin/pages/salaryProposals/SuperAdminSalaryProposalApprovalsPage"),
-);
-const SuperAdminCategoryListPage = lazy(
-  () => import("../super-admin/pages/categories/SuperAdminCategoryListPage"),
 );
 const SuperAdminCategoryCreatePage = lazy(
   () => import("../super-admin/pages/categories/SuperAdminCategoryCreatePage"),
 );
 const SuperAdminCategoryEditPage = lazy(
   () => import("../super-admin/pages/categories/SuperAdminCategoryEditPage"),
-);
-const SuperAdminProductListPage = lazy(
-  () => import("../super-admin/pages/products/SuperAdminProductListPage"),
 );
 const SuperAdminProductDetailPage = lazy(
   () => import("../super-admin/pages/products/SuperAdminProductDetailPage"),
@@ -80,26 +74,11 @@ const SuperAdminProductCreatePage = lazy(
 const SuperAdminProductEditPage = lazy(
   () => import("../super-admin/pages/products/SuperAdminProductEditPage"),
 );
-const SuperAdminInventoryOverviewPage = lazy(
-  () => import("../super-admin/pages/inventory/SuperAdminInventoryOverviewPage"),
-);
-const SuperAdminInventoryTransactionsPage = lazy(
-  () => import("../super-admin/pages/inventory/SuperAdminInventoryTransactionsPage"),
-);
-const SuperAdminLowStockPage = lazy(
-  () => import("../super-admin/pages/inventory/SuperAdminLowStockPage"),
-);
-const SuperAdminOutOfStockPage = lazy(
-  () => import("../super-admin/pages/inventory/SuperAdminOutOfStockPage"),
-);
 const SuperAdminInventoryDetailPage = lazy(
   () => import("../super-admin/pages/inventory/SuperAdminInventoryDetailPage"),
 );
-const SuperAdminLeadListPage = lazy(() => import("../super-admin/pages/crm/SuperAdminLeadListPage"));
 const SuperAdminLeadCreatePage = lazy(() => import("../super-admin/pages/crm/SuperAdminLeadCreatePage"));
 const SuperAdminLeadDetailPage = lazy(() => import("../super-admin/pages/crm/SuperAdminLeadDetailPage"));
-const SuperAdminFollowUpsPage = lazy(() => import("../super-admin/pages/crm/SuperAdminFollowUpsPage"));
-const SuperAdminCrmPipelinePage = lazy(() => import("../super-admin/pages/crm/SuperAdminCrmPipelinePage"));
 const SuperAdminQuotationListPage = lazy(
   () => import("../super-admin/pages/quotations/SuperAdminQuotationListPage"),
 );
@@ -133,17 +112,12 @@ const SuperAdminOrderCreatePage = lazy(
 );
 const SuperAdminOrderDetailPage = lazy(() => import("../super-admin/pages/orders/SuperAdminOrderDetailPage"));
 const SuperAdminOrderPrintPage = lazy(() => import("../super-admin/pages/orders/SuperAdminOrderPrintPage"));
-const SuperAdminInvoiceListPage = lazy(() => import("../super-admin/pages/invoices/SuperAdminInvoiceListPage"));
-const SuperAdminInvoiceOutstandingPage = lazy(
-  () => import("../super-admin/pages/invoices/SuperAdminInvoiceOutstandingPage"),
-);
 const SuperAdminInvoiceDetailPage = lazy(
   () => import("../super-admin/pages/invoices/SuperAdminInvoiceDetailPage"),
 );
 const SuperAdminInvoicePrintPage = lazy(
   () => import("../super-admin/pages/invoices/SuperAdminInvoicePrintPage"),
 );
-const SuperAdminPaymentListPage = lazy(() => import("../super-admin/pages/payments/SuperAdminPaymentListPage"));
 const SuperAdminAllDSRListPage = lazy(() => import("../super-admin/pages/dsr/SuperAdminAllDSRListPage"));
 const SuperAdminProductRecommendationsPage = lazy(
   () => import("../super-admin/pages/productRecommendations/SuperAdminProductRecommendationsPage"),
@@ -184,7 +158,10 @@ export const superAdminRouteConfig = {
       children: [
         { path: ROUTES.SUPER_ADMIN.DASHBOARD, element: <SuperAdminDashboardPage /> },
         { path: ROUTES.SUPER_ADMIN.EMPLOYEES, element: <SuperAdminEmployeeListPage /> },
-        { path: ROUTES.SUPER_ADMIN.EMPLOYEE_PENDING, element: <SuperAdminPendingEmployeesPage /> },
+        {
+          path: ROUTES.SUPER_ADMIN.EMPLOYEE_PENDING,
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.APPROVALS}?type=employees`} />,
+        },
         { path: ROUTES.SUPER_ADMIN.EMPLOYEE_HIERARCHY, element: <SuperAdminEmployeeHierarchyPage /> },
         {
           path: ROUTES.SUPER_ADMIN.EMPLOYEE_CREATE,
@@ -196,8 +173,15 @@ export const superAdminRouteConfig = {
         { path: ROUTES.SUPER_ADMIN.EMPLOYEE_EDIT, element: <SuperAdminEmployeeEditPage /> },
         { path: ROUTES.SUPER_ADMIN.EMPLOYEE_DETAIL, element: <SuperAdminEmployeeDetailPage /> },
         {
+          path: ROUTES.SUPER_ADMIN.TERRITORY,
+          element: <SuperAdminTerritoryPage />,
+        },
+        // Regions and districts are one screen now. The old paths stay as
+        // redirects into the matching tab, because links to them exist all
+        // over the app (and in people's bookmarks).
+        {
           path: ROUTES.SUPER_ADMIN.REGIONS,
-          element: withPermission(PERMISSIONS.REGION_READ, <SuperAdminRegionListPage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.TERRITORY}?tab=regions`} />,
         },
         {
           path: ROUTES.SUPER_ADMIN.REGION_CREATE,
@@ -209,7 +193,7 @@ export const superAdminRouteConfig = {
         },
         {
           path: ROUTES.SUPER_ADMIN.DISTRICTS,
-          element: withPermission(PERMISSIONS.DISTRICT_READ, <SuperAdminDistrictListPage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.TERRITORY}?tab=districts`} />,
         },
         {
           path: ROUTES.SUPER_ADMIN.DISTRICT_CREATE,
@@ -228,20 +212,31 @@ export const superAdminRouteConfig = {
           element: withPermission(PERMISSIONS.HIRING_CREATE, <SuperAdminHiringCreatePage />),
         },
         {
+          path: ROUTES.SUPER_ADMIN.APPROVALS,
+          element: <SuperAdminApprovalsPage />,
+        },
+        // The four queues merged into one screen. These paths stay so
+        // notification deep-links keep working; each opens the combined
+        // screen on its own tab.
+        {
           path: ROUTES.SUPER_ADMIN.HIRING,
-          element: withPermission(PERMISSIONS.HIRING_READ, <SuperAdminHiringListPage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.APPROVALS}?type=hiring`} />,
         },
         {
           path: ROUTES.SUPER_ADMIN.PROMOTION_APPROVALS,
-          element: withPermission(PERMISSIONS.PROMOTION_READ, <SuperAdminPromotionApprovalsPage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.APPROVALS}?type=promotions`} />,
         },
         {
           path: ROUTES.SUPER_ADMIN.SALARY_PROPOSAL_APPROVALS,
-          element: withPermission(PERMISSIONS.SALARY_PROPOSAL_READ, <SuperAdminSalaryProposalApprovalsPage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.APPROVALS}?type=salary`} />,
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.CATALOGUE,
+          element: <SuperAdminCataloguePage />,
         },
         {
           path: ROUTES.SUPER_ADMIN.CATEGORIES,
-          element: withPermission(PERMISSIONS.CATEGORIES_READ, <SuperAdminCategoryListPage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.CATALOGUE}?tab=categories`} />,
         },
         {
           path: ROUTES.SUPER_ADMIN.CATEGORY_CREATE,
@@ -253,7 +248,7 @@ export const superAdminRouteConfig = {
         },
         {
           path: ROUTES.SUPER_ADMIN.PRODUCTS,
-          element: withPermission(PERMISSIONS.PRODUCTS_READ, <SuperAdminProductListPage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.CATALOGUE}?tab=products`} />,
         },
         {
           path: ROUTES.SUPER_ADMIN.PRODUCT_CREATE,
@@ -268,20 +263,24 @@ export const superAdminRouteConfig = {
           element: withPermission(PERMISSIONS.PRODUCTS_READ, <SuperAdminProductDetailPage />),
         },
         {
+          path: ROUTES.SUPER_ADMIN.STOCK,
+          element: <SuperAdminStockPage />,
+        },
+        {
           path: ROUTES.SUPER_ADMIN.INVENTORY,
-          element: withPermission(PERMISSIONS.INVENTORY_READ, <SuperAdminInventoryOverviewPage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.STOCK}?tab=levels`} />,
         },
         {
           path: ROUTES.SUPER_ADMIN.INVENTORY_TRANSACTIONS,
-          element: withPermission(PERMISSIONS.INVENTORY_TRANSACTIONS_READ, <SuperAdminInventoryTransactionsPage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.STOCK}?tab=movements`} />,
         },
         {
           path: ROUTES.SUPER_ADMIN.INVENTORY_LOW_STOCK,
-          element: withPermission(PERMISSIONS.INVENTORY_READ, <SuperAdminLowStockPage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.STOCK}?tab=low`} />,
         },
         {
           path: ROUTES.SUPER_ADMIN.INVENTORY_OUT_OF_STOCK,
-          element: withPermission(PERMISSIONS.INVENTORY_READ, <SuperAdminOutOfStockPage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.STOCK}?tab=out`} />,
         },
         {
           path: ROUTES.SUPER_ADMIN.INVENTORY_DETAIL,
@@ -289,11 +288,13 @@ export const superAdminRouteConfig = {
         },
         {
           path: ROUTES.SUPER_ADMIN.CRM,
-          element: withPermission(PERMISSIONS.LEADS_READ, <SuperAdminCrmPipelinePage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.LEADS}?tab=pipeline`} />,
         },
         {
+          // The list, the pipeline board and the follow-up queue are three
+          // readings of the same records, so they are tabs on this one path.
           path: ROUTES.SUPER_ADMIN.LEADS,
-          element: withPermission(PERMISSIONS.LEADS_READ, <SuperAdminLeadListPage />),
+          element: <SuperAdminLeadsWorkspacePage />,
         },
         {
           path: ROUTES.SUPER_ADMIN.LEAD_CREATE,
@@ -305,7 +306,7 @@ export const superAdminRouteConfig = {
         },
         {
           path: ROUTES.SUPER_ADMIN.FOLLOW_UPS,
-          element: withPermission(PERMISSIONS.LEADS_READ, <SuperAdminFollowUpsPage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.LEADS}?tab=follow-ups`} />,
         },
         {
           path: ROUTES.SUPER_ADMIN.QUOTATIONS,
@@ -362,12 +363,16 @@ export const superAdminRouteConfig = {
           element: withPermission(PERMISSIONS.ORDERS_READ, <SuperAdminOrderPrintPage />),
         },
         {
+          path: ROUTES.SUPER_ADMIN.BILLING,
+          element: <SuperAdminBillingPage />,
+        },
+        {
           path: ROUTES.SUPER_ADMIN.INVOICES,
-          element: withPermission(PERMISSIONS.INVOICES_READ, <SuperAdminInvoiceListPage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.BILLING}?tab=invoices`} />,
         },
         {
           path: ROUTES.SUPER_ADMIN.INVOICE_OUTSTANDING,
-          element: withPermission(PERMISSIONS.INVOICES_READ, <SuperAdminInvoiceOutstandingPage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.BILLING}?tab=outstanding`} />,
         },
         {
           path: ROUTES.SUPER_ADMIN.INVOICE_DETAIL,
@@ -379,7 +384,7 @@ export const superAdminRouteConfig = {
         },
         {
           path: ROUTES.SUPER_ADMIN.PAYMENTS,
-          element: withPermission(PERMISSIONS.PAYMENTS_READ, <SuperAdminPaymentListPage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.BILLING}?tab=payments`} />,
         },
         {
           path: ROUTES.SUPER_ADMIN.DSR,

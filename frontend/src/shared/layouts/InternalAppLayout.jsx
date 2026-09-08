@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
-import { ChevronDown, KeyRound, LogOut, Menu, PanelLeftClose, UserCircle, X } from "lucide-react";
+import { ChevronDown, Download, KeyRound, LogOut, Menu, PanelLeftClose, UserCircle, X } from "lucide-react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import logo from "../../assets/KN_AGRO_LOGO.png";
 import { useAuth } from "../../core/auth";
 import { NotificationBell } from "../../features/notifications";
 import { PERMISSIONS, ROLE_LABELS, ROUTES } from "../constants";
+import { useInstallPrompt } from "../hooks";
 
 const getInitials = (name = "") =>
   name
@@ -118,6 +119,9 @@ export default function InternalAppLayout({ navigationItems, portalLabel }) {
   const { hasPermission } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
+  // Only ever true when the browser has actually offered an install and
+  // the app is not already running installed — see useInstallPrompt.
+  const { canInstall, promptInstall } = useInstallPrompt();
   const desktopSidebarClass = desktopCollapsed ? "lg:w-24" : "lg:w-72";
   const desktopContentClass = desktopCollapsed ? "lg:pl-24" : "lg:pl-72";
 
@@ -149,6 +153,23 @@ export default function InternalAppLayout({ navigationItems, portalLabel }) {
             <X className="h-5 w-5" />
           </button>
         </div>
+
+        {/* Absent entirely once the app is installed, and on browsers that
+            never offer an install — a control that cannot do anything is
+            worse than no control. */}
+        {canInstall ? (
+          <button
+            className={`mt-3 inline-flex min-h-10 items-center gap-2 rounded-xl bg-mint/70 px-3 py-2 text-xs font-bold text-forest ring-1 ring-forest/15 transition hover:bg-mint ${
+              desktopCollapsed ? "lg:justify-center lg:px-0" : ""
+            }`}
+            onClick={promptInstall}
+            title="Install KN Agro as an app"
+            type="button"
+          >
+            <Download aria-hidden="true" className="h-4 w-4 shrink-0" />
+            <span className={desktopCollapsed ? "lg:sr-only" : ""}>Install app</span>
+          </button>
+        ) : null}
 
         <div className="mt-8 flex-1 overflow-y-auto">
           <NavigationItems

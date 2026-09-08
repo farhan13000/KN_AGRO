@@ -8,6 +8,7 @@
 export const MEDIA_KIND = Object.freeze({
   EMPLOYEE_PHOTO: "EMPLOYEE_PHOTO",
   RESUME: "RESUME",
+  ATTENDANCE_PHOTO: "ATTENDANCE_PHOTO",
 });
 
 export const MEDIA_KIND_RULES = Object.freeze({
@@ -16,6 +17,14 @@ export const MEDIA_KIND_RULES = Object.freeze({
     mimeTypes: ["image/jpeg", "image/png", "image/webp"],
     maxBytes: 5 * 1024 * 1024,
     label: "JPG, PNG or WebP, up to 5MB",
+  }),
+  [MEDIA_KIND.ATTENDANCE_PHOTO]: Object.freeze({
+    accept: "image/jpeg,image/png,image/webp",
+    mimeTypes: ["image/jpeg", "image/png", "image/webp"],
+    // Higher than a profile photo on purpose: this is taken on a phone,
+    // in the field, and is refused outright if it is too large.
+    maxBytes: 8 * 1024 * 1024,
+    label: "JPG, PNG or WebP, up to 8MB",
   }),
   [MEDIA_KIND.RESUME]: Object.freeze({
     accept: "application/pdf",

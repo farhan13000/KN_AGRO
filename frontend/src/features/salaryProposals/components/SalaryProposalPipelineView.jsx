@@ -30,7 +30,7 @@ import SalaryProposalDecisionDialog from "./SalaryProposalDecisionDialog";
  * either) so they run immediately on click, mirroring exactly how
  * HiringPipelineView's own Approve step has no confirmation step either.
  */
-export default function SalaryProposalPipelineView({ description, portalLabel }) {
+export default function SalaryProposalPipelineView({ description, portalLabel, showHeading = true }) {
   const { hasPermission, role } = useAuth();
   const [statusFilter, setStatusFilter] = useState("");
   const [decision, setDecision] = useState(null); // { proposal, kind: "review" | "reject" }
@@ -117,11 +117,13 @@ export default function SalaryProposalPipelineView({ description, portalLabel })
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
-        <h1 className="mt-2 text-3xl font-black text-ink">Salary Proposals</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
-      </div>
+      {showHeading ? (
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
+          <h1 className="mt-2 text-3xl font-black text-ink">Salary Proposals</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
+        </div>
+      ) : null}
 
       {message ? (
         <p className="rounded-lg border border-forest/15 bg-mint/60 px-4 py-3 text-sm font-semibold text-forest">

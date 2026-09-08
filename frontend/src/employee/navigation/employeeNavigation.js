@@ -1,12 +1,8 @@
 import {
-  Wallet,
-  AlertTriangle,
-  CalendarCheck,
   CalendarRange,
   ClipboardList,
   ClipboardSignature,
   Clock,
-  CreditCard,
   FileText,
   LayoutDashboard,
   Lightbulb,
@@ -15,6 +11,7 @@ import {
   ShoppingCart,
   UserCircle,
   Users,
+  Wallet,
 } from "lucide-react";
 import { PERMISSIONS, ROUTES } from "../../shared/constants";
 
@@ -31,15 +28,11 @@ export const employeeNavigation = [
     permission: PERMISSIONS.EMPLOYEES_READ_SELF,
   },
   {
+    // The lead list and the follow-up queue are the same records, so they
+    // are two tabs rather than two entries.
     label: "My Leads",
     route: ROUTES.EMPLOYEE.LEADS,
     icon: PhoneCall,
-    permission: PERMISSIONS.LEADS_READ,
-  },
-  {
-    label: "Follow-Ups",
-    route: ROUTES.EMPLOYEE.FOLLOW_UPS,
-    icon: CalendarCheck,
     permission: PERMISSIONS.LEADS_READ,
   },
   {
@@ -78,22 +71,11 @@ export const employeeNavigation = [
     permission: PERMISSIONS.ORDERS_READ,
   },
   {
-    label: "Invoices",
-    route: ROUTES.EMPLOYEE.INVOICES,
+    // Invoices + outstanding + payments. No `permission`: each tab
+    // declares its own so a viewer sees only what they can open.
+    label: "Billing",
+    route: ROUTES.EMPLOYEE.BILLING,
     icon: Receipt,
-    permission: PERMISSIONS.INVOICES_READ,
-  },
-  {
-    label: "Outstanding",
-    route: ROUTES.EMPLOYEE.INVOICE_OUTSTANDING,
-    icon: AlertTriangle,
-    permission: PERMISSIONS.INVOICES_READ,
-  },
-  {
-    label: "Payments",
-    route: ROUTES.EMPLOYEE.PAYMENTS,
-    icon: CreditCard,
-    permission: PERMISSIONS.PAYMENTS_READ,
   },
   {
     label: "My Attendance",

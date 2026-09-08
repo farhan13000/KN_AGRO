@@ -1,13 +1,14 @@
 import { ROUTES } from "../../../shared/constants";
 import { LeadListView } from "../../../features/leads";
 
-export default function SalesManagerLeadListPage() {
+export default function SalesManagerLeadListPage({ showHeading = true }) {
   return (
     <LeadListView
       createPath={ROUTES.SALES_MANAGER.LEAD_CREATE}
       detailPath={(lead) => `${ROUTES.SALES_MANAGER.LEADS}/${lead._id}`}
       roleLabel="Manager CRM"
       showAssignments
+      showHeading={showHeading}
       subtitle="Review leads returned by your backend manager scope. The browser does not filter global lead data."
       title="Assigned Leads"
     />

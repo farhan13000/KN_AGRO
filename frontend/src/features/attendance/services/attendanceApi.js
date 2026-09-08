@@ -4,17 +4,18 @@ const emptyValues = new Set(["", null, undefined]);
 const cleanQuery = (query = {}) =>
   Object.fromEntries(Object.entries(query).filter(([, value]) => !emptyValues.has(value)));
 
-// checkIn/checkOut deliberately take no body — the backend's own schemas
-// are `z.object({})`, every field (timestamp, workingMinutes, status) is
-// always server-computed, never client-supplied.
+// checkIn/checkOut send exactly one thing: the photo reference returned
+// by POST /media/uploads/ATTENDANCE_PHOTO. Everything else — the
+// timestamp, workingMinutes, status — stays server-computed and has no
+// field in the backend schema at all.
 export const attendanceApi = {
-  async checkIn() {
-    const response = await apiClient.post(API_ENDPOINTS.ATTENDANCE.CHECK_IN, {});
+  async checkIn(photo) {
+    const response = await apiClient.post(API_ENDPOINTS.ATTENDANCE.CHECK_IN, { photo });
     return unwrapApiData(response);
   },
 
-  async checkOut() {
-    const response = await apiClient.post(API_ENDPOINTS.ATTENDANCE.CHECK_OUT, {});
+  async checkOut(photo) {
+    const response = await apiClient.post(API_ENDPOINTS.ATTENDANCE.CHECK_OUT, { photo });
     return unwrapApiData(response);
   },
 

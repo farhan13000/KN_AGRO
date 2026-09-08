@@ -30,7 +30,7 @@ const formatDate = (value) => {
  * authoritative: if the two ever disagree, its 400/403 is what the user
  * sees, rendered inline rather than swallowed.
  */
-export default function HiringPipelineView({ createHref, description, portalLabel }) {
+export default function HiringPipelineView({ createHref, description, portalLabel, showHeading = true }) {
   const { hasPermission, role } = useAuth();
   const [statusFilter, setStatusFilter] = useState("");
   const [completing, setCompleting] = useState(null);
@@ -101,11 +101,13 @@ export default function HiringPipelineView({ createHref, description, portalLabe
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
-          <h1 className="mt-2 text-3xl font-black text-ink">Hiring Requests</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
-        </div>
+        {showHeading ? (
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
+            <h1 className="mt-2 text-3xl font-black text-ink">Hiring Requests</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
+          </div>
+        ) : null}
         {createHref && hasPermission(PERMISSIONS.HIRING_CREATE) ? (
           <a
             className="inline-flex min-h-11 items-center justify-center rounded-lg bg-forest px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-agriculture"

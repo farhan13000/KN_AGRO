@@ -4,6 +4,30 @@ import { PermissionGuard } from "../core/auth";
 import ProtectedRoute from "./ProtectedRoute";
 import { BACKEND_ROLES, PERMISSIONS, ROUTES } from "../shared/constants";
 
+const SalesManagerApprovalsPage = lazy(
+  () => import("../sales-manager/pages/approvals/SalesManagerApprovalsPage"),
+);
+const SalesManagerBillingPage = lazy(
+  () => import("../sales-manager/pages/billing/SalesManagerBillingPage"),
+);
+const SalesManagerLeadsWorkspacePage = lazy(
+  () => import("../sales-manager/pages/crm/SalesManagerLeadsWorkspacePage"),
+);
+const SalesManagerTerritoryPage = lazy(
+  () => import("../sales-manager/pages/territory/SalesManagerTerritoryPage"),
+);
+const SalesManagerDSRWorkspacePage = lazy(
+  () => import("../sales-manager/pages/dsr/SalesManagerDSRWorkspacePage"),
+);
+const SalesManagerAttendanceWorkspacePage = lazy(
+  () => import("../sales-manager/pages/attendance/SalesManagerAttendanceWorkspacePage"),
+);
+const SalesManagerLeavesWorkspacePage = lazy(
+  () => import("../sales-manager/pages/leaves/SalesManagerLeavesWorkspacePage"),
+);
+const SalesManagerReportsWorkspacePage = lazy(
+  () => import("../sales-manager/pages/reportRequests/SalesManagerReportsWorkspacePage"),
+);
 const SalesManagerLayout = lazy(() => import("../sales-manager/layout/SalesManagerLayout"));
 const SalesManagerDashboardPage = lazy(
   () => import("../sales-manager/dashboard/SalesManagerDashboardPage"),
@@ -12,32 +36,14 @@ const SalesManagerTeamPage = lazy(() => import("../sales-manager/pages/team/Sale
 const SalesManagerTeamMemberDetailPage = lazy(
   () => import("../sales-manager/pages/team/SalesManagerTeamMemberDetailPage"),
 );
-const SalesManagerRegionListPage = lazy(
-  () => import("../sales-manager/pages/regions/SalesManagerRegionListPage"),
-);
-const SalesManagerDistrictListPage = lazy(
-  () => import("../sales-manager/pages/districts/SalesManagerDistrictListPage"),
-);
 const SalesManagerDistrictDetailPage = lazy(
   () => import("../sales-manager/pages/districts/SalesManagerDistrictDetailPage"),
-);
-const SalesManagerHiringListPage = lazy(
-  () => import("../sales-manager/pages/hiring/SalesManagerHiringListPage"),
 );
 const SalesManagerHiringCreatePage = lazy(
   () => import("../sales-manager/pages/hiring/SalesManagerHiringCreatePage"),
 );
-const SalesManagerPromotionApprovalsPage = lazy(
-  () => import("../sales-manager/pages/promotions/SalesManagerPromotionApprovalsPage"),
-);
-const SalesManagerSalaryProposalApprovalsPage = lazy(
-  () => import("../sales-manager/pages/salaryProposals/SalesManagerSalaryProposalApprovalsPage"),
-);
-const SalesManagerLeadListPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerLeadListPage"));
 const SalesManagerLeadCreatePage = lazy(() => import("../sales-manager/pages/crm/SalesManagerLeadCreatePage"));
 const SalesManagerLeadDetailPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerLeadDetailPage"));
-const SalesManagerFollowUpsPage = lazy(() => import("../sales-manager/pages/crm/SalesManagerFollowUpsPage"));
-const SalesManagerCrmPipelinePage = lazy(() => import("../sales-manager/pages/crm/SalesManagerCrmPipelinePage"));
 const SalesManagerQuotationListPage = lazy(
   () => import("../sales-manager/pages/quotations/SalesManagerQuotationListPage"),
 );
@@ -75,42 +81,15 @@ const SalesManagerOrderDetailPage = lazy(
 const SalesManagerOrderPrintPage = lazy(
   () => import("../sales-manager/pages/orders/SalesManagerOrderPrintPage"),
 );
-const SalesManagerInvoiceListPage = lazy(
-  () => import("../sales-manager/pages/invoices/SalesManagerInvoiceListPage"),
-);
-const SalesManagerInvoiceOutstandingPage = lazy(
-  () => import("../sales-manager/pages/invoices/SalesManagerInvoiceOutstandingPage"),
-);
 const SalesManagerInvoiceDetailPage = lazy(
   () => import("../sales-manager/pages/invoices/SalesManagerInvoiceDetailPage"),
 );
 const SalesManagerInvoicePrintPage = lazy(
   () => import("../sales-manager/pages/invoices/SalesManagerInvoicePrintPage"),
 );
-const SalesManagerPaymentListPage = lazy(
-  () => import("../sales-manager/pages/payments/SalesManagerPaymentListPage"),
-);
 const SalesManagerDSRSubmitPage = lazy(() => import("../sales-manager/pages/dsr/SalesManagerDSRSubmitPage"));
-const SalesManagerMyDSRListPage = lazy(() => import("../sales-manager/pages/dsr/SalesManagerMyDSRListPage"));
-const SalesManagerTeamDSRListPage = lazy(
-  () => import("../sales-manager/pages/dsr/SalesManagerTeamDSRListPage"),
-);
 const SalesManagerProductRecommendationsPage = lazy(
   () => import("../sales-manager/pages/productRecommendations/SalesManagerProductRecommendationsPage"),
-);
-const SalesManagerMyAttendancePage = lazy(
-  () => import("../sales-manager/pages/attendance/SalesManagerMyAttendancePage"),
-);
-const SalesManagerTeamAttendancePage = lazy(
-  () => import("../sales-manager/pages/attendance/SalesManagerTeamAttendancePage"),
-);
-const SalesManagerMyLeavesPage = lazy(() => import("../sales-manager/pages/leaves/SalesManagerMyLeavesPage"));
-const SalesManagerTeamLeavesPage = lazy(() => import("../sales-manager/pages/leaves/SalesManagerTeamLeavesPage"));
-const SalesManagerMyReportRequestsPage = lazy(
-  () => import("../sales-manager/pages/reportRequests/SalesManagerMyReportRequestsPage"),
-);
-const SalesManagerReportRequestsPage = lazy(
-  () => import("../sales-manager/pages/reportRequests/SalesManagerReportRequestsPage"),
 );
 const SalesManagerMyPayrollPage = lazy(
   () => import("../sales-manager/pages/payroll/SalesManagerMyPayrollPage"),
@@ -148,12 +127,18 @@ export const salesManagerRouteConfig = {
         { path: ROUTES.SALES_MANAGER.TEAM, element: <SalesManagerTeamPage /> },
         { path: ROUTES.SALES_MANAGER.TEAM_MEMBER_DETAIL, element: <SalesManagerTeamMemberDetailPage /> },
         {
+          path: ROUTES.SALES_MANAGER.TERRITORY,
+          element: <SalesManagerTerritoryPage />,
+        },
+        // Old per-view paths stay as redirects into the matching tab:
+        // links to them exist across the app and in bookmarks.
+        {
           path: ROUTES.SALES_MANAGER.REGIONS,
-          element: withPermission(PERMISSIONS.REGION_READ, <SalesManagerRegionListPage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.TERRITORY}?tab=regions`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.DISTRICTS,
-          element: withPermission(PERMISSIONS.DISTRICT_READ, <SalesManagerDistrictListPage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.TERRITORY}?tab=districts`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.DISTRICT_DETAIL,
@@ -164,24 +149,28 @@ export const salesManagerRouteConfig = {
           element: withPermission(PERMISSIONS.HIRING_CREATE, <SalesManagerHiringCreatePage />),
         },
         {
+          path: ROUTES.SALES_MANAGER.APPROVALS,
+          element: <SalesManagerApprovalsPage />,
+        },
+        {
           path: ROUTES.SALES_MANAGER.HIRING,
-          element: withPermission(PERMISSIONS.HIRING_READ, <SalesManagerHiringListPage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.APPROVALS}?type=hiring`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.PROMOTION_APPROVALS,
-          element: withPermission(PERMISSIONS.PROMOTION_READ, <SalesManagerPromotionApprovalsPage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.APPROVALS}?type=promotions`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.SALARY_PROPOSAL_APPROVALS,
-          element: withPermission(PERMISSIONS.SALARY_PROPOSAL_READ, <SalesManagerSalaryProposalApprovalsPage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.APPROVALS}?type=salary`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.CRM,
-          element: withPermission(PERMISSIONS.LEADS_READ, <SalesManagerCrmPipelinePage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.LEADS}?tab=pipeline`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.LEADS,
-          element: withPermission(PERMISSIONS.LEADS_READ, <SalesManagerLeadListPage />),
+          element: <SalesManagerLeadsWorkspacePage />,
         },
         {
           // Registered BEFORE :leadId — otherwise /manager/leads/create
@@ -195,7 +184,7 @@ export const salesManagerRouteConfig = {
         },
         {
           path: ROUTES.SALES_MANAGER.FOLLOW_UPS,
-          element: withPermission(PERMISSIONS.LEADS_READ, <SalesManagerFollowUpsPage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.LEADS}?tab=follow-ups`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.QUOTATIONS,
@@ -252,12 +241,16 @@ export const salesManagerRouteConfig = {
           element: withPermission(PERMISSIONS.ORDERS_READ, <SalesManagerOrderPrintPage />),
         },
         {
+          path: ROUTES.SALES_MANAGER.BILLING,
+          element: <SalesManagerBillingPage />,
+        },
+        {
           path: ROUTES.SALES_MANAGER.INVOICES,
-          element: withPermission(PERMISSIONS.INVOICES_READ, <SalesManagerInvoiceListPage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.BILLING}?tab=invoices`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.INVOICE_OUTSTANDING,
-          element: withPermission(PERMISSIONS.INVOICES_READ, <SalesManagerInvoiceOutstandingPage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.BILLING}?tab=outstanding`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.INVOICE_DETAIL,
@@ -269,47 +262,63 @@ export const salesManagerRouteConfig = {
         },
         {
           path: ROUTES.SALES_MANAGER.PAYMENTS,
-          element: withPermission(PERMISSIONS.PAYMENTS_READ, <SalesManagerPaymentListPage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.BILLING}?tab=payments`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.DSR_SUBMIT,
           element: withPermission(PERMISSIONS.DSR_CREATE, <SalesManagerDSRSubmitPage />),
         },
         {
+          path: ROUTES.SALES_MANAGER.DSRS,
+          element: <SalesManagerDSRWorkspacePage />,
+        },
+        {
           path: ROUTES.SALES_MANAGER.DSR_ME,
-          element: withPermission(PERMISSIONS.DSR_READ_SELF, <SalesManagerMyDSRListPage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.DSRS}?tab=me`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.DSR_TEAM,
-          element: withPermission(PERMISSIONS.DSR_READ_TEAM, <SalesManagerTeamDSRListPage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.DSRS}?tab=team`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.PRODUCT_RECOMMENDATIONS,
           element: withPermission(PERMISSIONS.PRODUCTS_READ, <SalesManagerProductRecommendationsPage />),
         },
         {
+          path: ROUTES.SALES_MANAGER.ATTENDANCE,
+          element: <SalesManagerAttendanceWorkspacePage />,
+        },
+        {
           path: ROUTES.SALES_MANAGER.ATTENDANCE_ME,
-          element: withPermission(PERMISSIONS.ATTENDANCE_READ_SELF, <SalesManagerMyAttendancePage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.ATTENDANCE}?tab=me`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.ATTENDANCE_TEAM,
-          element: withPermission(PERMISSIONS.ATTENDANCE_READ_TEAM, <SalesManagerTeamAttendancePage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.ATTENDANCE}?tab=team`} />,
+        },
+        {
+          path: ROUTES.SALES_MANAGER.LEAVES,
+          element: <SalesManagerLeavesWorkspacePage />,
         },
         {
           path: ROUTES.SALES_MANAGER.LEAVES_ME,
-          element: withPermission(PERMISSIONS.LEAVES_READ_SELF, <SalesManagerMyLeavesPage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.LEAVES}?tab=me`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.LEAVES_TEAM,
-          element: withPermission(PERMISSIONS.LEAVES_READ_TEAM, <SalesManagerTeamLeavesPage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.LEAVES}?tab=team`} />,
+        },
+        {
+          path: ROUTES.SALES_MANAGER.REPORTS,
+          element: <SalesManagerReportsWorkspacePage />,
         },
         {
           path: ROUTES.SALES_MANAGER.REPORT_REQUESTS_ME,
-          element: withPermission(PERMISSIONS.REPORTS_READ_SELF, <SalesManagerMyReportRequestsPage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.REPORTS}?tab=me`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.REPORT_REQUESTS_TEAM,
-          element: withPermission(PERMISSIONS.REPORTS_READ_TEAM, <SalesManagerReportRequestsPage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.REPORTS}?tab=team`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.MY_PAYROLL,

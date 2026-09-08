@@ -12,6 +12,7 @@ import {
   DirectReportsList,
   EmployeeApprovalDialog,
   EmployeeDetailSections,
+  EmployeePerformanceCard,
   EmployeeLifecycleDialog,
   EmployeeRejectionDialog,
   ManagerAssignmentDialog,
@@ -88,6 +89,13 @@ export default function SuperAdminEmployeeDetailPage() {
       ) : null}
 
       <EmployeeDetailSections employee={employee} />
+
+      {/* Admin-only: the endpoint behind this returns the whole company's
+          figures, so it is mounted only for viewers who already hold
+          ANALYTICS_ADMIN rather than letting it render and 403. */}
+      {hasPermission(PERMISSIONS.ANALYTICS_ADMIN) ? (
+        <EmployeePerformanceCard employeeId={employeeId} />
+      ) : null}
 
       <Card className="p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

@@ -31,7 +31,7 @@ const summaryCards = (summary = {}) => [
   { label: "Discontinued", value: summary.discontinuedProducts ?? 0 },
 ];
 
-export default function SuperAdminProductListPage() {
+export default function SuperAdminProductListPage({ showHeading = true }) {
   const { hasPermission } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [statusProduct, setStatusProduct] = useState(null);
@@ -99,13 +99,15 @@ export default function SuperAdminProductListPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Product Catalog</p>
-          <h1 className="mt-2 text-3xl font-black text-ink">Products</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-            Manage product records, catalog status, price fields, and reorder settings from the backend API.
-          </p>
-        </div>
+        {showHeading ? (
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Product Catalog</p>
+            <h1 className="mt-2 text-3xl font-black text-ink">Products</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+              Manage product records, catalog status, price fields, and reorder settings from the backend API.
+            </p>
+          </div>
+        ) : null}
         {canCreateProducts ? (
           <Link
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-forest px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-agriculture"

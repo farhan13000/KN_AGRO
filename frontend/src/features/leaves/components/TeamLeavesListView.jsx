@@ -16,7 +16,7 @@ const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key
 // client-side" posture as every other workflow phase) — a manager
 // outside the real chain gets the backend's own 403, not a hidden
 // button.
-export default function TeamLeavesListView({ description, portalLabel }) {
+export default function TeamLeavesListView({ description, portalLabel, showHeading = true }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [deciding, setDeciding] = useState(null);
   const query = {
@@ -37,11 +37,13 @@ export default function TeamLeavesListView({ description, portalLabel }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
-        <h1 className="mt-2 text-3xl font-black text-ink">Team Leaves</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
-      </div>
+      {showHeading ? (
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
+          <h1 className="mt-2 text-3xl font-black text-ink">Team Leaves</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
+        </div>
+      ) : null}
 
       <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
         <label className="block max-w-xs">

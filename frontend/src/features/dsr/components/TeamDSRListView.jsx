@@ -19,7 +19,7 @@ import DSRReviewDialog from "./DSRReviewDialog";
  * acknowledge" checks are the real gate; a 403 here is an expected,
  * explainable outcome for a permitted-but-out-of-chain actor, not a bug.
  */
-export default function TeamDSRListView({ description, portalLabel }) {
+export default function TeamDSRListView({ description, portalLabel, showHeading = true }) {
   const { hasPermission } = useAuth();
   const [reviewing, setReviewing] = useState(null);
   const [acknowledging, setAcknowledging] = useState(null);
@@ -79,11 +79,13 @@ export default function TeamDSRListView({ description, portalLabel }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
-        <h1 className="mt-2 text-3xl font-black text-ink">Team Daily Sales Reports</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
-      </div>
+      {showHeading ? (
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
+          <h1 className="mt-2 text-3xl font-black text-ink">Team Daily Sales Reports</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
+        </div>
+      ) : null}
 
       {message ? (
         <p className="rounded-lg border border-forest/15 bg-mint/60 px-4 py-3 text-sm font-semibold text-forest">{message}</p>

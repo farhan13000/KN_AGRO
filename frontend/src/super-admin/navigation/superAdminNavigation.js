@@ -1,26 +1,18 @@
 import {
-  AlertTriangle,
-  Boxes,
   CalendarRange,
   ClipboardCheck,
   ClipboardList,
   Clock,
-  Columns3,
-  CreditCard,
   FileQuestion,
   FileText,
-  FolderTree,
   GitBranch,
-  History,
   LayoutDashboard,
   Lightbulb,
   MapPin,
   Package,
   PhoneCall,
-  ScrollText,
-  TrendingUp,
-  UserPlus,
   Receipt,
+  ScrollText,
   ShoppingCart,
   UserCircle,
   Users,
@@ -29,6 +21,10 @@ import {
 } from "lucide-react";
 import { PERMISSIONS, ROUTES } from "../../shared/constants";
 
+// Several entries below stand for a screen with tabs rather than a single
+// view. They carry no `permission` on purpose: each tab declares its own
+// and hides itself, so gating the whole entry on any one permission would
+// hide the other tabs from someone who holds those instead.
 export const superAdminNavigation = [
   {
     label: "Dashboard",
@@ -42,10 +38,10 @@ export const superAdminNavigation = [
     permission: PERMISSIONS.EMPLOYEES_READ,
   },
   {
-    label: "Pending Approvals",
-    route: ROUTES.SUPER_ADMIN.EMPLOYEE_PENDING,
+    // Hiring, promotions, salary proposals, employee applications.
+    label: "Approvals",
+    route: ROUTES.SUPER_ADMIN.APPROVALS,
     icon: ClipboardCheck,
-    permission: PERMISSIONS.EMPLOYEES_APPROVE,
   },
   {
     label: "Hierarchy",
@@ -54,69 +50,28 @@ export const superAdminNavigation = [
     permission: PERMISSIONS.EMPLOYEES_READ,
   },
   {
-    label: "Regions",
-    route: ROUTES.SUPER_ADMIN.REGIONS,
+    // Regions + districts.
+    label: "Territory",
+    route: ROUTES.SUPER_ADMIN.TERRITORY,
     icon: MapPin,
-    permission: PERMISSIONS.REGION_READ,
   },
   {
-    label: "Districts",
-    route: ROUTES.SUPER_ADMIN.DISTRICTS,
-    icon: GitBranch,
-    permission: PERMISSIONS.DISTRICT_READ,
-  },
-  {
-    label: "Hiring Requests",
-    route: ROUTES.SUPER_ADMIN.HIRING,
-    icon: UserPlus,
-    permission: PERMISSIONS.HIRING_READ,
-  },
-  {
-    label: "Promotion Approvals",
-    route: ROUTES.SUPER_ADMIN.PROMOTION_APPROVALS,
-    icon: TrendingUp,
-    permission: PERMISSIONS.PROMOTION_READ,
-  },
-  {
-    label: "Salary Proposals",
-    route: ROUTES.SUPER_ADMIN.SALARY_PROPOSAL_APPROVALS,
-    icon: Wallet,
-    permission: PERMISSIONS.SALARY_PROPOSAL_READ,
-  },
-  {
-    label: "Categories",
-    route: ROUTES.SUPER_ADMIN.CATEGORIES,
-    icon: FolderTree,
-    permission: PERMISSIONS.CATEGORIES_READ,
-  },
-  {
-    label: "Products",
-    route: ROUTES.SUPER_ADMIN.PRODUCTS,
+    // Products + categories.
+    label: "Catalogue",
+    route: ROUTES.SUPER_ADMIN.CATALOGUE,
     icon: Package,
-    permission: PERMISSIONS.PRODUCTS_READ,
   },
   {
+    // Stock levels + low stock + out of stock + movements.
     label: "Inventory",
-    route: ROUTES.SUPER_ADMIN.INVENTORY,
+    route: ROUTES.SUPER_ADMIN.STOCK,
     icon: Warehouse,
-    permission: PERMISSIONS.INVENTORY_READ,
   },
   {
-    label: "CRM",
-    route: ROUTES.SUPER_ADMIN.CRM,
-    icon: Columns3,
-    permission: PERMISSIONS.LEADS_READ,
-  },
-  {
+    // Lead list + pipeline board + follow-ups: one subject, three readings.
     label: "Leads",
     route: ROUTES.SUPER_ADMIN.LEADS,
     icon: PhoneCall,
-    permission: PERMISSIONS.LEADS_READ,
-  },
-  {
-    label: "Follow-Ups",
-    route: ROUTES.SUPER_ADMIN.FOLLOW_UPS,
-    icon: ClipboardCheck,
     permission: PERMISSIONS.LEADS_READ,
   },
   {
@@ -150,45 +105,10 @@ export const superAdminNavigation = [
     permission: PERMISSIONS.ORDERS_READ,
   },
   {
-    label: "Invoices",
-    route: ROUTES.SUPER_ADMIN.INVOICES,
+    // Invoices + outstanding + payments: one ledger.
+    label: "Billing",
+    route: ROUTES.SUPER_ADMIN.BILLING,
     icon: Receipt,
-    permission: PERMISSIONS.INVOICES_READ,
-  },
-  // Flat sibling of "Invoices", not nested under it — Prompt 57 marks
-  // nesting as optional, and this app's nav renderer has no support for a
-  // `children` structure at all (verified in InternalAppLayout.jsx); this
-  // mirrors the exact "Inventory" / "Low Stock" / "Out Of Stock" /
-  // "Transactions" flat-sibling pattern already used a few entries below.
-  {
-    label: "Outstanding",
-    route: ROUTES.SUPER_ADMIN.INVOICE_OUTSTANDING,
-    icon: AlertTriangle,
-    permission: PERMISSIONS.INVOICES_READ,
-  },
-  {
-    label: "Payments",
-    route: ROUTES.SUPER_ADMIN.PAYMENTS,
-    icon: CreditCard,
-    permission: PERMISSIONS.PAYMENTS_READ,
-  },
-  {
-    label: "Low Stock",
-    route: ROUTES.SUPER_ADMIN.INVENTORY_LOW_STOCK,
-    icon: AlertTriangle,
-    permission: PERMISSIONS.INVENTORY_READ,
-  },
-  {
-    label: "Out Of Stock",
-    route: ROUTES.SUPER_ADMIN.INVENTORY_OUT_OF_STOCK,
-    icon: Boxes,
-    permission: PERMISSIONS.INVENTORY_READ,
-  },
-  {
-    label: "Transactions",
-    route: ROUTES.SUPER_ADMIN.INVENTORY_TRANSACTIONS,
-    icon: History,
-    permission: PERMISSIONS.INVENTORY_TRANSACTIONS_READ,
   },
   {
     label: "Audit Log",

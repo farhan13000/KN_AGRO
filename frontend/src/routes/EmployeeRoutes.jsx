@@ -4,14 +4,18 @@ import { PermissionGuard } from "../core/auth";
 import ProtectedRoute from "./ProtectedRoute";
 import { BACKEND_ROLES, PERMISSIONS, ROUTES } from "../shared/constants";
 
+const EmployeeBillingPage = lazy(
+  () => import("../employee/pages/billing/EmployeeBillingPage"),
+);
+const EmployeeLeadsWorkspacePage = lazy(
+  () => import("../employee/pages/crm/EmployeeLeadsWorkspacePage"),
+);
 const EmployeeLayout = lazy(() => import("../employee/layout/EmployeeLayout"));
 const EmployeeDashboardPage = lazy(() => import("../employee/dashboard/EmployeeDashboardPage"));
 const EmployeeProfilePage = lazy(() => import("../employee/pages/profile/EmployeeProfilePage"));
 const EmployeeProfileEditPage = lazy(() => import("../employee/pages/profile/EmployeeProfileEditPage"));
-const EmployeeLeadListPage = lazy(() => import("../employee/pages/crm/EmployeeLeadListPage"));
 const EmployeeLeadCreatePage = lazy(() => import("../employee/pages/crm/EmployeeLeadCreatePage"));
 const EmployeeLeadDetailPage = lazy(() => import("../employee/pages/crm/EmployeeLeadDetailPage"));
-const EmployeeFollowUpsPage = lazy(() => import("../employee/pages/crm/EmployeeFollowUpsPage"));
 const EmployeeQuotationListPage = lazy(() => import("../employee/pages/quotations/EmployeeQuotationListPage"));
 const EmployeeQuotationDetailPage = lazy(() => import("../employee/pages/quotations/EmployeeQuotationDetailPage"));
 const EmployeeQuotationPrintPage = lazy(() => import("../employee/pages/quotations/EmployeeQuotationPrintPage"));
@@ -23,13 +27,8 @@ const EmployeeOrderCreatePage = lazy(
 );
 const EmployeeOrderDetailPage = lazy(() => import("../employee/pages/orders/EmployeeOrderDetailPage"));
 const EmployeeOrderPrintPage = lazy(() => import("../employee/pages/orders/EmployeeOrderPrintPage"));
-const EmployeeInvoiceListPage = lazy(() => import("../employee/pages/invoices/EmployeeInvoiceListPage"));
-const EmployeeInvoiceOutstandingPage = lazy(
-  () => import("../employee/pages/invoices/EmployeeInvoiceOutstandingPage"),
-);
 const EmployeeInvoiceDetailPage = lazy(() => import("../employee/pages/invoices/EmployeeInvoiceDetailPage"));
 const EmployeeInvoicePrintPage = lazy(() => import("../employee/pages/invoices/EmployeeInvoicePrintPage"));
-const EmployeePaymentListPage = lazy(() => import("../employee/pages/payments/EmployeePaymentListPage"));
 const EmployeeDSRSubmitPage = lazy(() => import("../employee/pages/dsr/EmployeeDSRSubmitPage"));
 const EmployeeMyDSRListPage = lazy(() => import("../employee/pages/dsr/EmployeeMyDSRListPage"));
 const EmployeeProductRecommendationsPage = lazy(
@@ -65,7 +64,7 @@ export const employeeRouteConfig = {
         { path: ROUTES.EMPLOYEE.PROFILE_EDIT, element: <EmployeeProfileEditPage /> },
         {
           path: ROUTES.EMPLOYEE.LEADS,
-          element: withPermission(PERMISSIONS.LEADS_READ, <EmployeeLeadListPage />),
+          element: <EmployeeLeadsWorkspacePage />,
         },
         {
           // Registered BEFORE :leadId — otherwise /employee/leads/create
@@ -80,7 +79,7 @@ export const employeeRouteConfig = {
         },
         {
           path: ROUTES.EMPLOYEE.FOLLOW_UPS,
-          element: withPermission(PERMISSIONS.LEADS_READ, <EmployeeFollowUpsPage />),
+          element: <Navigate replace to={`${ROUTES.EMPLOYEE.LEADS}?tab=follow-ups`} />,
         },
         {
           path: ROUTES.EMPLOYEE.QUOTATIONS,
@@ -121,12 +120,16 @@ export const employeeRouteConfig = {
           element: withPermission(PERMISSIONS.ORDERS_READ, <EmployeeOrderPrintPage />),
         },
         {
+          path: ROUTES.EMPLOYEE.BILLING,
+          element: <EmployeeBillingPage />,
+        },
+        {
           path: ROUTES.EMPLOYEE.INVOICES,
-          element: withPermission(PERMISSIONS.INVOICES_READ, <EmployeeInvoiceListPage />),
+          element: <Navigate replace to={`${ROUTES.EMPLOYEE.BILLING}?tab=invoices`} />,
         },
         {
           path: ROUTES.EMPLOYEE.INVOICE_OUTSTANDING,
-          element: withPermission(PERMISSIONS.INVOICES_READ, <EmployeeInvoiceOutstandingPage />),
+          element: <Navigate replace to={`${ROUTES.EMPLOYEE.BILLING}?tab=outstanding`} />,
         },
         {
           path: ROUTES.EMPLOYEE.INVOICE_DETAIL,
@@ -138,7 +141,7 @@ export const employeeRouteConfig = {
         },
         {
           path: ROUTES.EMPLOYEE.PAYMENTS,
-          element: withPermission(PERMISSIONS.PAYMENTS_READ, <EmployeePaymentListPage />),
+          element: <Navigate replace to={`${ROUTES.EMPLOYEE.BILLING}?tab=payments`} />,
         },
         {
           path: ROUTES.EMPLOYEE.DSR_SUBMIT,

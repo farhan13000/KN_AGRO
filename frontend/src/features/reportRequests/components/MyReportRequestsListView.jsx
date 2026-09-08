@@ -12,7 +12,7 @@ import ReportSubmitDialog from "./ReportSubmitDialog";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
-export default function MyReportRequestsListView({ description, portalLabel }) {
+export default function MyReportRequestsListView({ description, portalLabel, showHeading = true }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [submitting, setSubmitting] = useState(null);
   const [actionError, setActionError] = useState("");
@@ -81,11 +81,13 @@ export default function MyReportRequestsListView({ description, portalLabel }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
-        <h1 className="mt-2 text-3xl font-black text-ink">My Report Requests</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
-      </div>
+      {showHeading ? (
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
+          <h1 className="mt-2 text-3xl font-black text-ink">My Report Requests</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
+        </div>
+      ) : null}
 
       <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
         <label className="block max-w-xs">

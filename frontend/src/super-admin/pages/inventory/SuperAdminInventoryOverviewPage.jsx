@@ -24,7 +24,7 @@ const getSummaryCards = (summary = {}) => [
   { label: "Available Units", value: summary.totalAvailableStock ?? 0 },
 ];
 
-export default function SuperAdminInventoryOverviewPage() {
+export default function SuperAdminInventoryOverviewPage({ showHeading = true }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const searchInput = getQueryValue(searchParams, "search");
   const debouncedSearch = useDebouncedValue(searchInput);
@@ -61,13 +61,15 @@ export default function SuperAdminInventoryOverviewPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Inventory Control</p>
-        <h1 className="mt-2 text-3xl font-black text-ink">Inventory</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Review stock levels, reserved quantities, reorder thresholds, and product-level inventory status.
-        </p>
-      </div>
+      {showHeading ? (
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Inventory Control</p>
+          <h1 className="mt-2 text-3xl font-black text-ink">Inventory</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+            Review stock levels, reserved quantities, reorder thresholds, and product-level inventory status.
+          </p>
+        </div>
+      ) : null}
 
       {!summaryState.isLoading && !summaryState.isError ? (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

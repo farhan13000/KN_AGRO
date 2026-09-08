@@ -15,7 +15,7 @@ import {
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
-export default function SuperAdminInventoryTransactionsPage() {
+export default function SuperAdminInventoryTransactionsPage({ showHeading = true }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const searchInput = getQueryValue(searchParams, "search");
   const debouncedSearch = useDebouncedValue(searchInput);
@@ -53,14 +53,16 @@ export default function SuperAdminInventoryTransactionsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Inventory Ledger</p>
-        <h1 className="mt-2 text-3xl font-black text-ink">Transaction History</h1>
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
-          Review immutable stock ledger records. Reserved, released, and sale transactions are read-only
-          system-driven movements for future order workflows, not manual Phase 3 actions.
-        </p>
-      </div>
+      {showHeading ? (
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Inventory Ledger</p>
+          <h1 className="mt-2 text-3xl font-black text-ink">Transaction History</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
+            Review immutable stock ledger records. Reserved, released, and sale transactions are read-only
+            system-driven movements for future order workflows, not manual Phase 3 actions.
+          </p>
+        </div>
+      ) : null}
 
       <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-7">

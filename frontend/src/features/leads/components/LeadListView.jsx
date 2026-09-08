@@ -32,6 +32,7 @@ export default function LeadListView({
   emptyActionLabel = "",
   roleLabel = "CRM",
   showAssignments = true,
+  showHeading = true,
   showPipelineValue = true,
   showSource = true,
   subtitle = "Review backend-scoped leads with server pagination, filters, and search.",
@@ -73,11 +74,13 @@ export default function LeadListView({
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{roleLabel}</p>
-          <h1 className="mt-2 text-3xl font-black text-ink">{title}</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{subtitle}</p>
-        </div>
+        {showHeading ? (
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{roleLabel}</p>
+            <h1 className="mt-2 text-3xl font-black text-ink">{title}</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{subtitle}</p>
+          </div>
+        ) : null}
         {showCreate ? (
           <Link
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-forest px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-agriculture"

@@ -4,7 +4,35 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#174C2B" />
+    <meta name="description" content="Sales, inventory and team management for KN Agro." />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <!-- iOS ignores the web manifest's icons and reads this instead. -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="KN Agro" />
     <title>KN Agro</title>
+    <script>
+      // `beforeinstallprompt` fires as soon as the browser decides the app
+      // is installable — which is routinely BEFORE the React bundle has
+      // even executed, let alone mounted a component that could listen for
+      // it. Missing it here is invisible and total: the browser shows its
+      // own install affordance in the address bar while the app's own
+      // Install button never appears, because the event it waits for
+      // already came and went.
+      //
+      // This inline script is the earliest point in the document, so it
+      // catches the event whenever it fires and parks it for the app to
+      // pick up (see useInstallPrompt, which reads this on mount and also
+      // keeps listening for a later one).
+      window.__knAgroInstallPrompt = null;
+      window.addEventListener("beforeinstallprompt", function (event) {
+        event.preventDefault();
+        window.__knAgroInstallPrompt = event;
+        // Let anything already mounted know without waiting for a reload.
+        window.dispatchEvent(new Event("knagro:installready"));
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>

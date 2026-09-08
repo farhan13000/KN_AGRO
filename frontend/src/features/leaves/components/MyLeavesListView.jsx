@@ -13,7 +13,7 @@ import LeaveRequestDialog from "./LeaveRequestDialog";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
-export default function MyLeavesListView({ description, portalLabel }) {
+export default function MyLeavesListView({ description, portalLabel, showHeading = true }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [requestOpen, setRequestOpen] = useState(false);
   const [cancelling, setCancelling] = useState(null);
@@ -36,11 +36,13 @@ export default function MyLeavesListView({ description, portalLabel }) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
-          <h1 className="mt-2 text-3xl font-black text-ink">My Leaves</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
-        </div>
+        {showHeading ? (
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
+            <h1 className="mt-2 text-3xl font-black text-ink">My Leaves</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
+          </div>
+        ) : null}
         <button
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-forest px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-agriculture"
           onClick={() => setRequestOpen(true)}

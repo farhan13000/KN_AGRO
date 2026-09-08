@@ -34,7 +34,7 @@ export default function InvoiceLifecycleActions({ invoice, onSuccess }) {
   const [dueDateError, setDueDateError] = useState("");
   const [cancelReason, setCancelReason] = useState("");
 
-  const { canCancelInvoice, canIssueInvoice } = getInvoiceCapabilities({ hasPermission, invoice, role });
+  const { canCancelInvoice, canIssueInvoice } = getInvoiceCapabilities({ hasPermission, invoice });
 
   const closeDialog = () => {
     setDialog("");

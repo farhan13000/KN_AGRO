@@ -11,7 +11,7 @@ import { useDebouncedValue } from "../../../shared/hooks";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
-export default function SuperAdminRegionListPage() {
+export default function SuperAdminRegionListPage({ showHeading = true }) {
   const { hasPermission } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const searchInput = getQueryValue(searchParams, "search");
@@ -43,13 +43,15 @@ export default function SuperAdminRegionListPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Org Structure</p>
-          <h1 className="mt-2 text-3xl font-black text-ink">Regions</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-            Top-level geography the sales organization is divided into.
-          </p>
-        </div>
+        {showHeading ? (
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Org Structure</p>
+            <h1 className="mt-2 text-3xl font-black text-ink">Regions</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+              Top-level geography the sales organization is divided into.
+            </p>
+          </div>
+        ) : null}
         {canCreate ? (
           <Link
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-forest px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-agriculture"

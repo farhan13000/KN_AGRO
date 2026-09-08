@@ -9,7 +9,7 @@ import AttendanceTable from "./AttendanceTable";
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 const now = new Date();
 
-export default function TeamAttendanceListView({ description, portalLabel }) {
+export default function TeamAttendanceListView({ description, portalLabel, showHeading = true }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const month = Number(getQueryValue(searchParams, "month", String(now.getMonth() + 1)));
   const year = Number(getQueryValue(searchParams, "year", String(now.getFullYear())));
@@ -35,11 +35,13 @@ export default function TeamAttendanceListView({ description, portalLabel }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
-        <h1 className="mt-2 text-3xl font-black text-ink">Team Attendance</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
-      </div>
+      {showHeading ? (
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
+          <h1 className="mt-2 text-3xl font-black text-ink">Team Attendance</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
+        </div>
+      ) : null}
 
       <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
         <div className="flex flex-wrap items-end justify-between gap-3">

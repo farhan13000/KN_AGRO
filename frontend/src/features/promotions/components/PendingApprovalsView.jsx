@@ -17,7 +17,7 @@ import PromotionDecisionDialog from "./PromotionDecisionDialog";
  * so an actor may see a row they can't decide, and gets told why when
  * they try.
  */
-export default function PendingApprovalsView({ description, portalLabel }) {
+export default function PendingApprovalsView({ description, portalLabel, showHeading = true }) {
   const [decision, setDecision] = useState(null); // { promotion, kind }
   const [message, setMessage] = useState("");
 
@@ -31,11 +31,13 @@ export default function PendingApprovalsView({ description, portalLabel }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
-        <h1 className="mt-2 text-3xl font-black text-ink">Promotion Approvals</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
-      </div>
+      {showHeading ? (
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
+          <h1 className="mt-2 text-3xl font-black text-ink">Promotion Approvals</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
+        </div>
+      ) : null}
 
       {message ? (
         <p className="rounded-lg border border-forest/15 bg-mint/60 px-4 py-3 text-sm font-semibold text-forest">

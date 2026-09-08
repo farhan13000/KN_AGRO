@@ -64,19 +64,22 @@ function PipelineColumn({ detailPath, status }) {
 export default function LeadPipelineView({
   detailPath,
   roleLabel = "CRM",
+  showHeading = true,
   title = "CRM Pipeline",
 }) {
   const summaryState = useLeadSummary();
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{roleLabel}</p>
-        <h1 className="mt-2 text-3xl font-black text-ink">{title}</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Pipeline stages use status-filtered backend requests. Status changes stay explicit actions on lead detail.
-        </p>
-      </div>
+      {showHeading ? (
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{roleLabel}</p>
+          <h1 className="mt-2 text-3xl font-black text-ink">{title}</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+            Pipeline stages use status-filtered backend requests. Status changes stay explicit actions on lead detail.
+          </p>
+        </div>
+      ) : null}
 
       {!summaryState.isLoading && !summaryState.isError ? (
         <LeadSummaryCards summary={summaryState.data} />

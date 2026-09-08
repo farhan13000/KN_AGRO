@@ -10,7 +10,7 @@ import { InventoryThresholdTable, useLowStockInventory } from "../../../features
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
-export default function SuperAdminLowStockPage() {
+export default function SuperAdminLowStockPage({ showHeading = true }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const searchInput = getQueryValue(searchParams, "search");
   const debouncedSearch = useDebouncedValue(searchInput);
@@ -43,13 +43,15 @@ export default function SuperAdminLowStockPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Inventory Control</p>
-        <h1 className="mt-2 text-3xl font-black text-ink">Low Stock</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Review products where available stock is at or below the backend-defined minimum threshold.
-        </p>
-      </div>
+      {showHeading ? (
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Inventory Control</p>
+          <h1 className="mt-2 text-3xl font-black text-ink">Low Stock</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+            Review products where available stock is at or below the backend-defined minimum threshold.
+          </p>
+        </div>
+      ) : null}
 
       <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">

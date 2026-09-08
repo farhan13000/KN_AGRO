@@ -21,6 +21,7 @@ export default function InvoiceListView({
   emptyStateDescription = "No invoices matched the current filters.",
   emptyStateTitle = "No invoices found",
   roleLabel = "CRM",
+  showHeading = true,
   subtitle = "Review invoices with server pagination, filters, and search.",
   title = "Invoices",
 }) {
@@ -55,11 +56,13 @@ export default function InvoiceListView({
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{roleLabel}</p>
-        <h1 className="mt-2 text-3xl font-black text-ink">{title}</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{subtitle}</p>
-      </div>
+      {showHeading ? (
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{roleLabel}</p>
+          <h1 className="mt-2 text-3xl font-black text-ink">{title}</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{subtitle}</p>
+        </div>
+      ) : null}
 
       <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">

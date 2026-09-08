@@ -224,6 +224,11 @@ export const API_ENDPOINTS = Object.freeze({
   // numbers); SO gets its own lighter SO_DASHBOARD; FO/legacy EMPLOYEE get
   // EMPLOYEE_DASHBOARD; SA/legacy SUPER_ADMIN get ADMIN_DASHBOARD.
   ANALYTICS: {
+    // Company-wide per-employee performance (ANALYTICS_ADMIN). Returns a
+    // row for every active employee in one call; the employee detail
+    // screen picks its own row out rather than there being a per-employee
+    // endpoint to hit.
+    EMPLOYEE_PERFORMANCE: "/analytics/employees/performance",
     ADMIN_DASHBOARD: "/analytics/admin/dashboard",
     MANAGER_DASHBOARD: "/analytics/manager/dashboard",
     EMPLOYEE_DASHBOARD: "/analytics/employee/dashboard",

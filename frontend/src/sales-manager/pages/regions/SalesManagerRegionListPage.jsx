@@ -9,7 +9,7 @@ import { useDebouncedValue } from "../../../shared/hooks";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
-export default function SalesManagerRegionListPage() {
+export default function SalesManagerRegionListPage({ showHeading = true }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const searchInput = getQueryValue(searchParams, "search");
   const debouncedSearch = useDebouncedValue(searchInput);
@@ -33,13 +33,15 @@ export default function SalesManagerRegionListPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Org Structure</p>
-        <h1 className="mt-2 text-3xl font-black text-ink">Regions</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Reference geography for your assigned districts.
-        </p>
-      </div>
+      {showHeading ? (
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Org Structure</p>
+          <h1 className="mt-2 text-3xl font-black text-ink">Regions</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+            Reference geography for your assigned districts.
+          </p>
+        </div>
+      ) : null}
 
       <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
         <label>
