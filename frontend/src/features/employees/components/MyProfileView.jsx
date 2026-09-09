@@ -18,7 +18,7 @@ import EmployeeDetailSections from "./EmployeeDetailSections";
  * plain explanatory state — not an error, and never a fabricated
  * placeholder profile.
  */
-export default function MyProfileView({ actions = null }) {
+export default function MyProfileView({ actions = null, showHeading = true }) {
   const { role } = useAuth();
   const profileState = useMyEmployeeProfile();
   const employee = profileState.data?.employee;
@@ -38,15 +38,17 @@ export default function MyProfileView({ actions = null }) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">
-            {getPortalLabelForRole(role)}
-          </p>
-          <h1 className="mt-2 text-3xl font-black text-ink">My Profile</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-            Your own employee record and current salary.
-          </p>
-        </div>
+        {showHeading ? (
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">
+              {getPortalLabelForRole(role)}
+            </p>
+            <h1 className="mt-2 text-3xl font-black text-ink">My Profile</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+              Your own employee record and current salary.
+            </p>
+          </div>
+        ) : null}
         {employee ? actions : null}
       </div>
 

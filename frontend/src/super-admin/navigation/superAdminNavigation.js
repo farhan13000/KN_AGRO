@@ -16,6 +16,7 @@ import {
   ShoppingCart,
   UserCircle,
   Users,
+  UsersRound,
   Wallet,
   Warehouse,
 } from "lucide-react";
@@ -36,6 +37,14 @@ export const superAdminNavigation = [
     route: ROUTES.SUPER_ADMIN.EMPLOYEES,
     icon: Users,
     permission: PERMISSIONS.EMPLOYEES_READ,
+  },
+  {
+    // Your own direct reports, with their performance, attendance, leave
+    // and promotions on one page. Every role has this entry.
+    label: "My Team",
+    route: ROUTES.SUPER_ADMIN.MY_TEAM,
+    icon: UsersRound,
+    permission: PERMISSIONS.MANAGERS_READ,
   },
   {
     // Hiring, promotions, salary proposals, employee applications.
@@ -141,15 +150,9 @@ export const superAdminNavigation = [
     permission: PERMISSIONS.PAYROLL_READ,
   },
   {
-    label: "My Payroll",
-    route: ROUTES.SUPER_ADMIN.MY_PAYROLL,
-    icon: Wallet,
-    permission: PERMISSIONS.PAYROLL_READ_SELF,
-  },
-  {
-    label: "My Profile",
-    route: ROUTES.SUPER_ADMIN.MY_PROFILE,
+    // Your own profile and payslips — the two "My ..." entries, merged.
+    label: "My Workspace",
+    route: ROUTES.SUPER_ADMIN.MY_WORKSPACE,
     icon: UserCircle,
-    permission: PERMISSIONS.EMPLOYEES_READ_SELF,
   },
 ];

@@ -20,3 +20,8 @@ export { default as OrgChartTree } from "./OrgChartTree";
 export { default as EmployeePerformanceCard } from "./EmployeePerformanceCard";
 export { default as OrgFlowChart } from "./OrgFlowChart";
 export { default as PendingApplicationsView } from "./PendingApplicationsView";
+export { default as MyTeamListView } from "./MyTeamListView";
+export { default as TeamMemberPerformanceCard } from "./TeamMemberPerformanceCard";
+export { default as TeamMemberWorkspace } from "./TeamMemberWorkspace";
+export { default as EmployeeRoleBadge } from "./EmployeeRoleBadge";
+export { default as TeamHierarchyTable } from "./TeamHierarchyTable";

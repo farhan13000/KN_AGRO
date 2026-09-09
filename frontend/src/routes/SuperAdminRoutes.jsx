@@ -4,6 +4,15 @@ import { PermissionGuard } from "../core/auth";
 import ProtectedRoute from "./ProtectedRoute";
 import { BACKEND_ROLES, PERMISSIONS, ROUTES } from "../shared/constants";
 
+const SuperAdminMyWorkspacePage = lazy(
+  () => import("../super-admin/pages/me/SuperAdminMyWorkspacePage"),
+);
+const SuperAdminMyTeamPage = lazy(
+  () => import("../super-admin/pages/team/SuperAdminMyTeamPage"),
+);
+const SuperAdminTeamMemberPage = lazy(
+  () => import("../super-admin/pages/team/SuperAdminTeamMemberPage"),
+);
 const SuperAdminLayout = lazy(() => import("../super-admin/layout/SuperAdminLayout"));
 const SuperAdminDashboardPage = lazy(
   () => import("../super-admin/dashboard/SuperAdminDashboardPage"),
@@ -131,12 +140,6 @@ const SuperAdminAllReportRequestsPage = lazy(
   () => import("../super-admin/pages/reportRequests/SuperAdminAllReportRequestsPage"),
 );
 const SuperAdminPayrollPage = lazy(() => import("../super-admin/pages/payroll/SuperAdminPayrollPage"));
-const SuperAdminMyPayrollPage = lazy(
-  () => import("../super-admin/pages/payroll/SuperAdminMyPayrollPage"),
-);
-const SuperAdminMyProfilePage = lazy(
-  () => import("../super-admin/pages/profile/SuperAdminMyProfilePage"),
-);
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -415,12 +418,26 @@ export const superAdminRouteConfig = {
           element: withPermission(PERMISSIONS.PAYROLL_READ, <SuperAdminPayrollPage />),
         },
         {
+          path: ROUTES.SUPER_ADMIN.MY_TEAM,
+          element: <SuperAdminMyTeamPage />,
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.MY_TEAM_MEMBER,
+          element: <SuperAdminTeamMemberPage />,
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.MY_WORKSPACE,
+          element: <SuperAdminMyWorkspacePage />,
+        },
+        // The two personal screens are tabs now; their old paths
+        // still resolve, because links to them exist elsewhere.
+        {
           path: ROUTES.SUPER_ADMIN.MY_PAYROLL,
-          element: withPermission(PERMISSIONS.PAYROLL_READ_SELF, <SuperAdminMyPayrollPage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.MY_WORKSPACE}?tab=payroll`} />,
         },
         {
           path: ROUTES.SUPER_ADMIN.MY_PROFILE,
-          element: withPermission(PERMISSIONS.EMPLOYEES_READ_SELF, <SuperAdminMyProfilePage />),
+          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.MY_WORKSPACE}?tab=profile`} />,
         },
         { path: "/super-admin/*", element: <InternalNotFoundPage /> },
       ],

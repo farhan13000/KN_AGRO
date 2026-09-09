@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Card from "../../../shared/components/Card";
+import { getBusinessDateKey } from "../../../shared/utils";
 import { ATTENDANCE_STATUS, ATTENDANCE_STATUS_LABELS } from "../constants";
 
 /**
@@ -11,10 +12,12 @@ import { ATTENDANCE_STATUS, ATTENDANCE_STATUS_LABELS } from "../constants";
  * manager actually ask. Both still exist — this sits above the list, it
  * does not replace it.
  *
- * Records are matched to cells by their LOCAL calendar date. Attendance
- * `date` is a business-day marker (UTC midnight of the workday in the
- * business timezone), so the day component is read in UTC; reading it
- * locally would shift every cell by one day for anyone west of UTC.
+ * Records are matched to cells by their BUSINESS-TIMEZONE calendar date.
+ * Attendance `date` is a business-day marker — local midnight of the
+ * workday expressed as a UTC instant — so for a zone ahead of UTC it is
+ * stored as the PREVIOUS UTC day (8 Sept IST is 2026-09-07T18:30Z).
+ * Reading it as a UTC date therefore lands the mark one day early, which
+ * is exactly what it did before this used getBusinessDateKey.
  */
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -30,7 +33,7 @@ const STATUS_STYLE = {
 const isoDayKey = (value) => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
-  return date.toISOString().slice(0, 10);
+  return getBusinessDateKey(date);
 };
 
 const monthLabel = (year, month) =>
@@ -42,8 +45,9 @@ const monthLabel = (year, month) =>
 
 /**
  * Days laid out Monday-first, with leading blanks so the 1st lands under
- * the right weekday. `Date.UTC` throughout, for the same reason the keys
- * above are read in UTC.
+ * the right weekday. Cell keys are the plain calendar date of the cell
+ * ("2026-09-08"), which is what getBusinessDateKey turns a record into —
+ * `Date.UTC` here only builds that string, it is not a timezone claim.
  */
 const buildGrid = (year, month) => {
   const first = new Date(Date.UTC(year, month - 1, 1));

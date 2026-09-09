@@ -4,6 +4,13 @@ import { PermissionGuard } from "../core/auth";
 import ProtectedRoute from "./ProtectedRoute";
 import { BACKEND_ROLES, PERMISSIONS, ROUTES } from "../shared/constants";
 
+const EmployeeMyWorkspacePage = lazy(
+  () => import("../employee/pages/me/EmployeeMyWorkspacePage"),
+);
+const EmployeeMyTeamPage = lazy(() => import("../employee/pages/team/EmployeeMyTeamPage"));
+const EmployeeTeamMemberPage = lazy(
+  () => import("../employee/pages/team/EmployeeTeamMemberPage"),
+);
 const EmployeeBillingPage = lazy(
   () => import("../employee/pages/billing/EmployeeBillingPage"),
 );
@@ -12,7 +19,6 @@ const EmployeeLeadsWorkspacePage = lazy(
 );
 const EmployeeLayout = lazy(() => import("../employee/layout/EmployeeLayout"));
 const EmployeeDashboardPage = lazy(() => import("../employee/dashboard/EmployeeDashboardPage"));
-const EmployeeProfilePage = lazy(() => import("../employee/pages/profile/EmployeeProfilePage"));
 const EmployeeProfileEditPage = lazy(() => import("../employee/pages/profile/EmployeeProfileEditPage"));
 const EmployeeLeadCreatePage = lazy(() => import("../employee/pages/crm/EmployeeLeadCreatePage"));
 const EmployeeLeadDetailPage = lazy(() => import("../employee/pages/crm/EmployeeLeadDetailPage"));
@@ -30,16 +36,9 @@ const EmployeeOrderPrintPage = lazy(() => import("../employee/pages/orders/Emplo
 const EmployeeInvoiceDetailPage = lazy(() => import("../employee/pages/invoices/EmployeeInvoiceDetailPage"));
 const EmployeeInvoicePrintPage = lazy(() => import("../employee/pages/invoices/EmployeeInvoicePrintPage"));
 const EmployeeDSRSubmitPage = lazy(() => import("../employee/pages/dsr/EmployeeDSRSubmitPage"));
-const EmployeeMyDSRListPage = lazy(() => import("../employee/pages/dsr/EmployeeMyDSRListPage"));
 const EmployeeProductRecommendationsPage = lazy(
   () => import("../employee/pages/productRecommendations/EmployeeProductRecommendationsPage"),
 );
-const EmployeeMyAttendancePage = lazy(() => import("../employee/pages/attendance/EmployeeMyAttendancePage"));
-const EmployeeMyLeavesPage = lazy(() => import("../employee/pages/leaves/EmployeeMyLeavesPage"));
-const EmployeeMyReportRequestsPage = lazy(
-  () => import("../employee/pages/reportRequests/EmployeeMyReportRequestsPage"),
-);
-const EmployeeMyPayrollPage = lazy(() => import("../employee/pages/payroll/EmployeeMyPayrollPage"));
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const withPermission = (permission, element) => (
@@ -60,7 +59,15 @@ export const employeeRouteConfig = {
       element: <EmployeeLayout />,
       children: [
         { path: ROUTES.EMPLOYEE.DASHBOARD, element: <EmployeeDashboardPage /> },
-        { path: ROUTES.EMPLOYEE.PROFILE, element: <EmployeeProfilePage /> },
+        { path: ROUTES.EMPLOYEE.MY_TEAM, element: <EmployeeMyTeamPage /> },
+        { path: ROUTES.EMPLOYEE.MY_TEAM_MEMBER, element: <EmployeeTeamMemberPage /> },
+        { path: ROUTES.EMPLOYEE.MY_WORKSPACE, element: <EmployeeMyWorkspacePage /> },
+        // Six personal screens became six tabs. Every old path is kept as
+        // a redirect into the right one.
+        {
+          path: ROUTES.EMPLOYEE.PROFILE,
+          element: <Navigate replace to={`${ROUTES.EMPLOYEE.MY_WORKSPACE}?tab=profile`} />,
+        },
         { path: ROUTES.EMPLOYEE.PROFILE_EDIT, element: <EmployeeProfileEditPage /> },
         {
           path: ROUTES.EMPLOYEE.LEADS,
@@ -149,7 +156,7 @@ export const employeeRouteConfig = {
         },
         {
           path: ROUTES.EMPLOYEE.DSR_ME,
-          element: withPermission(PERMISSIONS.DSR_READ_SELF, <EmployeeMyDSRListPage />),
+          element: <Navigate replace to={`${ROUTES.EMPLOYEE.MY_WORKSPACE}?tab=dsrs`} />,
         },
         {
           path: ROUTES.EMPLOYEE.PRODUCT_RECOMMENDATIONS,
@@ -157,19 +164,19 @@ export const employeeRouteConfig = {
         },
         {
           path: ROUTES.EMPLOYEE.ATTENDANCE_ME,
-          element: withPermission(PERMISSIONS.ATTENDANCE_READ_SELF, <EmployeeMyAttendancePage />),
+          element: <Navigate replace to={`${ROUTES.EMPLOYEE.MY_WORKSPACE}?tab=attendance`} />,
         },
         {
           path: ROUTES.EMPLOYEE.LEAVES_ME,
-          element: withPermission(PERMISSIONS.LEAVES_READ_SELF, <EmployeeMyLeavesPage />),
+          element: <Navigate replace to={`${ROUTES.EMPLOYEE.MY_WORKSPACE}?tab=leaves`} />,
         },
         {
           path: ROUTES.EMPLOYEE.REPORT_REQUESTS_ME,
-          element: withPermission(PERMISSIONS.REPORTS_READ_SELF, <EmployeeMyReportRequestsPage />),
+          element: <Navigate replace to={`${ROUTES.EMPLOYEE.MY_WORKSPACE}?tab=reports`} />,
         },
         {
           path: ROUTES.EMPLOYEE.MY_PAYROLL,
-          element: withPermission(PERMISSIONS.PAYROLL_READ_SELF, <EmployeeMyPayrollPage />),
+          element: <Navigate replace to={`${ROUTES.EMPLOYEE.MY_WORKSPACE}?tab=payroll`} />,
         },
         { path: "/employee/*", element: <InternalNotFoundPage /> },
       ],

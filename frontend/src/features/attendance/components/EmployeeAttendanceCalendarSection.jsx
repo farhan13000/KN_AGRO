@@ -19,9 +19,16 @@ import AttendanceStatusBadge from "./AttendanceStatusBadge";
  * two queries is enabled at a time; running both would 403 for every
  * manager who is not also an admin.
  */
+/**
+ * A day wider at each end than the month itself. The stored business-day
+ * marker sits at local midnight expressed in UTC, so the 1st of a month
+ * in a zone ahead of UTC is stamped on the last UTC day of the previous
+ * month — a window of exactly the month would silently drop it. The extra
+ * days cost nothing: anything outside the grid simply matches no cell.
+ */
 const monthBounds = (year, month) => ({
-  from: new Date(Date.UTC(year, month - 1, 1)).toISOString(),
-  to: new Date(Date.UTC(year, month, 0, 23, 59, 59)).toISOString(),
+  from: new Date(Date.UTC(year, month - 1, 0)).toISOString(),
+  to: new Date(Date.UTC(year, month, 1, 23, 59, 59)).toISOString(),
 });
 
 export default function EmployeeAttendanceCalendarSection({ employeeId, title = "Attendance" }) {

@@ -8,6 +8,7 @@ import {
   getEmployeeEmail,
 } from "../utils";
 import { useEmployeeLocations } from "../hooks/useEmployeeLocations";
+import EmployeeRoleBadge from "./EmployeeRoleBadge";
 import EmployeeStatusBadge from "./EmployeeStatusBadge";
 import UserAccountStatusBadge from "./UserAccountStatusBadge";
 
@@ -39,6 +40,7 @@ export default function EmployeeTable({ employees = [], onApprove, onReject, sho
             <tr>
               <th className="px-4 py-3">Employee Code</th>
               <th className="px-4 py-3">Name</th>
+              <th className="px-4 py-3">Role</th>
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Phone</th>
               <th className="px-4 py-3">Department</th>
@@ -57,6 +59,9 @@ export default function EmployeeTable({ employees = [], onApprove, onReject, sho
               <tr className="align-top transition hover:bg-mint/35" key={employee._id}>
                 <td className="px-4 py-3 font-black text-forest">{employee.employeeCode || "Not Assigned"}</td>
                 <td className="px-4 py-3 font-bold text-ink">{getEmployeeDisplayName(employee)}</td>
+                <td className="px-4 py-3">
+                  <EmployeeRoleBadge employee={employee} />
+                </td>
                 <td className="px-4 py-3 text-muted">{getEmployeeEmail(employee) || "Not Available"}</td>
                 <td className="px-4 py-3 text-muted">{employee.phone || "Not Available"}</td>
                 <td className="px-4 py-3 text-muted">{employee.department || employee.requestedDepartment || "Not Set"}</td>

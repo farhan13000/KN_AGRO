@@ -2,6 +2,7 @@ import { User } from "lucide-react";
 import { useEmployeeLocations } from "../hooks/useEmployeeLocations";
 import { formatEmploymentType, toDateInputValue } from "../utils";
 import EmployeeDualStatus from "./EmployeeDualStatus";
+import EmployeeRoleBadge from "./EmployeeRoleBadge";
 import EmployeeStatusBadge from "./EmployeeStatusBadge";
 import UserAccountStatusBadge from "./UserAccountStatusBadge";
 
@@ -52,7 +53,10 @@ export default function EmployeeDetailSections({
           )}
         </span>
         <div>
-          <p className="text-xl font-black text-ink">{employee?.user?.name || "Not Available"}</p>
+          <span className="flex flex-wrap items-center gap-2">
+            <p className="text-xl font-black text-ink">{employee?.user?.name || "Not Available"}</p>
+            <EmployeeRoleBadge employee={employee} full />
+          </span>
           <p className="mt-1 text-sm font-semibold text-muted">
             {employee?.designation || "No designation"}
             {employee?.department ? ` · ${employee.department}` : ""}
@@ -63,6 +67,14 @@ export default function EmployeeDetailSections({
       <Section title="Identity">
         <DetailItem label="Employee Code" value={employee?.employeeCode} />
         <DetailItem label="Name" value={employee?.user?.name} />
+        {/* The role, not the free-text designation below — this is the one
+            that decides what this person can actually do. */}
+        <div>
+          <dt className="text-xs font-black uppercase text-forest">Role</dt>
+          <dd className="mt-1">
+            <EmployeeRoleBadge employee={employee} full />
+          </dd>
+        </div>
         <DetailItem label="Email" value={employee?.user?.email} />
         {showAccountStatus ? (
           <div>

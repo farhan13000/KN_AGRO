@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Eye } from "lucide-react";
 import { ROUTES } from "../../../shared/constants";
 import { formatEmploymentType, getEmployeeDisplayName } from "../utils";
+import EmployeeRoleBadge from "./EmployeeRoleBadge";
 import EmployeeStatusBadge from "./EmployeeStatusBadge";
 
 const formatDate = (value) => {
@@ -11,7 +12,15 @@ const formatDate = (value) => {
   return parsed.toLocaleDateString();
 };
 
-export default function TeamMembersTable({ employees = [] }) {
+/**
+ * `detailPathFor` says where a row leads. Each portal owns its own URL
+ * space for a team member, so the manager path is only the fallback for
+ * callers that predate the prop — not a default every portal should use.
+ */
+export default function TeamMembersTable({
+  detailPathFor = (employee) => `${ROUTES.SALES_MANAGER.TEAM}/${employee._id}`,
+  employees = [],
+}) {
   return (
     <div className="overflow-hidden rounded-lg border border-forest/10 bg-white shadow-sm">
       <div className="overflow-x-auto">
@@ -20,6 +29,7 @@ export default function TeamMembersTable({ employees = [] }) {
             <tr>
               <th className="px-4 py-3">Employee Code</th>
               <th className="px-4 py-3">Name</th>
+              <th className="px-4 py-3">Role</th>
               <th className="px-4 py-3">Department</th>
               <th className="px-4 py-3">Designation</th>
               <th className="px-4 py-3">Employment Type</th>
@@ -33,6 +43,9 @@ export default function TeamMembersTable({ employees = [] }) {
               <tr className="align-top transition hover:bg-mint/35" key={employee._id}>
                 <td className="px-4 py-3 font-black text-forest">{employee.employeeCode || "Not Assigned"}</td>
                 <td className="px-4 py-3 font-bold text-ink">{getEmployeeDisplayName(employee)}</td>
+                <td className="px-4 py-3">
+                  <EmployeeRoleBadge employee={employee} />
+                </td>
                 <td className="px-4 py-3 text-muted">{employee.department || "Not Set"}</td>
                 <td className="px-4 py-3 text-muted">{employee.designation || "Not Set"}</td>
                 <td className="px-4 py-3 text-muted">{formatEmploymentType(employee.employmentType)}</td>
@@ -45,7 +58,7 @@ export default function TeamMembersTable({ employees = [] }) {
                     <Link
                       aria-label={`View ${getEmployeeDisplayName(employee)}`}
                       className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white text-forest ring-1 ring-forest/15 transition hover:bg-mint"
-                      to={`${ROUTES.SALES_MANAGER.TEAM}/${employee._id}`}
+                      to={detailPathFor(employee)}
                     >
                       <Eye className="h-4 w-4" />
                     </Link>

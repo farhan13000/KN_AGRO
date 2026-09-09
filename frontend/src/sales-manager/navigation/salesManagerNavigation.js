@@ -13,7 +13,6 @@ import {
   ShoppingCart,
   UserCircle,
   Users,
-  Wallet,
 } from "lucide-react";
 import { PERMISSIONS, ROUTES } from "../../shared/constants";
 
@@ -103,15 +102,9 @@ export const salesManagerNavigation = [
     icon: ClipboardSignature,
   },
   {
-    label: "My Payroll",
-    route: ROUTES.SALES_MANAGER.MY_PAYROLL,
-    icon: Wallet,
-    permission: PERMISSIONS.PAYROLL_READ_SELF,
-  },
-  {
-    label: "My Profile",
-    route: ROUTES.SALES_MANAGER.MY_PROFILE,
+    // Your own profile and payslips — the two "My ..." entries, merged.
+    label: "My Workspace",
+    route: ROUTES.SALES_MANAGER.MY_WORKSPACE,
     icon: UserCircle,
-    permission: PERMISSIONS.EMPLOYEES_READ_SELF,
   },
 ];

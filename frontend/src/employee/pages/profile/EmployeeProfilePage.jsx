@@ -7,7 +7,7 @@ import { MyProfileView } from "../../../features/employees";
  * every other portal now uses (Phase F21), keeping only this portal's
  * extra "Edit Profile" action, which is the one thing that differs.
  */
-export default function EmployeeProfilePage() {
+export default function EmployeeProfilePage({ showHeading = true }) {
   return (
     <MyProfileView
       actions={
@@ -15,6 +15,7 @@ export default function EmployeeProfilePage() {
           Edit Profile
         </Button>
       }
+      showHeading={showHeading}
     />
   );
 }

@@ -6,3 +6,4 @@ export { default as LeaveRequestDialog } from "./LeaveRequestDialog";
 export { default as LeaveStatusBadge } from "./LeaveStatusBadge";
 export { default as MyLeavesListView } from "./MyLeavesListView";
 export { default as TeamLeavesListView } from "./TeamLeavesListView";
+export { default as EmployeeLeaveApprovalsSection } from "./EmployeeLeaveApprovalsSection";

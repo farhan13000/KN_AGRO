@@ -37,6 +37,16 @@ export const useLeadSummary = (options) => {
   return useAsyncResource(leadQueryKeys.summary, request, options);
 };
 
+/**
+ * Lead performance per employee, scoped by the backend to the caller.
+ * Used by the team views, where a manager needs their reports' numbers
+ * and cannot reach the ANALYTICS_ADMIN company-wide endpoint.
+ */
+export const useEmployeeLeadAnalytics = (query, options) => {
+  const request = useCallback(() => leadApi.getEmployeeLeadAnalytics(query), [query]);
+  return useAsyncResource(["leads", "analytics", "employees", query], request, options);
+};
+
 export const useLeadActions = ({ onError, onSuccess } = {}) => ({
   createLead: useAsyncMutation(leadApi.createLead, { onError, onSuccess }),
   updateLead: useAsyncMutation(leadApi.updateLead, { onError, onSuccess }),

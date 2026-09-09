@@ -1,5 +1,5 @@
 import { MyProfileView } from "../../../features/employees";
 
-export default function SalesManagerMyProfilePage() {
-  return <MyProfileView />;
+export default function SalesManagerMyProfilePage({ showHeading = true }) {
+  return <MyProfileView showHeading={showHeading} />;
 }

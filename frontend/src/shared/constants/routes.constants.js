@@ -86,6 +86,11 @@ export const ROUTES = Object.freeze({
     LEAVES: "/super-admin/leaves",
     REPORT_REQUESTS: "/super-admin/report-requests",
     PAYROLL: "/super-admin/payroll",
+    // Everything that is about YOU rather than the company: profile and
+    // payslips. The two old paths still resolve, as tabs on this one.
+    MY_WORKSPACE: "/super-admin/my-workspace",
+    MY_TEAM: "/super-admin/my-team",
+    MY_TEAM_MEMBER: "/super-admin/my-team/:employeeId",
     MY_PAYROLL: "/super-admin/my-payroll",
     MY_PROFILE: "/super-admin/my-profile",
   },
@@ -140,6 +145,7 @@ export const ROUTES = Object.freeze({
     REPORTS: "/manager/reports",
     REPORT_REQUESTS_ME: "/manager/report-requests/me",
     REPORT_REQUESTS_TEAM: "/manager/report-requests/team",
+    MY_WORKSPACE: "/manager/my-workspace",
     MY_PAYROLL: "/manager/my-payroll",
     MY_PROFILE: "/manager/my-profile",
   },
@@ -172,6 +178,9 @@ export const ROUTES = Object.freeze({
     ATTENDANCE_ME: "/employee/attendance/me",
     LEAVES_ME: "/employee/leaves/me",
     REPORT_REQUESTS_ME: "/employee/report-requests/me",
+    MY_WORKSPACE: "/employee/my-workspace",
+    MY_TEAM: "/employee/my-team",
+    MY_TEAM_MEMBER: "/employee/my-team/:employeeId",
     MY_PAYROLL: "/employee/my-payroll",
   },
   ERROR: {

@@ -123,4 +123,14 @@ export const leadApi = {
   async getLeadSummary() {
     return get(API_ENDPOINTS.LEADS.SUMMARY);
   },
+
+  /**
+   * Per-employee lead performance, already scoped by the backend to what
+   * the caller may see — a manager gets their own downline, an admin the
+   * whole company. Gated on leads.analytics.read, which the manager tier
+   * holds, unlike the company-wide ANALYTICS_ADMIN endpoint.
+   */
+  async getEmployeeLeadAnalytics(query) {
+    return get(API_ENDPOINTS.LEADS.ANALYTICS_EMPLOYEES, query);
+  },
 };

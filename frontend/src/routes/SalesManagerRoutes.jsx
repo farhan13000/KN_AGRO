@@ -4,6 +4,9 @@ import { PermissionGuard } from "../core/auth";
 import ProtectedRoute from "./ProtectedRoute";
 import { BACKEND_ROLES, PERMISSIONS, ROUTES } from "../shared/constants";
 
+const SalesManagerMyWorkspacePage = lazy(
+  () => import("../sales-manager/pages/me/SalesManagerMyWorkspacePage"),
+);
 const SalesManagerApprovalsPage = lazy(
   () => import("../sales-manager/pages/approvals/SalesManagerApprovalsPage"),
 );
@@ -90,12 +93,6 @@ const SalesManagerInvoicePrintPage = lazy(
 const SalesManagerDSRSubmitPage = lazy(() => import("../sales-manager/pages/dsr/SalesManagerDSRSubmitPage"));
 const SalesManagerProductRecommendationsPage = lazy(
   () => import("../sales-manager/pages/productRecommendations/SalesManagerProductRecommendationsPage"),
-);
-const SalesManagerMyPayrollPage = lazy(
-  () => import("../sales-manager/pages/payroll/SalesManagerMyPayrollPage"),
-);
-const SalesManagerMyProfilePage = lazy(
-  () => import("../sales-manager/pages/profile/SalesManagerMyProfilePage"),
 );
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
@@ -321,12 +318,16 @@ export const salesManagerRouteConfig = {
           element: <Navigate replace to={`${ROUTES.SALES_MANAGER.REPORTS}?tab=team`} />,
         },
         {
+          path: ROUTES.SALES_MANAGER.MY_WORKSPACE,
+          element: <SalesManagerMyWorkspacePage />,
+        },
+        {
           path: ROUTES.SALES_MANAGER.MY_PAYROLL,
-          element: withPermission(PERMISSIONS.PAYROLL_READ_SELF, <SalesManagerMyPayrollPage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.MY_WORKSPACE}?tab=payroll`} />,
         },
         {
           path: ROUTES.SALES_MANAGER.MY_PROFILE,
-          element: withPermission(PERMISSIONS.EMPLOYEES_READ_SELF, <SalesManagerMyProfilePage />),
+          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.MY_WORKSPACE}?tab=profile`} />,
         },
         { path: "/manager/*", element: <InternalNotFoundPage /> },
       ],

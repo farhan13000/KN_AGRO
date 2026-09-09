@@ -5,6 +5,7 @@ import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
 import { useDirectReports } from "../hooks";
 import { getEmployeeDisplayName } from "../utils";
+import EmployeeRoleBadge from "./EmployeeRoleBadge";
 import EmployeeStatusBadge from "./EmployeeStatusBadge";
 
 export default function DirectReportsList({ employeeId }) {
@@ -31,6 +32,7 @@ export default function DirectReportsList({ employeeId }) {
             <tr>
               <th className="px-4 py-3">Employee Code</th>
               <th className="px-4 py-3">Name</th>
+              <th className="px-4 py-3">Role</th>
               <th className="px-4 py-3">Designation</th>
               <th className="px-4 py-3">Department</th>
               <th className="px-4 py-3">Employee Status</th>
@@ -45,6 +47,9 @@ export default function DirectReportsList({ employeeId }) {
                   </Link>
                 </td>
                 <td className="px-4 py-3 font-bold text-ink">{getEmployeeDisplayName(report)}</td>
+                <td className="px-4 py-3">
+                  <EmployeeRoleBadge employee={report} />
+                </td>
                 <td className="px-4 py-3 text-muted">{report.designation || "Not Set"}</td>
                 <td className="px-4 py-3 text-muted">{report.department || "Not Set"}</td>
                 <td className="px-4 py-3">

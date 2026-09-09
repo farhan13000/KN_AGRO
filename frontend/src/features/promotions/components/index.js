@@ -1,3 +1,4 @@
+export { default as EmployeePromotionSection } from "./EmployeePromotionSection";
 export { default as PendingApprovalsView } from "./PendingApprovalsView";
 export { default as PromotionCard } from "./PromotionCard";
 export { default as PromotionDecisionDialog } from "./PromotionDecisionDialog";

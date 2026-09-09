@@ -11,7 +11,7 @@ import { useMyPayroll } from "../hooks";
 import PayrollStatusBadge from "./PayrollStatusBadge";
 import PayslipBreakdown from "./PayslipBreakdown";
 
-export default function MyPayrollView({ portalLabel }) {
+export default function MyPayrollView({ portalLabel, showHeading = true }) {
   const [page, setPage] = useState(1);
   const [expandedId, setExpandedId] = useState("");
   const state = useMyPayroll({ page });
@@ -19,14 +19,16 @@ export default function MyPayrollView({ portalLabel }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
-        <h1 className="mt-2 text-3xl font-black text-ink">My Payroll</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Your payslip history. Each month shows the figures frozen at the time it was generated, so a
-          later salary change never rewrites what you were actually paid.
-        </p>
-      </div>
+      {showHeading ? (
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
+          <h1 className="mt-2 text-3xl font-black text-ink">My Payroll</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+            Your payslip history. Each month shows the figures frozen at the time it was generated, so a
+            later salary change never rewrites what you were actually paid.
+          </p>
+        </div>
+      ) : null}
 
       {state.isLoading ? <PageLoader message="Loading your payroll history..." /> : null}
 

@@ -1,8 +1,4 @@
 import {
-  CalendarRange,
-  ClipboardList,
-  ClipboardSignature,
-  Clock,
   FileText,
   LayoutDashboard,
   Lightbulb,
@@ -11,7 +7,7 @@ import {
   ShoppingCart,
   UserCircle,
   Users,
-  Wallet,
+  UsersRound,
 } from "lucide-react";
 import { PERMISSIONS, ROUTES } from "../../shared/constants";
 
@@ -22,24 +18,20 @@ export const employeeNavigation = [
     icon: LayoutDashboard,
   },
   {
-    label: "My Profile",
-    route: ROUTES.EMPLOYEE.PROFILE,
-    icon: UserCircle,
-    permission: PERMISSIONS.EMPLOYEES_READ_SELF,
-  },
-  {
     // The lead list and the follow-up queue are the same records, so they
     // are two tabs rather than two entries.
-    label: "My Leads",
+    label: "Leads",
     route: ROUTES.EMPLOYEE.LEADS,
     icon: PhoneCall,
     permission: PERMISSIONS.LEADS_READ,
   },
   {
-    label: "My DSRs",
-    route: ROUTES.EMPLOYEE.DSR_ME,
-    icon: ClipboardList,
-    permission: PERMISSIONS.DSR_READ_SELF,
+    // Anyone reporting to you. At the bottom of the chain this is empty
+    // and says so; the same page is what an SO uses for their FOs.
+    label: "My Team",
+    route: ROUTES.EMPLOYEE.MY_TEAM,
+    icon: UsersRound,
+    permission: PERMISSIONS.MANAGERS_READ,
   },
   {
     label: "Product Recommendations",
@@ -78,27 +70,10 @@ export const employeeNavigation = [
     icon: Receipt,
   },
   {
-    label: "My Attendance",
-    route: ROUTES.EMPLOYEE.ATTENDANCE_ME,
-    icon: Clock,
-    permission: PERMISSIONS.ATTENDANCE_READ_SELF,
-  },
-  {
-    label: "My Leaves",
-    route: ROUTES.EMPLOYEE.LEAVES_ME,
-    icon: CalendarRange,
-    permission: PERMISSIONS.LEAVES_READ_SELF,
-  },
-  {
-    label: "My Reports",
-    route: ROUTES.EMPLOYEE.REPORT_REQUESTS_ME,
-    icon: ClipboardSignature,
-    permission: PERMISSIONS.REPORTS_READ_SELF,
-  },
-  {
-    label: "My Payroll",
-    route: ROUTES.EMPLOYEE.MY_PAYROLL,
-    icon: Wallet,
-    permission: PERMISSIONS.PAYROLL_READ_SELF,
+    // Profile, attendance, DSRs, leave, reports and payslips: everything
+    // that used to be its own "My ..." entry.
+    label: "My Workspace",
+    route: ROUTES.EMPLOYEE.MY_WORKSPACE,
+    icon: UserCircle,
   },
 ];

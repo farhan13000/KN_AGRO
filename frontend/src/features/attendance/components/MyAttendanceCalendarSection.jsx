@@ -14,11 +14,17 @@ import AttendanceStatusBadge from "./AttendanceStatusBadge";
  * so drawing a month from it would leave holes on page 2 and blank out
  * every day that fails the current status filter.
  */
+
+/**
+ * A day wider at each end than the month itself. The stored business-day
+ * marker sits at local midnight expressed in UTC, so the 1st of a month
+ * in a zone ahead of UTC is stamped on the last UTC day of the previous
+ * month — a window of exactly the month would silently drop it. The extra
+ * days cost nothing: anything outside the grid simply matches no cell.
+ */
 const monthBounds = (year, month) => ({
-  // Both ends inclusive of the whole month in UTC, matching how
-  // Attendance.date is stored (business-day marker at UTC midnight).
-  from: new Date(Date.UTC(year, month - 1, 1)).toISOString(),
-  to: new Date(Date.UTC(year, month, 0, 23, 59, 59)).toISOString(),
+  from: new Date(Date.UTC(year, month - 1, 0)).toISOString(),
+  to: new Date(Date.UTC(year, month, 1, 23, 59, 59)).toISOString(),
 });
 
 export default function MyAttendanceCalendarSection() {
