@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { Download } from "lucide-react";
 import { primaryNavigation } from "../../modules/public/data/navigation.data";
 import logoImage from "../../assets/KN_AGRO_LOGO.png";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { ROUTES } from "../constants";
 import Button from "../components/Button";
 import Icon from "../components/Icon";
+import { useInstallPrompt } from "../hooks";
 import LanguageToggle from "./LanguageToggle";
 
 export default function Navbar() {
@@ -13,6 +15,11 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { t } = useLanguage();
   const location = useLocation();
+  // Same hook as the portal sidebar: true only when the browser has
+  // actually offered an install and the app is not already running
+  // installed. So this never shows on iOS Safari (which offers no install
+  // prompt at all) or inside the installed app itself.
+  const { canInstall, promptInstall } = useInstallPrompt();
 
   useEffect(() => {
     setIsMenuOpen(false);
@@ -59,6 +66,17 @@ export default function Navbar() {
 
         <div className="hidden items-center gap-3 lg:flex">
           <LanguageToggle />
+          {canInstall ? (
+            <button
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-mint px-4 py-3 text-sm font-bold text-forest ring-1 ring-forest/15 transition hover:bg-white"
+              onClick={promptInstall}
+              title={t("Install KN Agro as an app")}
+              type="button"
+            >
+              <Download className="h-4 w-4" />
+              {t("Install App")}
+            </button>
+          ) : null}
           {/* Staff entry point. Deliberately `secondary` so it never competes
               with the customer-facing enquiry CTA beside it. */}
           <Button className="rounded-lg px-5" to={ROUTES.AUTH.LOGIN} icon="LogIn" variant="secondary">
@@ -69,15 +87,28 @@ export default function Navbar() {
           </Button>
         </div>
 
-        <button
-          aria-expanded={isMenuOpen}
-          aria-label="Toggle navigation menu"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-mint text-forest lg:hidden"
-          onClick={() => setIsMenuOpen((current) => !current)}
-          type="button"
-        >
-          <Icon name={isMenuOpen ? "X" : "Menu"} />
-        </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          {canInstall ? (
+            <button
+              aria-label={t("Install App")}
+              className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl bg-forest px-3 text-xs font-bold text-white shadow-soft transition hover:bg-agriculture"
+              onClick={promptInstall}
+              type="button"
+            >
+              <Download className="h-4 w-4" />
+              {t("Install")}
+            </button>
+          ) : null}
+          <button
+            aria-expanded={isMenuOpen}
+            aria-label="Toggle navigation menu"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-mint text-forest"
+            onClick={() => setIsMenuOpen((current) => !current)}
+            type="button"
+          >
+            <Icon name={isMenuOpen ? "X" : "Menu"} />
+          </button>
+        </div>
       </div>
 
       {isMenuOpen ? (
