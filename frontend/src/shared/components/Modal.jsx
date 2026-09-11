@@ -3,6 +3,11 @@ import { X } from "lucide-react";
 
 export default function Modal({ children, isOpen, onClose, title }) {
   const dialogRef = useRef(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -18,7 +23,7 @@ export default function Modal({ children, isOpen, onClose, title }) {
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
-        onClose?.();
+        onCloseRef.current?.();
         return;
       }
 
@@ -48,7 +53,7 @@ export default function Modal({ children, isOpen, onClose, title }) {
       window.removeEventListener("keydown", handleKeyDown);
       previousActiveElement?.focus?.();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

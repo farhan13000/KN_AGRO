@@ -10,11 +10,14 @@ import {
   CalendarX,
   CheckCircle2,
   CircleDollarSign,
+  ClipboardEdit,
   ClipboardList,
   FileCheck,
   FileText,
   FileX,
   Info,
+  LogIn,
+  LogOut,
   MapPin,
   MapPinCheck,
   MessageCircle,
@@ -67,6 +70,10 @@ export const NOTIFICATION_TYPE = Object.freeze({
   LEAVE_REQUESTED: "LEAVE_REQUESTED",
   LEAVE_APPROVED: "LEAVE_APPROVED",
   LEAVE_REJECTED: "LEAVE_REJECTED",
+
+  ATTENDANCE_CHECKED_IN: "ATTENDANCE_CHECKED_IN",
+  ATTENDANCE_CHECKED_OUT: "ATTENDANCE_CHECKED_OUT",
+  ATTENDANCE_CORRECTED: "ATTENDANCE_CORRECTED",
 
   DSR_REQUESTED: "DSR_REQUESTED",
   REPORT_SUBMITTED: "REPORT_SUBMITTED",
@@ -154,6 +161,10 @@ export const NOTIFICATION_TYPE_META = Object.freeze({
   [NOTIFICATION_TYPE.LEAVE_APPROVED]: { icon: CalendarCheck, label: "Leave approved" },
   [NOTIFICATION_TYPE.LEAVE_REJECTED]: { icon: CalendarX, label: "Leave rejected" },
 
+  [NOTIFICATION_TYPE.ATTENDANCE_CHECKED_IN]: { icon: LogIn, label: "Checked in" },
+  [NOTIFICATION_TYPE.ATTENDANCE_CHECKED_OUT]: { icon: LogOut, label: "Checked out" },
+  [NOTIFICATION_TYPE.ATTENDANCE_CORRECTED]: { icon: ClipboardEdit, label: "Attendance corrected" },
+
   [NOTIFICATION_TYPE.DSR_REQUESTED]: { icon: ClipboardList, label: "Daily report requested" },
   [NOTIFICATION_TYPE.REPORT_SUBMITTED]: { icon: FileCheck, label: "Report submitted" },
   [NOTIFICATION_TYPE.REPORT_REVIEWED]: { icon: FileCheck, label: "Report reviewed" },
@@ -187,7 +198,7 @@ export const NOTIFICATION_TYPE_META = Object.freeze({
 
 // Genuine fallback — only reached for a type this map doesn't know about
 // (e.g. a future backend addition the frontend hasn't been updated for
-// yet), never for any of the 38 types enumerated above.
+// yet), never for any of the types enumerated above.
 export const DEFAULT_NOTIFICATION_META = { icon: Bell, label: "Notification" };
 
 export const getNotificationTypeMeta = (type) => NOTIFICATION_TYPE_META[type] || DEFAULT_NOTIFICATION_META;

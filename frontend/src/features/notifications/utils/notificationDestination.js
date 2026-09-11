@@ -50,6 +50,16 @@ const ACTION_ROUTE_BUILDERS = Object.freeze({
   // so it goes to their My Payroll history (every portal has one) rather
   // than the admin-only company-wide run list.
   VIEW_PAYROLL: (routes) => routes.MY_PAYROLL || null,
+  // Sent to a manager on their employee's check-in/check-out — goes to
+  // that manager's own team attendance view. Only the Sales Manager
+  // portal splits ATTENDANCE_TEAM out from the general ATTENDANCE list;
+  // the Super Admin portal has one combined ATTENDANCE route that already
+  // covers this, so it's the fallback rather than a gap.
+  VIEW_TEAM_ATTENDANCE: (routes) => routes.ATTENDANCE_TEAM || routes.ATTENDANCE || null,
+  // Sent to an employee whose attendance record a manager corrected —
+  // goes to their own My Attendance view. Same ATTENDANCE fallback as
+  // above for the Super Admin portal, which has no separate ME route.
+  VIEW_MY_ATTENDANCE: (routes) => routes.ATTENDANCE_ME || routes.ATTENDANCE || null,
 });
 
 /**
