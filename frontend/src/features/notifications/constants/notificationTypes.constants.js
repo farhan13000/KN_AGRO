@@ -10,6 +10,7 @@ import {
   CalendarX,
   CheckCircle2,
   CircleDollarSign,
+  ClipboardCheck,
   ClipboardEdit,
   ClipboardList,
   FileCheck,
@@ -75,6 +76,7 @@ export const NOTIFICATION_TYPE = Object.freeze({
   ATTENDANCE_CHECKED_OUT: "ATTENDANCE_CHECKED_OUT",
   ATTENDANCE_CORRECTED: "ATTENDANCE_CORRECTED",
 
+  DSR_SUBMITTED: "DSR_SUBMITTED",
   DSR_REQUESTED: "DSR_REQUESTED",
   REPORT_SUBMITTED: "REPORT_SUBMITTED",
   REPORT_REVIEWED: "REPORT_REVIEWED",
@@ -165,6 +167,7 @@ export const NOTIFICATION_TYPE_META = Object.freeze({
   [NOTIFICATION_TYPE.ATTENDANCE_CHECKED_OUT]: { icon: LogOut, label: "Checked out" },
   [NOTIFICATION_TYPE.ATTENDANCE_CORRECTED]: { icon: ClipboardEdit, label: "Attendance corrected" },
 
+  [NOTIFICATION_TYPE.DSR_SUBMITTED]: { icon: ClipboardCheck, label: "DSR submitted" },
   [NOTIFICATION_TYPE.DSR_REQUESTED]: { icon: ClipboardList, label: "Daily report requested" },
   [NOTIFICATION_TYPE.REPORT_SUBMITTED]: { icon: FileCheck, label: "Report submitted" },
   [NOTIFICATION_TYPE.REPORT_REVIEWED]: { icon: FileCheck, label: "Report reviewed" },

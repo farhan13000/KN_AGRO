@@ -60,6 +60,18 @@ const ACTION_ROUTE_BUILDERS = Object.freeze({
   // goes to their own My Attendance view. Same ATTENDANCE fallback as
   // above for the Super Admin portal, which has no separate ME route.
   VIEW_MY_ATTENDANCE: (routes) => routes.ATTENDANCE_ME || routes.ATTENDANCE || null,
+  // Sent to a manager (SO/ASM/RM/GM) when someone in their chain submits
+  // a DSR — goes to that manager's own team DSR view. Only the Sales
+  // Manager portal has a DSR_TEAM route; every DSR_SUBMITTED recipient
+  // reached via Employee.manager is necessarily in that portal (SO/ASM/
+  // RM/GM are the only roles that can BE a manager), so this always
+  // resolves for its real audience — DSRS/DSR is only a defensive
+  // fallback, never actually needed.
+  VIEW_TEAM_DSR: (routes) => routes.DSR_TEAM || routes.DSRS || routes.DSR || null,
+  // Sent to OA/SA when a GM (top of the sales chain, no manager to
+  // escalate to) submits a DSR — goes to the company-wide DSR list, the
+  // only portal (Super Admin) either of those roles ever lands in.
+  VIEW_ALL_DSR: (routes) => routes.DSR || null,
 });
 
 /**
