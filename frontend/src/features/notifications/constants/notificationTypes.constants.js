@@ -16,6 +16,8 @@ import {
   FileCheck,
   FileText,
   FileX,
+  GitPullRequest,
+  Inbox,
   Info,
   LogIn,
   LogOut,
@@ -46,8 +48,10 @@ export const NOTIFICATION_TYPE = Object.freeze({
   EMPLOYEE_REJECTED: "EMPLOYEE_REJECTED",
   EMPLOYEE_PROMOTED: "EMPLOYEE_PROMOTED",
 
+  LEAD_ENQUIRY_RECEIVED: "LEAD_ENQUIRY_RECEIVED",
   LEAD_ASSIGNED: "LEAD_ASSIGNED",
   LEAD_REASSIGNED: "LEAD_REASSIGNED",
+  LEAD_STATUS_CHANGED: "LEAD_STATUS_CHANGED",
   FOLLOW_UP_DUE: "FOLLOW_UP_DUE",
   FOLLOW_UP_OVERDUE: "FOLLOW_UP_OVERDUE",
 
@@ -137,8 +141,10 @@ export const NOTIFICATION_TYPE_META = Object.freeze({
   [NOTIFICATION_TYPE.EMPLOYEE_REJECTED]: { icon: UserX, label: "Employee application rejected" },
   [NOTIFICATION_TYPE.EMPLOYEE_PROMOTED]: { icon: Award, label: "Employee promoted" },
 
+  [NOTIFICATION_TYPE.LEAD_ENQUIRY_RECEIVED]: { icon: Inbox, label: "New enquiry" },
   [NOTIFICATION_TYPE.LEAD_ASSIGNED]: { icon: UserPlus, label: "Lead assigned" },
   [NOTIFICATION_TYPE.LEAD_REASSIGNED]: { icon: UserPlus, label: "Lead reassigned" },
+  [NOTIFICATION_TYPE.LEAD_STATUS_CHANGED]: { icon: GitPullRequest, label: "Lead status updated" },
   [NOTIFICATION_TYPE.FOLLOW_UP_DUE]: { icon: AlarmClock, label: "Follow-up due" },
   [NOTIFICATION_TYPE.FOLLOW_UP_OVERDUE]: { icon: AlarmClock, label: "Follow-up overdue" },
 
