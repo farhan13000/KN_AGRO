@@ -12,6 +12,9 @@ const ContactPage = lazy(() => import("../modules/public/contact/pages/ContactPa
 const EnquiryPage = lazy(() => import("../modules/public/enquiries/pages/EnquiryPage"));
 const PrivacyPolicyPage = lazy(() => import("../modules/public/legal/pages/PrivacyPolicyPage"));
 const TermsPage = lazy(() => import("../modules/public/legal/pages/TermsPage"));
+const CustomerLoginPage = lazy(() => import("../modules/public/account/pages/CustomerLoginPage"));
+const CustomerRegisterPage = lazy(() => import("../modules/public/account/pages/CustomerRegisterPage"));
+const MyAccountPage = lazy(() => import("../modules/public/account/pages/MyAccountPage"));
 const NotFoundPage = lazy(() => import("./NotFoundPage"));
 
 export const publicRouteConfig = {
@@ -27,6 +30,11 @@ export const publicRouteConfig = {
     { path: ROUTES.PUBLIC.ENQUIRY, element: <EnquiryPage /> },
     { path: ROUTES.PUBLIC.PRIVACY_POLICY, element: <PrivacyPolicyPage /> },
     { path: ROUTES.PUBLIC.TERMS, element: <TermsPage /> },
+    // The customer's own area. These sit on the public site, under the
+    // public layout, because that is where the buyer already is.
+    { path: ROUTES.PUBLIC.ACCOUNT_LOGIN, element: <CustomerLoginPage /> },
+    { path: ROUTES.PUBLIC.ACCOUNT_REGISTER, element: <CustomerRegisterPage /> },
+    { path: ROUTES.PUBLIC.ACCOUNT, element: <MyAccountPage /> },
     { path: ROUTES.ERROR.NOT_FOUND, element: <NotFoundPage /> },
   ],
 };

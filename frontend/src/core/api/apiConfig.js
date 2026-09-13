@@ -283,4 +283,17 @@ export const API_ENDPOINTS = Object.freeze({
     PRODUCT_DETAIL: (slug) => `/public/products/${slug}`,
     ENQUIRIES: "/public/enquiries",
   },
+  // The website customer's own account. A different identity from AUTH
+  // above, which is staff-only — see accountClient.js for why they do not
+  // share a session.
+  ACCOUNT: {
+    REGISTER: "/account/register",
+    LOGIN: "/account/login",
+    LOGOUT: "/account/logout",
+    REFRESH: "/account/refresh",
+    ME: "/account/me",
+    MY_ENQUIRIES: "/account/me/enquiries",
+    MY_ORDERS: "/account/me/orders",
+    REORDER: (orderId) => `/account/me/orders/${orderId}/reorder`,
+  },
 });

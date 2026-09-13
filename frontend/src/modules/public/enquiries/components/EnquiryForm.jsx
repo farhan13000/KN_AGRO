@@ -7,7 +7,11 @@ import Textarea from "../../../../shared/forms/Textarea";
 import { useToast } from "../../../../shared/feedback/ToastContext";
 import { useLanguage } from "../../../../i18n/LanguageContext";
 import { isValidEmail, isValidPhone, validateRequired } from "../../../../utils/validation";
-import { publicEnquiriesApi } from "../api/publicEnquiries.api";
+import { Link } from "react-router-dom";
+import { ROUTES } from "../../../../shared/constants";
+import { accountApi } from "../../account/api/accountApi";
+import { useCustomerAuth } from "../../account/context/CustomerAuthContext";
+import AddressFields, { emptyAddress, validateAddress } from "../../account/components/AddressFields";
 
 const initialValues = {
   name: "",
@@ -37,7 +41,9 @@ const buildMessage = (values, selectedProduct, selectedCategory) =>
 
 export default function EnquiryForm({ products = [], categories = [] }) {
   const [searchParams] = useSearchParams();
+  const { account, isSignedIn } = useCustomerAuth();
   const [values, setValues] = useState(initialValues);
+  const [address, setAddress] = useState(emptyAddress);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
@@ -58,6 +64,19 @@ export default function EnquiryForm({ products = [], categories = [] }) {
       }));
     }
   }, [products, searchParams, t]);
+
+  useEffect(() => {
+    if (!account) return;
+    setValues((current) => ({
+      ...current,
+      name: current.name || account.name || "",
+      phone: current.phone || account.phone || "",
+      email: current.email || account.email || "",
+    }));
+    setAddress((current) =>
+      current.district || current.state ? current : { ...emptyAddress, ...(account.address || {}) },
+    );
+  }, [account]);
 
   const productOptions = useMemo(
     () => [
@@ -99,7 +118,10 @@ export default function EnquiryForm({ products = [], categories = [] }) {
     if (!validateRequired(values.product) && !validateRequired(values.category)) {
       nextErrors.product = "Select a product or category.";
     }
-    return nextErrors;
+    // District and state are asked of guests too: they are what routes an
+    // enquiry to the right area team, and an enquiry nobody can place on a
+    // map is an enquiry nobody can act on.
+    return { ...nextErrors, ...validateAddress(address) };
   };
 
   const handleSubmit = async (event) => {
@@ -112,12 +134,16 @@ export default function EnquiryForm({ products = [], categories = [] }) {
     try {
       const selectedProduct = products.find((product) => product.slug === values.product);
       const selectedCategory = categories.find((category) => category.slug === values.category);
-      await publicEnquiriesApi.submitEnquiry({
+      // Through accountApi, which carries the customer's token when there
+      // is one — so a signed-in buyer's enquiry lands in their own
+      // history, and a guest's stays anonymous.
+      await accountApi.submitEnquiry({
         name: values.name,
         phone: values.phone,
         email: values.email,
         companyName: values.companyName,
         location: values.location,
+        address,
         interestedProducts:
           selectedProduct?.id && objectIdPattern.test(selectedProduct.id) ? [selectedProduct.id] : [],
         message: buildMessage(values, selectedProduct, selectedCategory),
@@ -125,6 +151,7 @@ export default function EnquiryForm({ products = [], categories = [] }) {
       setIsComplete(true);
       showToast("Thank you. Your enquiry has been submitted.");
       setValues(initialValues);
+      setAddress(isSignedIn ? { ...emptyAddress, ...(account?.address || {}) } : emptyAddress);
     } catch (error) {
       const message =
         error.status === 429
@@ -144,6 +171,21 @@ export default function EnquiryForm({ products = [], categories = [] }) {
           <p className="mt-2 text-sm leading-6 text-muted">
             {t("Your request has been submitted. The team will review the enquiry details and respond through your provided contact information.")}
           </p>
+        </div>
+      ) : null}
+      {!isSignedIn ? (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-forest/10 bg-mint/40 p-4">
+          <p className="text-sm font-semibold text-forest">
+            {t("Buying from us? Sign in to the customer portal to track this enquiry and re-order later.")}
+          </p>
+          <span className="flex gap-3 text-sm font-bold">
+            <Link className="text-forest underline" to={ROUTES.PUBLIC.ACCOUNT_LOGIN}>
+              {t("Customer Sign In")}
+            </Link>
+            <Link className="text-forest underline" to={ROUTES.PUBLIC.ACCOUNT_REGISTER}>
+              {t("Create Customer Account")}
+            </Link>
+          </span>
         </div>
       ) : null}
       <div className="grid gap-5 sm:grid-cols-2">
@@ -218,6 +260,13 @@ export default function EnquiryForm({ products = [], categories = [] }) {
           ]}
           value={values.preferredContact}
         />
+        <div className="sm:col-span-2">
+          <h2 className="text-lg font-black text-ink">{t("Where should we reach you?")}</h2>
+          <p className="mt-1 text-sm text-muted">
+            {t("District and state let us send the right area team.")}
+          </p>
+        </div>
+        <AddressFields errors={errors} idPrefix="enquiry" onChange={setAddress} values={address} />
         <div className="sm:col-span-2">
           <Textarea
             id="enquiry-message"

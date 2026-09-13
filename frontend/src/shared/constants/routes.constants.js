@@ -10,6 +10,11 @@ export const ROUTES = Object.freeze({
     ENQUIRY: "/enquiry",
     PRIVACY_POLICY: "/privacy-policy",
     TERMS: "/terms",
+    // The website customer's own area. Separate from AUTH.LOGIN, which is
+    // the staff portal — a buyer and an employee are different identities.
+    ACCOUNT: "/account",
+    ACCOUNT_LOGIN: "/account/login",
+    ACCOUNT_REGISTER: "/account/register",
   },
   AUTH: {
     LOGIN: "/login",

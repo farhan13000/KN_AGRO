@@ -8,6 +8,7 @@ import { ROUTES } from "../constants";
 import Button from "../components/Button";
 import Icon from "../components/Icon";
 import { useInstallPrompt } from "../hooks";
+import { useCustomerAuth } from "../../modules/public/account/context/CustomerAuthContext";
 import LanguageToggle from "./LanguageToggle";
 
 export default function Navbar() {
@@ -20,6 +21,10 @@ export default function Navbar() {
   // installed. So this never shows on iOS Safari (which offers no install
   // prompt at all) or inside the installed app itself.
   const { canInstall, promptInstall } = useInstallPrompt();
+  // The website customer, not a staff member. The two sessions are
+  // separate, which is why the staff "Login" button below stays exactly
+  // where it was.
+  const { account, isSignedIn } = useCustomerAuth();
 
   useEffect(() => {
     setIsMenuOpen(false);
@@ -62,6 +67,12 @@ export default function Navbar() {
               ) : null}
             </NavLink>
           ))}
+          <NavLink
+            className={navClass}
+            to={isSignedIn ? ROUTES.PUBLIC.ACCOUNT : ROUTES.PUBLIC.ACCOUNT_LOGIN}
+          >
+            {isSignedIn ? account?.name?.split(" ")[0] || t("Customer Portal") : t("Customer Portal")}
+          </NavLink>
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
@@ -119,6 +130,9 @@ export default function Navbar() {
                 {t(item.label)}
               </NavLink>
             ))}
+            <NavLink className={navClass} to={isSignedIn ? ROUTES.PUBLIC.ACCOUNT : ROUTES.PUBLIC.ACCOUNT_LOGIN}>
+              {isSignedIn ? t("Customer Portal") : t("Customer Sign In")}
+            </NavLink>
             <LanguageToggle />
             <Button className="mt-2" to={ROUTES.AUTH.LOGIN} icon="LogIn" variant="secondary">
               Login
