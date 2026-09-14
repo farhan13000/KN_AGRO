@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { useAsyncMutation } from "../../../shared/hooks/useAsyncResource";
 import { mediaApi } from "../services";
 import { MEDIA_KIND_RULES, formatBytes } from "../constants";
+import { compressImage } from "../utils/compressImage";
 
 /**
  * Upload state for one field.
@@ -32,16 +33,23 @@ export const useMediaUpload = (kind, { onUploaded } = {}) => {
         setLocalError(`Unsupported file type. Accepted: ${rule.label}.`);
         return null;
       }
-      if (rule && file.size > rule.maxBytes) {
+
+      // Photos are shrunk in the browser BEFORE the size check, so a 12MB
+      // phone photo is judged by the ~1MB file actually sent, not refused
+      // for a size it will never be uploaded at. Documents (a PDF resume)
+      // are passed through untouched.
+      const toSend = rule?.compress ? await compressImage(file, rule.compress) : file;
+
+      if (rule && toSend.size > rule.maxBytes) {
         setLocalError(
-          `That file is ${formatBytes(file.size)}. The maximum is ${formatBytes(rule.maxBytes)}.`,
+          `That file is ${formatBytes(toSend.size)}. The maximum is ${formatBytes(rule.maxBytes)}.`,
         );
         return null;
       }
 
       setProgress(0);
       try {
-        return await mutate(file);
+        return await mutate(toSend);
       } catch {
         // useAsyncMutation already captured it into mutation.error; it is
         // rethrown for callers who await, and swallowed here so a failed

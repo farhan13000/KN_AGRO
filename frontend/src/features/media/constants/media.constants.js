@@ -16,7 +16,10 @@ export const MEDIA_KIND_RULES = Object.freeze({
     accept: "image/jpeg,image/png,image/webp",
     mimeTypes: ["image/jpeg", "image/png", "image/webp"],
     maxBytes: 5 * 1024 * 1024,
-    label: "JPG, PNG or WebP, up to 5MB",
+    // Shown small (avatars, detail headers) and face-cropped to 512px on
+    // the server anyway, so 1024px is more than enough to send.
+    compress: Object.freeze({ maxDimension: 1024, quality: 0.82 }),
+    label: "JPG, PNG or WebP. Large photos are resized automatically.",
   }),
   [MEDIA_KIND.ATTENDANCE_PHOTO]: Object.freeze({
     accept: "image/jpeg,image/png,image/webp",
@@ -24,7 +27,10 @@ export const MEDIA_KIND_RULES = Object.freeze({
     // Higher than a profile photo on purpose: this is taken on a phone,
     // in the field, and is refused outright if it is too large.
     maxBytes: 8 * 1024 * 1024,
-    label: "JPG, PNG or WebP, up to 8MB",
+    // Evidence of a place, so a little more detail than an avatar — but
+    // the server limits it to 1280px, so sending more is wasted upload.
+    compress: Object.freeze({ maxDimension: 1600, quality: 0.8 }),
+    label: "JPG, PNG or WebP. Large photos are resized automatically.",
   }),
   [MEDIA_KIND.RESUME]: Object.freeze({
     accept: "application/pdf",

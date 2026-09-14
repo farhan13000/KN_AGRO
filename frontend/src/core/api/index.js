@@ -3,6 +3,7 @@ export {
   apiClient,
   clearAccessToken,
   getAccessToken,
+  isSessionRejected,
   refreshAccessToken,
   setAccessToken,
   unwrapApiData,

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { API_CONFIG } from "../../../../core/api/apiConfig";
 import { normalizeApiError } from "../../../../core/api/apiError";
+import { isSessionRejected } from "../../../../core/api/apiClient";
 
 /**
  * The website customer's own HTTP client — deliberately a second axios
@@ -92,8 +93,13 @@ accountClient.interceptors.response.use(
         if (token) originalRequest.headers.Authorization = `Bearer ${token}`;
         return accountClient(originalRequest);
       } catch (refreshError) {
-        clearCustomerAccessToken();
-        onSessionLost?.();
+        // Same rule as the staff client: only the server refusing the
+        // session signs the customer out. A dropped connection or a 5xx
+        // fails this one request and leaves them signed in.
+        if (isSessionRejected(refreshError)) {
+          clearCustomerAccessToken();
+          onSessionLost?.();
+        }
         return Promise.reject(normalizeApiError(refreshError));
       }
     }

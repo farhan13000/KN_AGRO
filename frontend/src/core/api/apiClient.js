@@ -34,6 +34,21 @@ const refreshClient = axios.create({
   },
 });
 
+/**
+ * True only when the server looked at the session and refused it.
+ *
+ * Works on both a raw axios error (what refreshAccessToken rejects with)
+ * and an already-normalized FrontendApiError (what apiClient calls reject
+ * with), because callers see both. A network failure, a timeout, a 5xx or
+ * a 429 all come back false: none of those mean the session is dead, and
+ * treating them as if they did is what logged people out whenever the
+ * connection or the server hiccuped.
+ */
+export const isSessionRejected = (error) => {
+  const status = error?.response?.status ?? error?.status ?? 0;
+  return status === 401 || status === 403;
+};
+
 const shouldAttemptRefresh = (error) => {
   const status = error?.response?.status;
   const url = error?.config?.url || "";
@@ -102,17 +117,27 @@ apiClient.interceptors.response.use(
       const originalRequest = error.config;
       originalRequest._retry = true;
 
+      let token;
       try {
-        const token = await refreshAccessToken();
-        if (token) {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-        }
-        return apiClient(originalRequest);
+        token = await refreshAccessToken();
       } catch (refreshError) {
-        clearAccessToken();
-        notifySessionExpired();
+        // Only the server saying "this session is not valid" ends the
+        // session. A refresh that failed for any other reason — no
+        // network, a timeout, a 500, a 429 — says nothing about the
+        // session, and logging the user out for it threw away a perfectly
+        // good login every time the connection flickered. That request
+        // fails; the user stays signed in and the next one tries again.
+        if (isSessionRejected(refreshError)) {
+          clearAccessToken();
+          notifySessionExpired();
+        }
         return Promise.reject(normalizeApiError(refreshError));
       }
+
+      if (token) {
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+      }
+      return apiClient(originalRequest);
     }
 
     return Promise.reject(normalizeApiError(error));
