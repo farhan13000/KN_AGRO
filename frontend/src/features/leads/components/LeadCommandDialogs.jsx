@@ -31,6 +31,8 @@ const activeEmployeeQuery = Object.freeze({
   sortOrder: "asc",
 });
 
+const directReportQuery = Object.freeze({ ...activeEmployeeQuery, directOnly: true });
+
 const getEmployeeRole = (employee) => normalizeRoleName(employee?.user?.role?.name);
 
 const ignoreHandledError = () => {};
@@ -224,7 +226,13 @@ export function AssignmentDialog({ assignmentType = "employee", isOpen, lead, on
   const allEmployeesState = useEmployeeList(activeEmployeeQuery, {
     enabled: isOpen && (isManagerAssignment || !isManagerTierActor),
   });
-  const myTeamState = useMyTeam(activeEmployeeQuery, {
+  // directOnly: true — the backend only ever accepts a DIRECT report as
+  // the new employee (ensureEmployeeBelongsToManager checks
+  // employee.manager === the acting manager's own id, never "anywhere in
+  // my downline"). Without this, useMyTeam's default (the acting
+  // manager's FULL multi-level downline) would list candidates several
+  // tiers down that assignEmployee then rejects.
+  const myTeamState = useMyTeam(directReportQuery, {
     enabled: isOpen && !isManagerAssignment && isManagerTierActor,
   });
   const actions = useLeadDialogActions({ onClose, onSuccess });
@@ -238,12 +246,19 @@ export function AssignmentDialog({ assignmentType = "employee", isOpen, lead, on
       !isManagerAssignment && isManagerTierActor
         ? myTeamState.data?.employees || []
         : allEmployeesState.data?.employees || [];
+    // SO only, matching the backend's own LEAD_MANAGER_ASSIGNABLE_ROLES:
+    // a lead's employee can only be an FO, and an FO's direct manager is
+    // always an SO — so naming any other tier here would hand OA/SA a
+    // lead nobody can ever be delegated to.
     if (isManagerAssignment) {
-      return source.filter((employee) => MANAGER_TIER_ROLES.includes(getEmployeeRole(employee)));
+      return source.filter((employee) => getEmployeeRole(employee) === BACKEND_ROLES.SO);
     }
-    return source.filter(
-      (employee) => getEmployeeRole(employee) !== BACKEND_ROLES.SA,
-    );
+    // FO only, matching the backend's own EMPLOYEE_ASSIGNABLE_ROLES. An
+    // SO's direct reports are already all FOs, so this changes nothing
+    // for them — it matters for the OA/SA path, which reads the full
+    // employee list and would otherwise offer tiers assignEmployee then
+    // rejects outright.
+    return source.filter((employee) => getEmployeeRole(employee) === BACKEND_ROLES.FO);
   }, [allEmployeesState.data, isManagerAssignment, isManagerTierActor, myTeamState.data]);
 
   const handleSubmit = async (event) => {

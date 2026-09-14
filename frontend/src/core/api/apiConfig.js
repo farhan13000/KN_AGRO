@@ -135,6 +135,7 @@ export const API_ENDPOINTS = Object.freeze({
     BASE: "/promotions",
     DETAIL: (promotionId) => `/promotions/${promotionId}`,
     APPROVE: (promotionId) => `/promotions/${promotionId}/approve`,
+    ASSIGN_MANAGER: (promotionId) => `/promotions/${promotionId}/manager`,
     REJECT: (promotionId) => `/promotions/${promotionId}/reject`,
     CANCEL: (promotionId) => `/promotions/${promotionId}/cancel`,
   },
@@ -231,6 +232,10 @@ export const API_ENDPOINTS = Object.freeze({
     EMPLOYEE_PERFORMANCE: "/analytics/employees/performance",
     ADMIN_DASHBOARD: "/analytics/admin/dashboard",
     MANAGER_DASHBOARD: "/analytics/manager/dashboard",
+    // Per-employee performance across the caller's own downline, gated on
+    // analytics.employee_performance.read (which GM/RM/ASM hold) rather
+    // than the admin-only company-wide EMPLOYEE_PERFORMANCE above.
+    MANAGER_EMPLOYEE_PERFORMANCE: "/analytics/manager/employees",
     EMPLOYEE_DASHBOARD: "/analytics/employee/dashboard",
     SO_DASHBOARD: "/analytics/so/dashboard",
   },

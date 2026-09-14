@@ -1,9 +1,10 @@
 import { PERMISSIONS } from "../../../shared/constants/permissions.constants.js";
+import { MANAGER_TIER_ROLES, normalizeRoleName } from "../../../shared/constants";
 import { LEAD_STATUS } from "../constants/lead.constants.js";
 
 const terminalStatuses = [LEAD_STATUS.CONVERTED, LEAD_STATUS.LOST, LEAD_STATUS.CLOSED];
 
-export const getLeadCapabilities = ({ hasPermission, lead }) => {
+export const getLeadCapabilities = ({ hasPermission, lead, role }) => {
   const canUpdateLead = hasPermission(PERMISSIONS.LEADS_UPDATE);
   const canAssign = hasPermission(PERMISSIONS.LEADS_ASSIGN);
   const canChangeStatus = hasPermission(PERMISSIONS.LEADS_CHANGE_STATUS);
@@ -23,7 +24,14 @@ export const getLeadCapabilities = ({ hasPermission, lead }) => {
     // role check here duplicated (and drifted from) a rule the backend
     // already enforces — matches this file's own convention (every other
     // capability below is permission-only, no role branching).
-    canAssignManager: canAssign,
+    // WHICH manager owns a lead is an OA/SA decision, so the button is
+    // hidden from every manager tier (GM/RM/ASM/SO). They still hold
+    // LEADS_ASSIGN — that is what canAssignEmployee below rides on, so
+    // delegating to their own direct report is unaffected. The backend
+    // already refuses a manager-tier actor naming anyone but themselves
+    // here (see lead.service.js's assignManager); this stops the UI from
+    // offering an action that was only ever a self-claim in disguise.
+    canAssignManager: canAssign && !MANAGER_TIER_ROLES.includes(normalizeRoleName(role)),
     canAssignEmployee: canAssign,
     canChangeStatus,
     canChangePriority: canUpdateLead,

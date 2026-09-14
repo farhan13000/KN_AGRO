@@ -33,8 +33,24 @@ export const promotionApi = {
 
   // Comment is optional on approve, but REQUIRED on reject (the backend's
   // rejectPromotionSchema enforces a non-empty comment).
-  async approvePromotion(promotionId, comment) {
-    const response = await apiClient.post(API_ENDPOINTS.PROMOTIONS.APPROVE(promotionId), { comment });
+  // `managerDecision` ("SELF" | "ESCALATE") is mandatory for every tier
+  // whose new role must report to someone — i.e. everything except a
+  // promotion to GM. The backend resolves which case applies and rejects
+  // a missing decision, so this is passed through rather than guessed at.
+  async approvePromotion(promotionId, comment, managerDecision) {
+    const response = await apiClient.post(API_ENDPOINTS.PROMOTIONS.APPROVE(promotionId), {
+      comment,
+      managerDecision,
+    });
+    return unwrapApiData(response);
+  },
+
+  // Completes a promotion that was approved and passed up: names the
+  // manager the promoted employee will report to.
+  async assignPromotionManager(promotionId, managerEmployeeId) {
+    const response = await apiClient.post(API_ENDPOINTS.PROMOTIONS.ASSIGN_MANAGER(promotionId), {
+      managerEmployeeId,
+    });
     return unwrapApiData(response);
   },
 

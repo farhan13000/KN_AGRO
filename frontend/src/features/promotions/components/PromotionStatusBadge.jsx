@@ -4,6 +4,7 @@ const statusClasses = {
   [PROMOTION_STATUS.RECOMMENDED]: "bg-amber-50 text-amber-900 ring-amber-200",
   [PROMOTION_STATUS.UNDER_REVIEW]: "bg-amber-50 text-amber-900 ring-amber-200",
   [PROMOTION_STATUS.APPROVED]: "bg-green-50 text-green-800 ring-green-200",
+  [PROMOTION_STATUS.PENDING_MANAGER_ASSIGNMENT]: "bg-amber-50 text-amber-900 ring-amber-200",
   [PROMOTION_STATUS.COMPLETED]: "bg-green-50 text-green-800 ring-green-200",
   [PROMOTION_STATUS.REJECTED]: "bg-red-50 text-red-800 ring-red-200",
   [PROMOTION_STATUS.CANCELLED]: "bg-slate-50 text-slate-700 ring-slate-200",
