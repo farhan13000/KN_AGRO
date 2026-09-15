@@ -1,5 +1,7 @@
 import { PRODUCT_UNIT } from "../constants/index.js";
 
+const MAX_IMAGES = 10;
+
 const trimOrUndefined = (value) => {
   const trimmed = String(value || "").trim();
   return trimmed || undefined;
@@ -26,16 +28,17 @@ const stringifySpecifications = (specifications = {}) =>
     .map(([key, value]) => `${key}: ${value}`)
     .join("\n");
 
-const parseImages = (value, productName) =>
-  String(value || "")
-    .split("\n")
-    .map((url) => url.trim())
-    .filter(Boolean)
-    .map((url, index) => ({
-      url,
-      alt: productName ? `${productName} image ${index + 1}` : "",
-      isPrimary: index === 0,
-    }));
+/**
+ * Images are uploaded from the gallery (see ProductImagesField) and kept
+ * in the form as { url, publicId }. The first is the primary image.
+ */
+const toImagePayload = (images = [], productName) =>
+  images.slice(0, MAX_IMAGES).map((image, index) => ({
+    url: image.url,
+    ...(image.publicId ? { publicId: image.publicId } : {}),
+    alt: productName ? `${productName} image ${index + 1}` : "",
+    isPrimary: index === 0,
+  }));
 
 const hasAtMostTwoDecimals = (value) => {
   const text = String(value || "").trim();
@@ -43,15 +46,9 @@ const hasAtMostTwoDecimals = (value) => {
   return /^\d+(\.\d{1,2})?$/.test(text);
 };
 
-const isSafeHttpUrl = (value) => {
-  try {
-    const parsed = new URL(value);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
-  } catch {
-    return false;
-  }
-};
-
+// Purchase price is deliberately not part of the catalogue form: it is not
+// asked when adding a product, and editing a product leaves whatever is
+// stored untouched because the field is never sent.
 export const initialProductFormValues = {
   name: "",
   category: "",
@@ -59,11 +56,10 @@ export const initialProductFormValues = {
   shortDescription: "",
   description: "",
   unit: PRODUCT_UNIT.KG,
-  purchasePrice: "",
   sellingPrice: "",
   taxRate: "0",
   minimumStock: "0",
-  imagesText: "",
+  images: [],
   specificationsText: "",
 };
 
@@ -74,11 +70,14 @@ export const productToFormValues = (product) => ({
   shortDescription: product?.shortDescription || "",
   description: product?.description || "",
   unit: product?.unit || PRODUCT_UNIT.KG,
-  purchasePrice: String(product?.purchasePrice ?? ""),
   sellingPrice: String(product?.sellingPrice ?? ""),
   taxRate: String(product?.taxRate ?? 0),
   minimumStock: String(product?.minimumStock ?? 0),
-  imagesText: (product?.images || []).map((image) => image.url).filter(Boolean).join("\n"),
+  // Primary first, so it keeps its place as the main image.
+  images: [...(product?.images || [])]
+    .filter((image) => image?.url)
+    .sort((a, b) => Number(Boolean(b.isPrimary)) - Number(Boolean(a.isPrimary)))
+    .map((image) => ({ url: image.url, publicId: image.publicId || undefined })),
   specificationsText: stringifySpecifications(product?.specifications || {}),
 });
 
@@ -104,9 +103,6 @@ export const validateProductForm = (values) => {
   if (!Object.values(PRODUCT_UNIT).includes(values.unit)) {
     errors.unit = "Select a valid unit.";
   }
-  if (!hasAtMostTwoDecimals(values.purchasePrice) || Number(values.purchasePrice) < 0) {
-    errors.purchasePrice = "Purchase price must be 0 or greater with at most 2 decimal places.";
-  }
   if (!hasAtMostTwoDecimals(values.sellingPrice) || Number(values.sellingPrice) < 0) {
     errors.sellingPrice = "Selling price must be 0 or greater with at most 2 decimal places.";
   }
@@ -121,15 +117,8 @@ export const validateProductForm = (values) => {
     errors.minimumStock = "Minimum stock must be a whole number 0 or greater.";
   }
 
-  const imageUrls = String(values.imagesText || "")
-    .split("\n")
-    .map((url) => url.trim())
-    .filter(Boolean);
-  const invalidImage = imageUrls.find((url) => !isSafeHttpUrl(url));
-  if (invalidImage) {
-    errors.imagesText = "Each image must be a valid URL.";
-  } else if (imageUrls.length > 10) {
-    errors.imagesText = "A product may have at most 10 images.";
+  if ((values.images || []).length > MAX_IMAGES) {
+    errors.images = `A product may have at most ${MAX_IMAGES} images.`;
   }
 
   const specificationLines = String(values.specificationsText || "")
@@ -153,7 +142,6 @@ export const validateProductForm = (values) => {
 
 export const pickProductPayload = (values) => {
   const specifications = parseSpecifications(values.specificationsText);
-  const images = parseImages(values.imagesText, values.name);
 
   return {
     name: values.name.trim(),
@@ -164,11 +152,11 @@ export const pickProductPayload = (values) => {
       : {}),
     ...(trimOrUndefined(values.description) ? { description: values.description.trim() } : {}),
     unit: values.unit,
-    purchasePrice: Number(values.purchasePrice),
     sellingPrice: Number(values.sellingPrice),
     taxRate: Number(values.taxRate || 0),
     minimumStock: Number(values.minimumStock || 0),
-    ...(images.length ? { images } : {}),
+    // Always sent, so removing every photo while editing actually removes them.
+    images: toImagePayload(values.images, values.name.trim()),
     ...(Object.keys(specifications).length ? { specifications } : {}),
   };
 };

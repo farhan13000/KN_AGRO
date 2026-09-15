@@ -1,64 +1,12 @@
-import { useMemo, useState } from "react";
 import Button from "../../../shared/components/Button";
-import Icon from "../../../shared/components/Icon";
 import Select from "../../../shared/forms/Select";
 import TextInput from "../../../shared/forms/TextInput";
 import Textarea from "../../../shared/forms/Textarea";
 import { ROUTES } from "../../../shared/constants";
+import ProductImagesField from "../components/ProductImagesField";
 import { PRODUCT_UNIT_LABELS } from "../constants";
 
 const unitOptions = Object.entries(PRODUCT_UNIT_LABELS).map(([value, label]) => ({ label, value }));
-
-const getPreviewUrls = (value) =>
-  String(value || "")
-    .split("\n")
-    .map((url) => url.trim())
-    .filter(Boolean)
-    .filter((url) => {
-      try {
-        const parsed = new URL(url);
-        return parsed.protocol === "http:" || parsed.protocol === "https:";
-      } catch {
-        return false;
-      }
-    })
-    .slice(0, 3);
-
-function ImageUrlPreview({ imagesText, productName }) {
-  const [brokenUrls, setBrokenUrls] = useState(() => new Set());
-  const urls = useMemo(() => getPreviewUrls(imagesText), [imagesText]);
-
-  if (!urls.length) return null;
-
-  return (
-    <div className="grid gap-3 sm:grid-cols-3">
-      {urls.map((url) => {
-        const isBroken = brokenUrls.has(url);
-        return (
-          <div
-            className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg border border-forest/10 bg-mint"
-            key={url}
-          >
-            {isBroken ? (
-              <div className="flex flex-col items-center gap-2 text-center text-forest">
-                <Icon name="PackageCheck" className="h-7 w-7" />
-                <span className="text-xs font-bold">Preview unavailable</span>
-              </div>
-            ) : (
-              <img
-                alt={`${productName || "Product"} preview`}
-                className="h-full w-full object-contain p-2"
-                loading="lazy"
-                onError={() => setBrokenUrls((current) => new Set([...current, url]))}
-                src={url}
-              />
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 export default function ProductForm({
   categoryOptions = [],
@@ -141,19 +89,7 @@ export default function ProductForm({
 
       <section>
         <h2 className="text-lg font-black text-ink">Pricing And Reorder Policy</h2>
-        <div className="mt-4 grid gap-5 sm:grid-cols-4">
-          <TextInput
-            error={errors.purchasePrice}
-            id="product-purchase-price"
-            label="Purchase Price"
-            min="0"
-            name="purchasePrice"
-            onChange={onChange}
-            required
-            step="0.01"
-            type="number"
-            value={values.purchasePrice}
-          />
+        <div className="mt-4 grid gap-5 sm:grid-cols-3">
           <TextInput
             error={errors.sellingPrice}
             id="product-selling-price"
@@ -194,16 +130,7 @@ export default function ProductForm({
       <section>
         <h2 className="text-lg font-black text-ink">Images And Specifications</h2>
         <div className="mt-4 grid gap-5">
-          <Textarea
-            error={errors.imagesText}
-            id="product-images"
-            label="Image URLs"
-            name="imagesText"
-            onChange={onChange}
-            placeholder="One hosted image URL per line"
-            value={values.imagesText}
-          />
-          <ImageUrlPreview imagesText={values.imagesText} productName={values.name} />
+          <ProductImagesField error={errors.images} name="images" onChange={onChange} value={values.images} />
           <Textarea
             error={errors.specificationsText}
             id="product-specifications"

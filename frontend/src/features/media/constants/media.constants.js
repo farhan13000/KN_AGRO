@@ -9,6 +9,7 @@ export const MEDIA_KIND = Object.freeze({
   EMPLOYEE_PHOTO: "EMPLOYEE_PHOTO",
   RESUME: "RESUME",
   ATTENDANCE_PHOTO: "ATTENDANCE_PHOTO",
+  PRODUCT_IMAGE: "PRODUCT_IMAGE",
 });
 
 export const MEDIA_KIND_RULES = Object.freeze({
@@ -30,6 +31,15 @@ export const MEDIA_KIND_RULES = Object.freeze({
     // Evidence of a place, so a little more detail than an avatar — but
     // the server limits it to 1280px, so sending more is wasted upload.
     compress: Object.freeze({ maxDimension: 1600, quality: 0.8 }),
+    label: "JPG, PNG or WebP. Large photos are resized automatically.",
+  }),
+  [MEDIA_KIND.PRODUCT_IMAGE]: Object.freeze({
+    accept: "image/jpeg,image/png,image/webp",
+    mimeTypes: ["image/jpeg", "image/png", "image/webp"],
+    maxBytes: 8 * 1024 * 1024,
+    // A pack shot for the catalogue; the server limits it to 1600px, so
+    // that is all that is worth sending.
+    compress: Object.freeze({ maxDimension: 1600, quality: 0.85 }),
     label: "JPG, PNG or WebP. Large photos are resized automatically.",
   }),
   [MEDIA_KIND.RESUME]: Object.freeze({
