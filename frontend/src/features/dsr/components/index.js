@@ -5,3 +5,5 @@ export { default as DSRStatusBadge } from "./DSRStatusBadge";
 export { default as DSRSubmitForm } from "./DSRSubmitForm";
 export { default as MyDSRListView } from "./MyDSRListView";
 export { default as TeamDSRListView } from "./TeamDSRListView";
+export { default as DSRPrintRouteView } from "./DSRPrintRouteView";
+export { default as DSRPrintView } from "./DSRPrintView";

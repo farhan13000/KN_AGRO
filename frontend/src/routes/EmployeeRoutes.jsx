@@ -41,6 +41,8 @@ const EmployeeProductRecommendationsPage = lazy(
 );
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
+const DSRPrintRouteView = lazy(() => import("../features/dsr/components/DSRPrintRouteView"));
+
 const withPermission = (permission, element) => (
   <PermissionGuard
     fallback={<Navigate replace to={ROUTES.ERROR.UNAUTHORIZED} />}
@@ -145,6 +147,10 @@ export const employeeRouteConfig = {
         {
           path: ROUTES.EMPLOYEE.INVOICE_PRINT,
           element: withPermission(PERMISSIONS.INVOICES_READ, <EmployeeInvoicePrintPage />),
+        },
+        {
+          path: ROUTES.EMPLOYEE.DSR_PRINT,
+          element: withPermission(PERMISSIONS.DSR_READ_SELF, <DSRPrintRouteView backTo={`${ROUTES.EMPLOYEE.MY_WORKSPACE}?tab=dsrs`} />),
         },
         {
           path: ROUTES.EMPLOYEE.PAYMENTS,

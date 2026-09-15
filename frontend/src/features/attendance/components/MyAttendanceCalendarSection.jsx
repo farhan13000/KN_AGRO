@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
+import { MessageCircle } from "lucide-react";
 import ErrorState from "../../../shared/components/ErrorState";
-import { formatBusinessDateTime } from "../../../shared/utils";
 import Modal from "../../../shared/components/Modal";
 import { useMyAttendanceList } from "../hooks";
 import AttendanceCalendar from "./AttendanceCalendar";
-import AttendanceStatusBadge from "./AttendanceStatusBadge";
+import AttendanceDayDetails from "./AttendanceDayDetails";
+import { AttendanceReviewRequestDialog } from "./AttendanceReviewDialogs";
 
 /**
  * The calendar for your own attendance.
@@ -31,12 +32,17 @@ export default function MyAttendanceCalendarSection() {
   const now = new Date();
   const [period, setPeriod] = useState({ month: now.getMonth() + 1, year: now.getFullYear() });
   const [selected, setSelected] = useState(null);
+  const [requesting, setRequesting] = useState(null);
 
   const query = useMemo(
     () => ({ ...monthBounds(period.year, period.month), limit: 100, page: 1, sortOrder: "asc" }),
     [period],
   );
-  const { errorMessage, isError, records } = useMyAttendanceList(query);
+  const { errorMessage, isError, records, refetch } = useMyAttendanceList(query);
+
+  // A half day can be sent to the manager once; after that the day shows
+  // the pending request or the decision instead of the button.
+  const canAskForReview = selected?.status === "HALF_DAY" && selected?.review?.status !== "PENDING";
 
   return (
     <>
@@ -52,46 +58,35 @@ export default function MyAttendanceCalendarSection() {
       />
 
       <Modal isOpen={Boolean(selected)} onClose={() => setSelected(null)} title="That day">
-        {selected ? (
-          <div className="space-y-4">
-            <AttendanceStatusBadge status={selected.status} />
-            <dl className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <dt className="text-xs font-black uppercase tracking-wide text-muted">Check-In</dt>
-                <dd className="mt-1 text-sm text-ink">
-                  {selected.checkIn ? formatBusinessDateTime(selected.checkIn) : "Not marked"}
-                </dd>
-                {selected.checkInPhoto?.url ? (
-                  <img
-                    alt="Check-in location"
-                    className="mt-2 h-32 w-full rounded-lg object-cover ring-1 ring-forest/15"
-                    src={selected.checkInPhoto.url}
-                  />
-                ) : null}
-              </div>
-              <div>
-                <dt className="text-xs font-black uppercase tracking-wide text-muted">Check-Out</dt>
-                <dd className="mt-1 text-sm text-ink">
-                  {selected.checkOut ? formatBusinessDateTime(selected.checkOut) : "Not marked"}
-                </dd>
-                {selected.checkOutPhoto?.url ? (
-                  <img
-                    alt="Check-out location"
-                    className="mt-2 h-32 w-full rounded-lg object-cover ring-1 ring-forest/15"
-                    src={selected.checkOutPhoto.url}
-                  />
-                ) : null}
-              </div>
-            </dl>
-            {selected.workingMinutes ? (
-              <p className="text-sm text-muted">
-                Worked {Math.floor(selected.workingMinutes / 60)}h {selected.workingMinutes % 60}m.
-              </p>
-            ) : null}
-            {selected.remarks ? <p className="text-sm text-ink">{selected.remarks}</p> : null}
-          </div>
-        ) : null}
+        <AttendanceDayDetails
+          actions={
+            canAskForReview ? (
+              <button
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-forest px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-agriculture"
+                onClick={() => {
+                  setRequesting(selected);
+                  setSelected(null);
+                }}
+                type="button"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Discuss with manager
+              </button>
+            ) : null
+          }
+          record={selected}
+        />
       </Modal>
+
+      <AttendanceReviewRequestDialog
+        isOpen={Boolean(requesting)}
+        onClose={() => setRequesting(null)}
+        onSuccess={async () => {
+          setRequesting(null);
+          await refetch?.();
+        }}
+        record={requesting}
+      />
     </>
   );
 }

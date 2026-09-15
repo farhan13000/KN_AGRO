@@ -96,6 +96,8 @@ const SalesManagerProductRecommendationsPage = lazy(
 );
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
+const DSRPrintRouteView = lazy(() => import("../features/dsr/components/DSRPrintRouteView"));
+
 const withPermission = (permission, element) => (
   <PermissionGuard
     fallback={<Navigate replace to={ROUTES.ERROR.UNAUTHORIZED} />}
@@ -256,6 +258,10 @@ export const salesManagerRouteConfig = {
         {
           path: ROUTES.SALES_MANAGER.INVOICE_PRINT,
           element: withPermission(PERMISSIONS.INVOICES_READ, <SalesManagerInvoicePrintPage />),
+        },
+        {
+          path: ROUTES.SALES_MANAGER.DSR_PRINT,
+          element: withPermission(PERMISSIONS.DSR_READ_SELF, <DSRPrintRouteView backTo={ROUTES.SALES_MANAGER.DSRS} />),
         },
         {
           path: ROUTES.SALES_MANAGER.PAYMENTS,

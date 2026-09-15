@@ -19,7 +19,7 @@ import DSRReviewDialog from "./DSRReviewDialog";
  * acknowledge" checks are the real gate; a 403 here is an expected,
  * explainable outcome for a permitted-but-out-of-chain actor, not a bug.
  */
-export default function TeamDSRListView({ description, portalLabel, showHeading = true }) {
+export default function TeamDSRListView({ description, portalLabel, printRoute, showHeading = true }) {
   const { hasPermission } = useAuth();
   const [reviewing, setReviewing] = useState(null);
   const [acknowledging, setAcknowledging] = useState(null);
@@ -103,7 +103,13 @@ export default function TeamDSRListView({ description, portalLabel, showHeading 
       {state.dsrs.length ? (
         <ul className="space-y-3">
           {state.dsrs.map((dsr) => (
-            <DSRCard actions={actionsFor(dsr)} dsr={dsr} key={dsr._id} showEmployee />
+            <DSRCard
+              actions={actionsFor(dsr)}
+              dsr={dsr}
+              key={dsr._id}
+              printHref={printRoute ? printRoute.replace(":dsrId", dsr._id) : null}
+              showEmployee
+            />
           ))}
         </ul>
       ) : null}

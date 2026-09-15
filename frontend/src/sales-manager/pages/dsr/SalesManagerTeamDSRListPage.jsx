@@ -1,3 +1,4 @@
+import { ROUTES } from "../../../shared/constants";
 import { TeamDSRListView } from "../../../features/dsr";
 
 export default function SalesManagerTeamDSRListPage({ showHeading = true }) {
@@ -5,6 +6,7 @@ export default function SalesManagerTeamDSRListPage({ showHeading = true }) {
     <TeamDSRListView
       description="DSRs from your downline. Review and Acknowledge are only available if the backend confirms you manage this employee."
       portalLabel="My Team"
+      printRoute={ROUTES.SALES_MANAGER.DSR_PRINT}
       showHeading={showHeading}
     />
   );

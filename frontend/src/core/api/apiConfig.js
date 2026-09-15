@@ -215,6 +215,8 @@ export const API_ENDPOINTS = Object.freeze({
   DSR: {
     BASE: "/dsr",
     ME: "/dsr/me",
+    ME_DRAFT: "/dsr/me/draft",
+    DETAIL: (dsrId) => `/dsr/${dsrId}`,
     TEAM: "/dsr/team",
     REVIEW: (dsrId) => `/dsr/${dsrId}/review`,
     ACKNOWLEDGE: (dsrId) => `/dsr/${dsrId}/acknowledge`,
@@ -259,6 +261,8 @@ export const API_ENDPOINTS = Object.freeze({
     TEAM_SUMMARY: "/attendance/team/summary",
     TEAM: "/attendance/team",
     CORRECT: (attendanceId) => `/attendance/${attendanceId}/correct`,
+    REVIEW_REQUEST: (attendanceId) => `/attendance/${attendanceId}/review-request`,
+    REVIEW: (attendanceId) => `/attendance/${attendanceId}/review`,
     BASE: "/attendance",
   },
   LEAVES: {

@@ -11,7 +11,12 @@ export const useMyDSRList = (query = {}, options) => {
   return { ...state, dsrs: state.data?.dsrs || [], pagination: state.data?.pagination || {} };
 };
 
-export const useTeamDSRList = (query = {}, options) => {
+export const useMyDSRDraft = (options) => {
+  const request = useCallback(() => dsrApi.getMyDSRDraft(), []);
+  return useAsyncResource(["dsr", "me", "draft"], request, options);
+};
+
+export const useTeamDSRList =(query = {}, options) => {
   const requestQuery = useMemo(() => withDefaultQuery(query), [query]);
   const request = useCallback(() => dsrApi.listTeamDSRs(requestQuery), [requestQuery]);
   const state = useAsyncResource(["dsr", "team", requestQuery], request, options);
@@ -25,7 +30,12 @@ export const useAllDSRList = (query = {}, options) => {
   return { ...state, dsrs: state.data?.dsrs || [], pagination: state.data?.pagination || {} };
 };
 
-export const useDSRActions = ({ onSuccess } = {}) => ({
+export const useDSRDetail = (dsrId, options) => {
+  const request = useCallback(() => dsrApi.getDSR(dsrId), [dsrId]);
+  return useAsyncResource(["dsr", "detail", dsrId], request, { enabled: Boolean(dsrId), ...options });
+};
+
+export const useDSRActions =({ onSuccess } = {}) => ({
   submitDSR: useAsyncMutation(dsrApi.submitDSR, { onSuccess }),
   reviewDSR: useAsyncMutation(dsrApi.reviewDSR, { onSuccess }),
   acknowledgeDSR: useAsyncMutation(dsrApi.acknowledgeDSR, { onSuccess }),

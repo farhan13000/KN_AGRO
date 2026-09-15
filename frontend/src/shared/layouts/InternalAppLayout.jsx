@@ -5,6 +5,7 @@ import logo from "../../assets/KN_AGRO_LOGO.png";
 import { useAuth } from "../../core/auth";
 import { NotificationBell } from "../../features/notifications";
 import { PERMISSIONS, ROLE_LABELS, ROUTES } from "../constants";
+import InstallInstructionsDialog from "../components/InstallInstructionsDialog";
 import { useInstallPrompt } from "../hooks";
 
 const getInitials = (name = "") =>
@@ -119,14 +120,27 @@ export default function InternalAppLayout({ navigationItems, portalLabel }) {
   const { hasPermission } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
-  // Only ever true when the browser has actually offered an install and
-  // the app is not already running installed — see useInstallPrompt.
-  const { canInstall, promptInstall } = useInstallPrompt();
+  // True when the browser can install the app, or on Apple devices (where
+  // the button shows the Add-to-Home-Screen steps instead) — never once
+  // the app is already running installed. See useInstallPrompt.
+  const { canInstall, installMode, promptInstall } = useInstallPrompt();
+  const [showInstallSteps, setShowInstallSteps] = useState(false);
+  const handleInstall = async () => {
+    if ((await promptInstall()) === "manual") setShowInstallSteps(true);
+  };
   const desktopSidebarClass = desktopCollapsed ? "lg:w-24" : "lg:w-72";
   const desktopContentClass = desktopCollapsed ? "lg:pl-24" : "lg:pl-72";
 
   return (
     <div className="min-h-screen bg-ivory text-ink">
+      {/* Outside the sidebar: its translate transform would otherwise trap
+          the dialog's fixed overlay inside the sidebar. */}
+      <InstallInstructionsDialog
+        isOpen={showInstallSteps}
+        onClose={() => setShowInstallSteps(false)}
+        platform={installMode}
+      />
+
       {sidebarOpen ? (
         <div className="fixed inset-0 z-40 bg-ink/40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       ) : null}
@@ -162,7 +176,7 @@ export default function InternalAppLayout({ navigationItems, portalLabel }) {
             className={`mt-3 inline-flex min-h-10 items-center gap-2 rounded-xl bg-mint/70 px-3 py-2 text-xs font-bold text-forest ring-1 ring-forest/15 transition hover:bg-mint ${
               desktopCollapsed ? "lg:justify-center lg:px-0" : ""
             }`}
-            onClick={promptInstall}
+            onClick={handleInstall}
             title="Install KN Agro as an app"
             type="button"
           >

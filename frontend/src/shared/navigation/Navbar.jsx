@@ -7,6 +7,7 @@ import { useLanguage } from "../../i18n/LanguageContext";
 import { ROUTES } from "../constants";
 import Button from "../components/Button";
 import Icon from "../components/Icon";
+import InstallInstructionsDialog from "../components/InstallInstructionsDialog";
 import { useInstallPrompt } from "../hooks";
 import { useCustomerAuth } from "../../modules/public/account/context/CustomerAuthContext";
 import LanguageToggle from "./LanguageToggle";
@@ -16,11 +17,15 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { t } = useLanguage();
   const location = useLocation();
-  // Same hook as the portal sidebar: true only when the browser has
-  // actually offered an install and the app is not already running
-  // installed. So this never shows on iOS Safari (which offers no install
-  // prompt at all) or inside the installed app itself.
-  const { canInstall, promptInstall } = useInstallPrompt();
+  // Same hook as the portal sidebar: offered when the browser can install
+  // the app, or on Apple devices (which have no install prompt, so the
+  // button shows the Add-to-Home-Screen steps) — never inside the
+  // installed app itself.
+  const { canInstall, installMode, promptInstall } = useInstallPrompt();
+  const [showInstallSteps, setShowInstallSteps] = useState(false);
+  const handleInstall = async () => {
+    if ((await promptInstall()) === "manual") setShowInstallSteps(true);
+  };
   // The website customer, not a staff member. The two sessions are
   // separate, which is why the staff "Login" button below stays exactly
   // where it was.
@@ -43,6 +48,7 @@ export default function Navbar() {
     }`;
 
   return (
+    <>
     <header
       className={`sticky top-0 z-50 border-b border-forest/10 bg-white/95 backdrop-blur transition ${
         isScrolled ? "shadow-card" : ""
@@ -80,7 +86,7 @@ export default function Navbar() {
           {canInstall ? (
             <button
               className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-mint px-4 py-3 text-sm font-bold text-forest ring-1 ring-forest/15 transition hover:bg-white"
-              onClick={promptInstall}
+              onClick={handleInstall}
               title={t("Install KN Agro as an app")}
               type="button"
             >
@@ -103,7 +109,7 @@ export default function Navbar() {
             <button
               aria-label={t("Install App")}
               className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl bg-forest px-3 text-xs font-bold text-white shadow-soft transition hover:bg-agriculture"
-              onClick={promptInstall}
+              onClick={handleInstall}
               type="button"
             >
               <Download className="h-4 w-4" />
@@ -144,5 +150,14 @@ export default function Navbar() {
         </div>
       ) : null}
     </header>
+
+    {/* Outside the header: its backdrop-blur would otherwise become the
+        containing block for the dialog's fixed overlay. */}
+    <InstallInstructionsDialog
+      isOpen={showInstallSteps}
+      onClose={() => setShowInstallSteps(false)}
+      platform={installMode}
+    />
+    </>
   );
 }

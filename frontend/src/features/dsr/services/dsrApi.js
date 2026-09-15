@@ -15,6 +15,18 @@ export const dsrApi = {
     return post(API_ENDPOINTS.DSR.BASE, payload);
   },
 
+  // Today's report pre-filled from the day's leads, orders, payments and
+  // attendance meter readings, plus the option lists the form needs.
+  async getMyDSRDraft() {
+    const response = await apiClient.get(API_ENDPOINTS.DSR.ME_DRAFT);
+    return unwrapApiData(response);
+  },
+
+  async getDSR(dsrId) {
+    const response = await apiClient.get(API_ENDPOINTS.DSR.DETAIL(dsrId));
+    return unwrapApiData(response);
+  },
+
   async listMyDSRs(query) {
     const response = await apiClient.get(API_ENDPOINTS.DSR.ME, { params: cleanQuery(query) });
     return unwrapApiData(response);

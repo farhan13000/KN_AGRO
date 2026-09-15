@@ -4,14 +4,20 @@ import EmptyState from "../../../shared/components/EmptyState";
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
 import Pagination from "../../../shared/components/Pagination";
+import { PERMISSIONS } from "../../../shared/constants";
+import { useAuth } from "../../../core/auth";
 import { useAllAttendanceList } from "../hooks";
 import AttendanceCorrectionDialog from "./AttendanceCorrectionDialog";
+import AttendanceRecordDialog from "./AttendanceRecordDialog";
 import AttendanceTable from "./AttendanceTable";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
 export default function AllAttendanceListView({ description, portalLabel }) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { hasPermission } = useAuth();
+  const canCorrect = hasPermission(PERMISSIONS.ATTENDANCE_CORRECT);
+  const [viewingRecord, setViewingRecord] = useState(null);
   const [correctingRecord, setCorrectingRecord] = useState(null);
   const query = {
     page: Number(getQueryValue(searchParams, "page", "1")),
@@ -36,10 +42,6 @@ export default function AllAttendanceListView({ description, portalLabel }) {
         <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
         <h1 className="mt-2 text-3xl font-black text-ink">Company-Wide Attendance</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
-        <p className="mt-2 text-xs font-semibold text-muted">
-          ATTENDANCE_READ_ALL and ATTENDANCE_CORRECT are currently held only via the SA wildcard —
-          no seeded role grants either directly.
-        </p>
       </div>
 
       <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
@@ -72,7 +74,12 @@ export default function AllAttendanceListView({ description, portalLabel }) {
       ) : null}
       {!isLoading && !isError && records.length ? (
         <>
-          <AttendanceTable onCorrect={setCorrectingRecord} records={records} showEmployee />
+          <AttendanceTable
+            onCorrect={canCorrect ? setCorrectingRecord : undefined}
+            onView={setViewingRecord}
+            records={records}
+            showEmployee
+          />
           <Pagination
             ariaLabel="Attendance pagination"
             onPageChange={(page) => updateQuery({ page })}
@@ -81,6 +88,8 @@ export default function AllAttendanceListView({ description, portalLabel }) {
           />
         </>
       ) : null}
+
+      <AttendanceRecordDialog onChanged={refetch} onClose={() => setViewingRecord(null)} record={viewingRecord} />
 
       <AttendanceCorrectionDialog
         isOpen={Boolean(correctingRecord)}

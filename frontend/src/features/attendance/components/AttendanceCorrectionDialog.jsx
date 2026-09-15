@@ -16,13 +16,18 @@ const toDateTimeLocal = (value) => {
   return `${parsed.getFullYear()}-${pad(parsed.getMonth() + 1)}-${pad(parsed.getDate())}T${pad(parsed.getHours())}:${pad(parsed.getMinutes())}`;
 };
 
-// checkIn/checkOut/status/remarks are all OPTIONAL on the backend's own
-// attendanceCorrectionSchema — only correctionReason is required. Blank
-// datetime fields are simply omitted from the payload, leaving that
-// field untouched server-side.
+const toReadingField = (value) => (typeof value === "number" ? String(value) : "");
+
+// checkIn/checkOut/status/remarks/meter readings are all OPTIONAL on the
+// backend's own attendanceCorrectionSchema — only correctionReason is
+// required. Blank fields are simply omitted from the payload, leaving
+// that field untouched server-side; a meter reading is only sent when it
+// actually differs from what is stored.
 export default function AttendanceCorrectionDialog({ isOpen, onClose, onSuccess, record }) {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
+  const [checkInReading, setCheckInReading] = useState("");
+  const [checkOutReading, setCheckOutReading] = useState("");
   const [status, setStatus] = useState("");
   const [remarks, setRemarks] = useState("");
   const [correctionReason, setCorrectionReason] = useState("");
@@ -32,6 +37,8 @@ export default function AttendanceCorrectionDialog({ isOpen, onClose, onSuccess,
   const resetAndClose = () => {
     setCheckIn("");
     setCheckOut("");
+    setCheckInReading("");
+    setCheckOutReading("");
     setStatus("");
     setRemarks("");
     setCorrectionReason("");
@@ -43,6 +50,8 @@ export default function AttendanceCorrectionDialog({ isOpen, onClose, onSuccess,
     if (isOpen && record) {
       setCheckIn(toDateTimeLocal(record.checkIn));
       setCheckOut(toDateTimeLocal(record.checkOut));
+      setCheckInReading(toReadingField(record.checkInMeterReading));
+      setCheckOutReading(toReadingField(record.checkOutMeterReading));
       setStatus(record.status || "");
       setRemarks(record.remarks || "");
       setCorrectionReason("");
@@ -63,6 +72,19 @@ export default function AttendanceCorrectionDialog({ isOpen, onClose, onSuccess,
     if (checkOut) payload.checkOut = new Date(checkOut).toISOString();
     if (status) payload.status = status;
     if (remarks.trim()) payload.remarks = remarks.trim();
+
+    for (const [value, key] of [
+      [checkInReading, "checkInMeterReading"],
+      [checkOutReading, "checkOutMeterReading"],
+    ]) {
+      if (value === "") continue;
+      const number = Number(value);
+      if (!Number.isFinite(number) || number < 0) {
+        setFormError("Meter readings must be valid numbers.");
+        return;
+      }
+      if (number !== record[key]) payload[key] = number;
+    }
 
     try {
       await correctAttendance.mutate(record._id, payload);
@@ -90,6 +112,26 @@ export default function AttendanceCorrectionDialog({ isOpen, onClose, onSuccess,
             onChange={(event) => setCheckOut(event.target.value)}
             type="datetime-local"
             value={checkOut}
+          />
+          <TextInput
+            id="correction-check-in-reading"
+            inputMode="decimal"
+            label="Check-In Meter (km)"
+            min="0"
+            onChange={(event) => setCheckInReading(event.target.value)}
+            step="any"
+            type="number"
+            value={checkInReading}
+          />
+          <TextInput
+            id="correction-check-out-reading"
+            inputMode="decimal"
+            label="Check-Out Meter (km)"
+            min="0"
+            onChange={(event) => setCheckOutReading(event.target.value)}
+            step="any"
+            type="number"
+            value={checkOutReading}
           />
         </div>
         <Select

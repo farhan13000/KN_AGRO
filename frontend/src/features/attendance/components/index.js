@@ -9,3 +9,4 @@ export { default as AttendanceTable } from "./AttendanceTable";
 export { default as AttendanceTodayWidget } from "./AttendanceTodayWidget";
 export { default as MyAttendanceListView } from "./MyAttendanceListView";
 export { default as TeamAttendanceListView } from "./TeamAttendanceListView";
+export { default as AttendanceRecordDialog } from "./AttendanceRecordDialog";

@@ -3,22 +3,23 @@ import { useCallback, useEffect, useState } from "react";
 /**
  * Whether this app can be installed right now, and how to do it.
  *
- * The browser fires `beforeinstallprompt` only when it considers the app
- * installable AND not already installed — so having a deferred prompt IS
- * the "can install" signal; nothing here needs to guess at it.
+ * Two very different install paths exist:
  *
- * Three things independently mean "don't offer it":
- *   - the browser never offered a prompt (already installed, or a browser
- *     that does not support installing — iOS Safari never fires this
- *     event, so there is no programmatic install to offer there);
- *   - the page is already RUNNING as an installed app, which
- *     `display-mode: standalone` reports (plus `navigator.standalone`,
- *     which is the only signal iOS gives);
- *   - the app was installed during this session, which fires `appinstalled`.
+ *  - "prompt": Chrome, Edge, Samsung Internet… fire `beforeinstallprompt`
+ *    when they consider the app installable and not yet installed. Having
+ *    that deferred event IS the "can install" signal, and calling
+ *    `prompt()` on it opens the browser's own install dialog.
  *
- * The listeners are attached once and cleaned up on unmount; the deferred
- * event is kept because it can only be prompted with once, and only in
- * response to a real user gesture.
+ *  - "ios" / "mac-safari": Apple never fires that event, and offers no
+ *    API to trigger an install. On iPhone/iPad the only way is Share →
+ *    "Add to Home Screen"; on a Mac, Safari's File → "Add to Dock". So on
+ *    Apple devices the button is always offered (unless already running
+ *    installed) and pressing it returns "manual", for the caller to show
+ *    those steps instead.
+ *
+ * "Already installed" is `display-mode: standalone`, plus
+ * `navigator.standalone`, the only signal iOS gives. `appinstalled` covers
+ * an install during this session on the prompt path.
  */
 const isRunningInstalled = () => {
   if (typeof window === "undefined") return false;
@@ -26,6 +27,39 @@ const isRunningInstalled = () => {
   // iOS Safari exposes this instead of the display-mode media query.
   const iosStandalone = window.navigator?.standalone === true;
   return Boolean(standaloneDisplay || iosStandalone);
+};
+
+/**
+ * "ios" for iPhone/iPad/iPod — including iPadOS, which by default reports
+ * itself as a Mac and is told apart only by having a touch screen.
+ * "mac-safari" for Safari on a Mac (not Chrome/Edge/Firefox there, which
+ * either fire the prompt or cannot install). Otherwise null.
+ */
+export const detectAppleInstallPlatform = () => {
+  if (typeof navigator === "undefined") return null;
+  const ua = navigator.userAgent || "";
+  const isTouchMac = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+  if (/iPad|iPhone|iPod/.test(ua) || isTouchMac) return "ios";
+
+  const isMac = /Macintosh/.test(ua);
+  const isSafari = /Safari\//.test(ua) && !/Chrome\/|Chromium\/|Edg\/|OPR\/|Firefox\//.test(ua);
+  return isMac && isSafari ? "mac-safari" : null;
+};
+
+/**
+ * Which iOS browser this is, because the steps differ: Safari's Share
+ * button is in the bottom bar, Chrome/Edge put Share in the address bar,
+ * and apps' built-in browsers (Instagram, Facebook, WhatsApp…) cannot add
+ * to the Home Screen at all.
+ */
+export const detectIosBrowser = () => {
+  if (typeof navigator === "undefined") return "safari";
+  const ua = navigator.userAgent || "";
+  if (/FBAN|FBAV|Instagram|Line\/|WhatsApp|Snapchat|GSA\//.test(ua)) return "in-app";
+  if (/CriOS/.test(ua)) return "chrome";
+  if (/EdgiOS/.test(ua)) return "edge";
+  if (/FxiOS/.test(ua)) return "firefox";
+  return "safari";
 };
 
 export const useInstallPrompt = () => {
@@ -38,6 +72,7 @@ export const useInstallPrompt = () => {
     () => (typeof window === "undefined" ? null : window.__knAgroInstallPrompt || null),
   );
   const [installed, setInstalled] = useState(isRunningInstalled);
+  const [applePlatform] = useState(detectAppleInstallPlatform);
 
   useEffect(() => {
     const onBeforeInstallPrompt = (event) => {
@@ -82,8 +117,11 @@ export const useInstallPrompt = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // The real prompt wins when a browser offers one (e.g. a future Safari).
+  const installMode = installed ? null : deferredPrompt ? "prompt" : applePlatform;
+
   const promptInstall = useCallback(async () => {
-    if (!deferredPrompt) return "unavailable";
+    if (!deferredPrompt) return applePlatform ? "manual" : "unavailable";
 
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
@@ -94,10 +132,11 @@ export const useInstallPrompt = () => {
     setDeferredPrompt(null);
     if (outcome === "accepted") setInstalled(true);
     return outcome;
-  }, [deferredPrompt]);
+  }, [applePlatform, deferredPrompt]);
 
   return {
-    canInstall: Boolean(deferredPrompt) && !installed,
+    canInstall: Boolean(installMode),
+    installMode,
     installed,
     promptInstall,
   };

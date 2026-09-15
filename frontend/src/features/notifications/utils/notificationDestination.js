@@ -59,7 +59,15 @@ const ACTION_ROUTE_BUILDERS = Object.freeze({
   // Sent to an employee whose attendance record a manager corrected —
   // goes to their own My Attendance view. Same ATTENDANCE fallback as
   // above for the Super Admin portal, which has no separate ME route.
-  VIEW_MY_ATTENDANCE: (routes) => routes.ATTENDANCE_ME || routes.ATTENDANCE || null,
+  VIEW_MY_ATTENDANCE: (routes) => routes.ATTENDANCE_ME || routes.ATTENDANCE || routes.MY_WORKSPACE || null,
+  // An employee asked their manager to review a half day. `referenceId` is
+  // the EMPLOYEE, so this opens that person's team page, where the pending
+  // request sits above their month. The manager portal calls that route
+  // TEAM_MEMBER_DETAIL; the Super Admin and field portals MY_TEAM_MEMBER.
+  REVIEW_ATTENDANCE: (routes, id) => {
+    const template = routes.TEAM_MEMBER_DETAIL || routes.MY_TEAM_MEMBER;
+    return template && id ? template.replace(":employeeId", id) : null;
+  },
   // Sent to a manager (SO/ASM/RM/GM) when someone in their chain submits
   // a DSR — goes to that manager's own team DSR view. Only the Sales
   // Manager portal has a DSR_TEAM route; every DSR_SUBMITTED recipient

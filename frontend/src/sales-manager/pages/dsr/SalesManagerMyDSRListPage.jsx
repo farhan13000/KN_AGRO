@@ -6,6 +6,7 @@ export default function SalesManagerMyDSRListPage({ showHeading = true }) {
     <MyDSRListView
       description="Every DSR you've submitted, newest first."
       portalLabel="My Team"
+      printRoute={ROUTES.SALES_MANAGER.DSR_PRINT}
       showHeading={showHeading}
       submitHref={ROUTES.SALES_MANAGER.DSR_SUBMIT}
     />

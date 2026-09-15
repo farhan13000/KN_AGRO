@@ -47,4 +47,12 @@ export const useAttendanceActions = ({ onSuccess } = {}) => ({
     (attendanceId, payload) => attendanceApi.correctAttendance(attendanceId, payload),
     { onSuccess },
   ),
+  requestReview: useAsyncMutation(
+    (attendanceId, message) => attendanceApi.requestReview(attendanceId, message),
+    { onSuccess },
+  ),
+  resolveReview: useAsyncMutation(
+    (attendanceId, payload) => attendanceApi.resolveReview(attendanceId, payload),
+    { onSuccess },
+  ),
 });

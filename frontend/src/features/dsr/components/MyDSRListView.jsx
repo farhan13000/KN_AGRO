@@ -6,7 +6,7 @@ import { PERMISSIONS } from "../../../shared/constants";
 import { useMyDSRList } from "../hooks";
 import DSRCard from "./DSRCard";
 
-export default function MyDSRListView({ description, portalLabel, showHeading = true, submitHref }) {
+export default function MyDSRListView({ description, portalLabel, printRoute, showHeading = true, submitHref }) {
   const { hasPermission } = useAuth();
   const state = useMyDSRList();
 
@@ -39,7 +39,12 @@ export default function MyDSRListView({ description, portalLabel, showHeading = 
       {state.dsrs.length ? (
         <ul className="space-y-3">
           {state.dsrs.map((dsr) => (
-            <DSRCard dsr={dsr} key={dsr._id} showEmployee={false} />
+            <DSRCard
+              dsr={dsr}
+              key={dsr._id}
+              printHref={printRoute ? printRoute.replace(":dsrId", dsr._id) : null}
+              showEmployee={false}
+            />
           ))}
         </ul>
       ) : null}

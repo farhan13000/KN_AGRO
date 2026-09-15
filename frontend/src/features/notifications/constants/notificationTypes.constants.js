@@ -79,6 +79,8 @@ export const NOTIFICATION_TYPE = Object.freeze({
   ATTENDANCE_CHECKED_IN: "ATTENDANCE_CHECKED_IN",
   ATTENDANCE_CHECKED_OUT: "ATTENDANCE_CHECKED_OUT",
   ATTENDANCE_CORRECTED: "ATTENDANCE_CORRECTED",
+  ATTENDANCE_REVIEW_REQUESTED: "ATTENDANCE_REVIEW_REQUESTED",
+  ATTENDANCE_REVIEW_RESOLVED: "ATTENDANCE_REVIEW_RESOLVED",
 
   DSR_SUBMITTED: "DSR_SUBMITTED",
   DSR_REQUESTED: "DSR_REQUESTED",
@@ -172,6 +174,8 @@ export const NOTIFICATION_TYPE_META = Object.freeze({
   [NOTIFICATION_TYPE.ATTENDANCE_CHECKED_IN]: { icon: LogIn, label: "Checked in" },
   [NOTIFICATION_TYPE.ATTENDANCE_CHECKED_OUT]: { icon: LogOut, label: "Checked out" },
   [NOTIFICATION_TYPE.ATTENDANCE_CORRECTED]: { icon: ClipboardEdit, label: "Attendance corrected" },
+  [NOTIFICATION_TYPE.ATTENDANCE_REVIEW_REQUESTED]: { icon: MessageCircle, label: "Attendance review requested" },
+  [NOTIFICATION_TYPE.ATTENDANCE_REVIEW_RESOLVED]: { icon: CalendarCheck, label: "Attendance review decided" },
 
   [NOTIFICATION_TYPE.DSR_SUBMITTED]: { icon: ClipboardCheck, label: "DSR submitted" },
   [NOTIFICATION_TYPE.DSR_REQUESTED]: { icon: ClipboardList, label: "Daily report requested" },

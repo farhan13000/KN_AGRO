@@ -1,41 +1,67 @@
-import { useState } from "react";
-import { LogIn, LogOut } from "lucide-react";
+import { useEffect, useState } from "react";
+import { LogIn, LogOut, MessageCircle } from "lucide-react";
 import Card from "../../../shared/components/Card";
-import { formatBusinessDateTime } from "../../../shared/utils";
 import { useAttendanceActions, useMyAttendanceToday } from "../hooks";
+import {
+  DEFAULT_ATTENDANCE_POLICY,
+  TONE_CLASSES,
+  describeCheckIn,
+  describeCheckOut,
+  describePolicy,
+} from "../utils/attendancePolicy";
+import AttendanceDayDetails from "./AttendanceDayDetails";
 import AttendanceMarkDialog from "./AttendanceMarkDialog";
-import AttendanceStatusBadge from "./AttendanceStatusBadge";
+import { AttendanceReviewRequestDialog } from "./AttendanceReviewDialogs";
 
 /**
- * Dashboard widget — check in/out for today. `GET /attendance/me/today`'s
- * own `marked` flag (not "is checkOut null") decides which state to
- * show: a day can be marked (e.g. HOLIDAY/WEEK_OFF, no check-in expected)
- * without ever having a check-in at all.
+ * Today's attendance: the rule, a live warning for what pressing the
+ * button now would mean, the buttons, and — once marked — the photos,
+ * readings and distance. A half day offers "discuss with your manager".
+ *
+ * The policy comes from the backend with today's record, so the times
+ * shown are the times enforced.
  */
 export default function AttendanceTodayWidget() {
   const todayState = useMyAttendanceToday();
-  // null when closed, "in" or "out" while the photo is being taken.
+  // null when closed, "in" or "out" while the photos are being taken.
   const [marking, setMarking] = useState(null);
+  const [requestingReview, setRequestingReview] = useState(false);
+  const [now, setNow] = useState(() => new Date());
   const actions = useAttendanceActions({ onSuccess: () => todayState.refetch() });
 
+  // Keep the warning line honest if the card is left open across 9:30 or 6:00.
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
   const today = todayState.data;
+  const policy = today?.policy || DEFAULT_ATTENDANCE_POLICY;
   const hasCheckedIn = Boolean(today?.checkIn);
   const hasCheckedOut = Boolean(today?.checkOut);
 
-  // The dialog owns the photo and surfaces its own errors, so a failure
+  const liveHint = !hasCheckedIn
+    ? describeCheckIn(now, policy)
+    : !hasCheckedOut
+      ? describeCheckOut(now, policy)
+      : null;
+
+  // The dialog owns the photos and surfaces its own errors, so a failure
   // here is rethrown for it rather than swallowed into this card.
-  const confirmMark = async (photo) => {
+  const confirmMark = async (payload) => {
     const mutate = marking === "out" ? actions.checkOut.mutate : actions.checkIn.mutate;
-    await mutate(photo);
+    await mutate(payload);
     setMarking(null);
   };
+
+  const canAskForReview = today?.status === "HALF_DAY" && today?._id && today?.review?.status !== "PENDING";
 
   return (
     <Card className="p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-black text-ink">Attendance Today</h2>
-          {todayState.isLoading ? null : <AttendanceStatusBadge status={today?.status} />}
+          <p className="mt-1 text-xs font-semibold text-muted">{describePolicy(policy)}</p>
         </div>
         <div className="flex gap-3">
           <button
@@ -59,54 +85,49 @@ export default function AttendanceTodayWidget() {
         </div>
       </div>
 
-      <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-        <div>
-          <dt className="text-xs font-black uppercase tracking-wide text-muted">Check-In</dt>
-          <dd className="mt-1 text-sm text-ink">
-            {today?.checkIn ? formatBusinessDateTime(today.checkIn) : "Not yet"}
-          </dd>
-          {today?.checkInPhoto?.url ? (
-            <a
-              className="mt-2 inline-block"
-              href={today.checkInPhoto.url}
-              rel="noreferrer"
-              target="_blank"
-            >
-              <img
-                alt="Check-in location"
-                className="h-20 w-20 rounded-lg object-cover ring-1 ring-forest/15"
-                src={today.checkInPhoto.url}
-              />
-            </a>
-          ) : null}
+      {liveHint && !todayState.isLoading ? (
+        <p className={`mt-4 rounded-lg border px-3 py-2 text-sm font-semibold ${TONE_CLASSES[liveHint.tone]}`}>
+          {liveHint.message}
+        </p>
+      ) : null}
+
+      {today?.marked ? (
+        <div className="mt-4">
+          <AttendanceDayDetails
+            actions={
+              canAskForReview ? (
+                <button
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-bold text-forest ring-1 ring-forest/15 transition hover:bg-mint"
+                  onClick={() => setRequestingReview(true)}
+                  type="button"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  Discuss with manager
+                </button>
+              ) : null
+            }
+            record={today}
+          />
         </div>
-        <div>
-          <dt className="text-xs font-black uppercase tracking-wide text-muted">Check-Out</dt>
-          <dd className="mt-1 text-sm text-ink">
-            {today?.checkOut ? formatBusinessDateTime(today.checkOut) : "Not yet"}
-          </dd>
-          {today?.checkOutPhoto?.url ? (
-            <a
-              className="mt-2 inline-block"
-              href={today.checkOutPhoto.url}
-              rel="noreferrer"
-              target="_blank"
-            >
-              <img
-                alt="Check-out location"
-                className="h-20 w-20 rounded-lg object-cover ring-1 ring-forest/15"
-                src={today.checkOutPhoto.url}
-              />
-            </a>
-          ) : null}
-        </div>
-      </dl>
+      ) : null}
 
       <AttendanceMarkDialog
         isOpen={Boolean(marking)}
+        minMeterReading={marking === "out" ? today?.checkInMeterReading ?? null : null}
         mode={marking || "in"}
         onClose={() => setMarking(null)}
         onConfirm={confirmMark}
+        policy={policy}
+      />
+
+      <AttendanceReviewRequestDialog
+        isOpen={requestingReview}
+        onClose={() => setRequestingReview(false)}
+        onSuccess={async () => {
+          setRequestingReview(false);
+          await todayState.refetch();
+        }}
+        record={today}
       />
     </Card>
   );

@@ -4,18 +4,28 @@ const emptyValues = new Set(["", null, undefined]);
 const cleanQuery = (query = {}) =>
   Object.fromEntries(Object.entries(query).filter(([, value]) => !emptyValues.has(value)));
 
-// checkIn/checkOut send exactly one thing: the photo reference returned
-// by POST /media/uploads/ATTENDANCE_PHOTO. Everything else — the
-// timestamp, workingMinutes, status — stays server-computed and has no
-// field in the backend schema at all.
+// checkIn/checkOut send exactly four things: the selfie and meter photo
+// references returned by POST /media/uploads/ATTENDANCE_PHOTO, the meter
+// reading as a number, and the device location. The time, status and half-day decision stay
+// server-computed and have no field in the backend schema at all.
 export const attendanceApi = {
-  async checkIn(photo) {
-    const response = await apiClient.post(API_ENDPOINTS.ATTENDANCE.CHECK_IN, { photo });
+  async checkIn({ selfie, meterPhoto, meterReading, location }) {
+    const response = await apiClient.post(API_ENDPOINTS.ATTENDANCE.CHECK_IN, { selfie, meterPhoto, meterReading, location });
     return unwrapApiData(response);
   },
 
-  async checkOut(photo) {
-    const response = await apiClient.post(API_ENDPOINTS.ATTENDANCE.CHECK_OUT, { photo });
+  async checkOut({ selfie, meterPhoto, meterReading, location }) {
+    const response = await apiClient.post(API_ENDPOINTS.ATTENDANCE.CHECK_OUT, { selfie, meterPhoto, meterReading, location });
+    return unwrapApiData(response);
+  },
+
+  async requestReview(attendanceId, message) {
+    const response = await apiClient.post(API_ENDPOINTS.ATTENDANCE.REVIEW_REQUEST(attendanceId), { message });
+    return unwrapApiData(response);
+  },
+
+  async resolveReview(attendanceId, { decision, note }) {
+    const response = await apiClient.patch(API_ENDPOINTS.ATTENDANCE.REVIEW(attendanceId), { decision, note });
     return unwrapApiData(response);
   },
 

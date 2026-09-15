@@ -4,7 +4,7 @@ import PageLoader from "../../../shared/components/PageLoader";
 import { useAllDSRList } from "../hooks";
 import DSRCard from "./DSRCard";
 
-export default function AllDSRListView({ description, portalLabel }) {
+export default function AllDSRListView({ description, portalLabel, printRoute }) {
   const state = useAllDSRList();
 
   return (
@@ -24,7 +24,12 @@ export default function AllDSRListView({ description, portalLabel }) {
       {state.dsrs.length ? (
         <ul className="space-y-3">
           {state.dsrs.map((dsr) => (
-            <DSRCard dsr={dsr} key={dsr._id} showEmployee />
+            <DSRCard
+              dsr={dsr}
+              key={dsr._id}
+              printHref={printRoute ? printRoute.replace(":dsrId", dsr._id) : null}
+              showEmployee
+            />
           ))}
         </ul>
       ) : null}

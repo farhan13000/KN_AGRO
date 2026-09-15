@@ -1,3 +1,4 @@
+import { ROUTES } from "../../../shared/constants";
 import { AllDSRListView } from "../../../features/dsr";
 
 export default function SuperAdminAllDSRListPage() {
@@ -5,6 +6,7 @@ export default function SuperAdminAllDSRListPage() {
     <AllDSRListView
       description="Every DSR submitted company-wide. DSR_READ_ALL is currently held only via the SA wildcard — no seeded role grants it directly."
       portalLabel="Org Structure"
+      printRoute={ROUTES.SUPER_ADMIN.DSR_PRINT}
     />
   );
 }

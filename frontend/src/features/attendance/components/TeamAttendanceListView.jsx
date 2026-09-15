@@ -1,9 +1,14 @@
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import EmptyState from "../../../shared/components/EmptyState";
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
 import Pagination from "../../../shared/components/Pagination";
+import { PERMISSIONS } from "../../../shared/constants";
+import { useAuth } from "../../../core/auth";
 import { useTeamAttendanceList, useTeamAttendanceSummary } from "../hooks";
+import AttendanceCorrectionDialog from "./AttendanceCorrectionDialog";
+import AttendanceRecordDialog from "./AttendanceRecordDialog";
 import AttendanceTable from "./AttendanceTable";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
@@ -11,6 +16,10 @@ const now = new Date();
 
 export default function TeamAttendanceListView({ description, portalLabel, showHeading = true }) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { hasPermission } = useAuth();
+  const canCorrect = hasPermission(PERMISSIONS.ATTENDANCE_CORRECT);
+  const [viewingRecord, setViewingRecord] = useState(null);
+  const [correctingRecord, setCorrectingRecord] = useState(null);
   const month = Number(getQueryValue(searchParams, "month", String(now.getMonth() + 1)));
   const year = Number(getQueryValue(searchParams, "year", String(now.getFullYear())));
 
@@ -20,9 +29,13 @@ export default function TeamAttendanceListView({ description, portalLabel, showH
     from: getQueryValue(searchParams, "from") || undefined,
     to: getQueryValue(searchParams, "to") || undefined,
   };
-  const { errorMessage, isError, isLoading, pagination, records } = useTeamAttendanceList(query);
+  const { errorMessage, isError, isLoading, pagination, records, refetch } = useTeamAttendanceList(query);
   const summaryState = useTeamAttendanceSummary(month, year);
   const summaryRows = summaryState.data || [];
+
+  const refresh = async () => {
+    await Promise.all([refetch?.(), summaryState.refetch?.()]);
+  };
 
   const updateQuery = (updates) => {
     const next = new URLSearchParams(searchParams);
@@ -140,7 +153,12 @@ export default function TeamAttendanceListView({ description, portalLabel, showH
       ) : null}
       {!isLoading && !isError && records.length ? (
         <>
-          <AttendanceTable records={records} showEmployee />
+          <AttendanceTable
+            onCorrect={canCorrect ? setCorrectingRecord : undefined}
+            onView={setViewingRecord}
+            records={records}
+            showEmployee
+          />
           <Pagination
             ariaLabel="Team attendance pagination"
             onPageChange={(page) => updateQuery({ page })}
@@ -149,6 +167,15 @@ export default function TeamAttendanceListView({ description, portalLabel, showH
           />
         </>
       ) : null}
+
+      <AttendanceRecordDialog onChanged={refresh} onClose={() => setViewingRecord(null)} record={viewingRecord} />
+
+      <AttendanceCorrectionDialog
+        isOpen={Boolean(correctingRecord)}
+        onClose={() => setCorrectingRecord(null)}
+        onSuccess={refresh}
+        record={correctingRecord}
+      />
     </div>
   );
 }
