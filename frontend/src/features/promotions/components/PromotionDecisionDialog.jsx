@@ -109,7 +109,11 @@ export default function PromotionDecisionDialog({ decision, isOpen, onClose, onS
           {isLoadingPerformance ? (
             <p className="mt-2 text-sm text-muted">Loading performance…</p>
           ) : performance ? (
-            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            // One column below sm: at ~104px per cell in a 2-column phone
+            // layout, "Overdue Follow-Ups" (the longest label, 0.65rem
+            // uppercase tracked) wraps across 2-3 cramped lines. A
+            // full-width row fits it on one line instead.
+            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
               <Metric label="Leads" value={performance.assignedLeads} />
               <Metric label="Converted" value={performance.convertedLeads} />
               <Metric label="Conversion" value={`${performance.conversionRate}%`} />
