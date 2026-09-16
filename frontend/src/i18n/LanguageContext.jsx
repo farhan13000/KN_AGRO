@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { translations } from "./translations";
 
 const LanguageContext = createContext(null);
 const defaultLanguage = "en";
@@ -62,6 +61,7 @@ export function LanguageProvider({ children }) {
     if (typeof window === "undefined") return defaultLanguage;
     return window.localStorage.getItem("kn-agro-language") || defaultLanguage;
   });
+  const [dictionary, setDictionary] = useState({});
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -69,11 +69,47 @@ export function LanguageProvider({ children }) {
     window.localStorage.setItem("kn-agro-language", language);
   }, [language]);
 
+  /**
+   * The translation dictionary is a ~70KB module, and English needs none
+   * of it: every t() key IS the English string, so `dictionary[key] || key`
+   * below already returns the right text with an empty dictionary. Loading
+   * it statically therefore charged every English-only visitor for bytes
+   * they could never use, on the very first paint (this provider wraps the
+   * whole app). It is fetched on demand instead, only for a language that
+   * actually has an entry.
+   *
+   * A not-yet-arrived chunk is indistinguishable from a missing key, so
+   * the brief window before it resolves degrades to English on its own —
+   * no loading state or gating is needed. A failed fetch degrades the same
+   * way rather than breaking the page.
+   */
+  useEffect(() => {
+    if (language === defaultLanguage) {
+      setDictionary({});
+      return undefined;
+    }
+
+    // Guards against a slow fetch for a language the user has already
+    // switched away from resolving last and winning.
+    let isCurrent = true;
+
+    import("./translations")
+      .then((module) => {
+        if (isCurrent) setDictionary(module.translations[language] || {});
+      })
+      .catch(() => {
+        if (isCurrent) setDictionary({});
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [language]);
+
   const t = useMemo(
     () =>
       (key, values = {}) => {
         if (!key) return "";
-        const dictionary = translations[language] || {};
         const translated = normalizeTranslation(dictionary[key] || key);
 
         return Object.entries(values).reduce(
@@ -81,7 +117,7 @@ export function LanguageProvider({ children }) {
           translated,
         );
       },
-    [language],
+    [dictionary],
   );
 
   const value = useMemo(
