@@ -33,6 +33,11 @@ export const useAsyncResource = (queryKey, request, { enabled = true } = {}) => 
     // disabled and when cached data is being refreshed in the background
     // — the latter is exactly the no-blank-spinner behavior we want.
     isLoading: query.isLoading,
+    // True during ANY fetch, including a background refresh of cached
+    // data (unlike isLoading above). Additive — existing callers ignore
+    // it — for a page that wants its own local "refreshing" indicator
+    // instead of relying only on GlobalFetchIndicator's app-wide bar.
+    isFetching: query.isFetching,
     queryKey,
     refetch: query.refetch,
   };
