@@ -32,6 +32,11 @@ export default function EmployeeDetailSections({
 }) {
   // region/district come back as raw ids on the employee payload.
   const { districtName, regionName } = useEmployeeLocations();
+  const coverage = {
+    states: employee?.coverage?.states ?? [],
+    districts: employee?.coverage?.districts ?? [],
+    posts: employee?.coverage?.posts ?? [],
+  };
   const address = employee?.address || {};
   const emergencyContact = employee?.emergencyContact || {};
 
@@ -118,6 +123,32 @@ export default function EmployeeDetailSections({
         <DetailItem label="Country" value={address.country} />
       </Section>
 
+      <section className="rounded-lg border border-forest/10 bg-white p-5 shadow-sm" data-employee-coverage-view>
+        <h2 className="text-lg font-black text-ink">Locations Covered</h2>
+        {coverage.states.length ? (
+          <div className="mt-4 space-y-3">
+            {coverage.states.map((stateName) => {
+              const districts = coverage.districts.filter((entry) => entry.state === stateName);
+              const posts = coverage.posts.filter((entry) => entry.state === stateName);
+              return (
+                <div className="rounded-lg border border-forest/10 bg-mint/30 px-4 py-3" key={stateName}>
+                  <p className="text-sm font-black text-ink">{stateName}</p>
+                  <p className="mt-1 text-sm text-muted">
+                    {districts.length ? districts.map((entry) => entry.district).join(", ") : "No district picked"}
+                  </p>
+                  {posts.length ? (
+                    <p className="mt-1 text-xs text-muted">
+                      Posts: {posts.map((entry) => `${entry.name}${entry.pincode ? ` (${entry.pincode})` : ""}`).join(", ")}
+                    </p>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="mt-3 text-sm text-muted">No locations assigned yet.</p>
+        )}
+      </section>
       <Section title="Manager / Hierarchy">
         <DetailItem label="Manager" value={employee?.manager?.user?.name} />
         <DetailItem label="Manager Code" value={employee?.manager?.employeeCode} />

@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { PermissionGuard } from "../core/auth";
 import ProtectedRoute from "./ProtectedRoute";
 import { BACKEND_ROLES, PERMISSIONS, ROUTES } from "../shared/constants";
+const SuperAdminLocationsPage = lazy(() => import("../super-admin/pages/locations/SuperAdminLocationsPage"));
 
 const SuperAdminMyWorkspacePage = lazy(
   () => import("../super-admin/pages/me/SuperAdminMyWorkspacePage"),
@@ -181,6 +182,10 @@ export const superAdminRouteConfig = {
         {
           path: ROUTES.SUPER_ADMIN.TERRITORY,
           element: <SuperAdminTerritoryPage />,
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.LOCATIONS,
+          element: <SuperAdminLocationsPage />,
         },
         // Regions and districts are one screen now. The old paths stay as
         // redirects into the matching tab, because links to them exist all

@@ -62,6 +62,7 @@ export const ROUTES = Object.freeze({
     // Regions and districts share one screen; both paths below still
     // resolve, so existing links keep working.
     TERRITORY: "/super-admin/territory",
+    LOCATIONS: "/super-admin/locations",
     REGIONS: "/super-admin/regions",
     REGION_CREATE: "/super-admin/regions/create",
     REGION_EDIT: "/super-admin/regions/:regionId/edit",
@@ -113,6 +114,7 @@ export const ROUTES = Object.freeze({
     TEAM: "/manager/team",
     TEAM_MEMBER_DETAIL: "/manager/team/:employeeId",
     TERRITORY: "/manager/territory",
+    LOCATIONS: "/manager/locations",
     REGIONS: "/manager/regions",
     DISTRICTS: "/manager/districts",
     DISTRICT_DETAIL: "/manager/districts/:districtId",

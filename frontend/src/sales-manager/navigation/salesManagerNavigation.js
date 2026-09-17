@@ -33,8 +33,8 @@ export const salesManagerNavigation = [
   },
   {
     // Regions + districts.
-    label: "Territory",
-    route: ROUTES.SALES_MANAGER.TERRITORY,
+    label: "Locations",
+    route: ROUTES.SALES_MANAGER.LOCATIONS,
     icon: MapPin,
   },
   {

@@ -1,3 +1,4 @@
+export { default as EmployeeCoverageFields } from "./EmployeeCoverageFields";
 export {
   EmergencyContactFields,
   EmployeeAddressFields,

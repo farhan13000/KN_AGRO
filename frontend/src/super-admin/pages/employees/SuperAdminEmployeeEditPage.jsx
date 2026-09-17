@@ -8,6 +8,7 @@ import { ROUTES } from "../../../shared/constants";
 import {
   EmergencyContactFields,
   EmployeeAddressFields,
+  EmployeeCoverageFields,
   EmployeeProfileFields,
   pickUpdateEmployeePayload,
   toDateInputValue,
@@ -27,6 +28,7 @@ const toFormValues = (employee) => ({
   photo: employee?.photo || null,
   address: employee?.address || {},
   emergencyContact: employee?.emergencyContact || {},
+  coverage: employee?.coverage || { states: [], districts: [], posts: [] },
 });
 
 export default function SuperAdminEmployeeEditPage() {
@@ -124,6 +126,11 @@ export default function SuperAdminEmployeeEditPage() {
             <h2 className="text-lg font-black text-ink">Emergency Contact</h2>
             <div className="mt-4">
               <EmergencyContactFields errors={errors} onChange={handleChange} values={values} />
+            </div>
+          </section>
+          <section>
+            <div className="mt-4">
+              <EmployeeCoverageFields errors={errors} onChange={handleChange} value={values.coverage} />
             </div>
           </section>
 

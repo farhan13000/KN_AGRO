@@ -6,6 +6,7 @@ import { ROUTES } from "../../../shared/constants";
 import {
   EmergencyContactFields,
   EmployeeAddressFields,
+  EmployeeCoverageFields,
   EmployeeProfileFields,
   UserAccountFields,
   pickCreateEmployeePayload,
@@ -35,6 +36,7 @@ const initialValues = {
   photo: null,
   address: {},
   emergencyContact: {},
+  coverage: { states: [], districts: [], posts: [] },
 };
 
 /**
@@ -109,6 +111,7 @@ export default function SuperAdminEmployeeCreatePage() {
               <EmployeeProfileFields errors={errors} onChange={handleChange} values={values} />
             </div>
           </section>
+          <EmployeeCoverageFields errors={errors} onChange={handleChange} value={values.coverage} />
           <section>
             <h2 className="text-lg font-black text-ink">Placement</h2>
             <div className="mt-4 grid gap-5 sm:grid-cols-2">

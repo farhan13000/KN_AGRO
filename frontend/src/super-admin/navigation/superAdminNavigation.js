@@ -61,8 +61,8 @@ export const superAdminNavigation = [
   },
   {
     // Regions + districts.
-    label: "Territory",
-    route: ROUTES.SUPER_ADMIN.TERRITORY,
+    label: "Locations",
+    route: ROUTES.SUPER_ADMIN.LOCATIONS,
     icon: MapPin,
   },
   {

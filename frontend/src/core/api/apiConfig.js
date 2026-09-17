@@ -207,6 +207,15 @@ export const API_ENDPOINTS = Object.freeze({
   PAYMENTS: {
     BASE: "/payments",
   },
+  EMPLOYEE_COVERAGE: {
+    BASE: "/employee-coverage",
+    SUMMARY: "/employee-coverage/summary",
+  },
+  GEO: {
+    STATES: "/geo/states",
+    DISTRICTS: "/geo/districts",
+    POST_OFFICES: "/geo/post-offices",
+  },
   LEAD_HANDLERS: {
     RELEASE: (leadId) => `/lead-handlers/${leadId}/release`,
   },

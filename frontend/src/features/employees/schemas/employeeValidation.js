@@ -56,6 +56,18 @@ const validateDate = (errors, values, field, label, required = false) => {
 
 const result = (errors) => ({ errors, isValid: Object.keys(errors).length === 0 });
 
+// Where the person works. A state alone is not enough to route leads or
+// draw them on the map, so at least one district of it is required too.
+const validateCoverage = (errors, values) => {
+  const coverage = values.coverage || {};
+  if (!(coverage.states || []).length) {
+    errors.coverageStates = "Pick at least one state this employee covers.";
+  }
+  if (!(coverage.districts || []).length) {
+    errors.coverageDistricts = "Pick at least one district.";
+  }
+};
+
 export const validateCreateEmployeeForm = (values = {}) => {
   const errors = {};
 
@@ -73,6 +85,7 @@ export const validateCreateEmployeeForm = (values = {}) => {
   requireField(errors, values, "designation", "Designation is required.");
   validateDate(errors, values, "dateOfJoining", "Date of Joining", true);
   validateEmploymentType(errors, values);
+  validateCoverage(errors, values);
 
   return result(errors);
 };
@@ -80,6 +93,7 @@ export const validateCreateEmployeeForm = (values = {}) => {
 export const validateUpdateEmployeeForm = (values = {}) => {
   const errors = {};
 
+  validateCoverage(errors, values);
   validatePhone(errors, values);
   requireField(errors, values, "department", "Department is required.");
   requireField(errors, values, "designation", "Designation is required.");

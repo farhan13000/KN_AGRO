@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { PermissionGuard } from "../core/auth";
 import ProtectedRoute from "./ProtectedRoute";
 import { BACKEND_ROLES, PERMISSIONS, ROUTES } from "../shared/constants";
+const SalesManagerLocationsPage = lazy(() => import("../sales-manager/pages/locations/SalesManagerLocationsPage"));
 
 const SalesManagerMyWorkspacePage = lazy(
   () => import("../sales-manager/pages/me/SalesManagerMyWorkspacePage"),
@@ -128,6 +129,10 @@ export const salesManagerRouteConfig = {
         {
           path: ROUTES.SALES_MANAGER.TERRITORY,
           element: <SalesManagerTerritoryPage />,
+        },
+        {
+          path: ROUTES.SALES_MANAGER.LOCATIONS,
+          element: <SalesManagerLocationsPage />,
         },
         // Old per-view paths stay as redirects into the matching tab:
         // links to them exist across the app and in bookmarks.

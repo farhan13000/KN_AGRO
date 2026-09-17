@@ -19,6 +19,8 @@ export const pickCreateEmployeePayload = (values) => ({
   roleId: values.roleId || undefined,
   region: values.region || undefined,
   district: values.district || undefined,
+  // The states/districts/post offices this person covers.
+  coverage: values.coverage,
   dateOfJoining: values.dateOfJoining,
   employmentType: values.employmentType || undefined,
   photo: values.photo || undefined,
@@ -28,6 +30,7 @@ export const pickCreateEmployeePayload = (values) => ({
 
 export const pickUpdateEmployeePayload = (values) => ({
   phone: values.phone,
+  coverage: values.coverage,
   department: values.department,
   designation: values.designation,
   dateOfJoining: values.dateOfJoining,
