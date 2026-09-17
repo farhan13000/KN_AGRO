@@ -5,8 +5,8 @@ import { API_ENDPOINTS, apiClient, unwrapApiData } from "../../../core/api";
 // contracts — this layer does no reshaping or client-side aggregation,
 // only unwraps the response envelope.
 export const analyticsApi = {
-  async getEmployeePerformance() {
-    const response = await apiClient.get(API_ENDPOINTS.ANALYTICS.EMPLOYEE_PERFORMANCE);
+  async getEmployeePerformance(query) {
+    const response = await apiClient.get(API_ENDPOINTS.ANALYTICS.EMPLOYEE_PERFORMANCE, { params: query });
     return unwrapApiData(response);
   },
 

@@ -8,6 +8,7 @@ export default function SuperAdminLeadListPage({ showHeading = true }) {
       detailPath={(lead) => `${ROUTES.SUPER_ADMIN.LEADS}/${lead._id}`}
       roleLabel="CRM"
       showHeading={showHeading}
+      showLocationFilter
       subtitle="View all backend-scoped leads with CRM filters, assignments, and pipeline value."
       title="Leads"
     />

@@ -21,8 +21,6 @@ import {
   Info,
   LogIn,
   LogOut,
-  MapPin,
-  MapPinCheck,
   MessageCircle,
   PackageCheck,
   Send,
@@ -106,9 +104,6 @@ export const NOTIFICATION_TYPE = Object.freeze({
   PROMOTION_REJECTED: "PROMOTION_REJECTED",
 
   EMPLOYEE_TRANSFERRED: "EMPLOYEE_TRANSFERRED",
-
-  DISTRICT_ASSIGNMENT_REQUESTED: "DISTRICT_ASSIGNMENT_REQUESTED",
-  DISTRICT_ASSIGNMENT_APPROVED: "DISTRICT_ASSIGNMENT_APPROVED",
 
   SALARY_PROPOSAL_RECOMMENDED: "SALARY_PROPOSAL_RECOMMENDED",
   SALARY_PROPOSAL_APPROVED: "SALARY_PROPOSAL_APPROVED",
@@ -201,9 +196,6 @@ export const NOTIFICATION_TYPE_META = Object.freeze({
   [NOTIFICATION_TYPE.PROMOTION_REJECTED]: { icon: XCircle, label: "Promotion rejected" },
 
   [NOTIFICATION_TYPE.EMPLOYEE_TRANSFERRED]: { icon: ArrowRightLeft, label: "Assignment transferred" },
-
-  [NOTIFICATION_TYPE.DISTRICT_ASSIGNMENT_REQUESTED]: { icon: MapPin, label: "District assignment requested" },
-  [NOTIFICATION_TYPE.DISTRICT_ASSIGNMENT_APPROVED]: { icon: MapPinCheck, label: "District assignment approved" },
 
   [NOTIFICATION_TYPE.SALARY_PROPOSAL_RECOMMENDED]: { icon: TrendingUp, label: "Salary proposal recommended" },
   [NOTIFICATION_TYPE.SALARY_PROPOSAL_APPROVED]: { icon: CircleDollarSign, label: "Salary proposal approved" },

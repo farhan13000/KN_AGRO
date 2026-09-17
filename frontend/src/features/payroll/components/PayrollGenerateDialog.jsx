@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { getApiErrorMessage } from "../../../core/api";
 import Modal from "../../../shared/components/Modal";
+import SearchableSelect from "../../../shared/forms/SearchableSelect";
 import Select from "../../../shared/forms/Select";
 import TextInput from "../../../shared/forms/TextInput";
 import { useAllEmployees } from "../../employees/hooks";
-import { employeeOptionLabel } from "../../employees/utils/employeeFormatters";
+import { employeeSelectOption } from "../../employees/utils/employeeFormatters";
 import { MONTH_LABELS } from "../constants";
 import { usePayrollActions } from "../hooks";
 
@@ -136,7 +137,7 @@ export default function PayrollGenerateDialog({ isOpen, onClose, onSuccess }) {
         </div>
 
         {mode === "single" ? (
-          <Select
+          <SearchableSelect
             error={fieldErrors.employeeId}
             id="payroll-employee"
             label="Employee"
@@ -144,10 +145,7 @@ export default function PayrollGenerateDialog({ isOpen, onClose, onSuccess }) {
             onChange={handleChange}
             options={[
               { value: "", label: employeesState.isLoading ? "Loading employees..." : "Select an employee" },
-              ...employeesState.employees.map((employee) => ({
-                value: employee._id,
-                label: employeeOptionLabel(employee),
-              })),
+              ...employeesState.employees.map(employeeSelectOption),
             ]}
             required
             value={values.employeeId}

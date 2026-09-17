@@ -16,14 +16,15 @@ import {
   useEmployeeListQuery,
   useEmployeeSummary,
 } from "../../../features/employees";
+import { LocationFilterFields } from "../../../features/geo";
 
 /**
  * Adding a person takes one of two forms, and which one you get is
  * decided by whether you may create an account outright:
  *
  * - "Add Employee" (employees.create) creates the account immediately,
- *   with the role, region, district and manager chosen on the form. This
- *   is the Super Admin's path; nobody else holds employees.create.
+ *   with the role, coverage and manager chosen on the form. This is the
+ *   Super Admin's path; nobody else holds employees.create.
  *
  * - "Request Employee" (hiring.create) raises a hiring request instead.
  *   The Super Admin approves it, and THAT approval is what creates the
@@ -50,6 +51,11 @@ export default function SuperAdminEmployeeListPage() {
 
   const handleFilterChange = (event) => {
     updateQuery({ [event.target.name]: event.target.value, page: 1 });
+  };
+
+  const locationFilter = { state: query.state, district: query.district, post: query.post };
+  const handleLocationFilterChange = (next) => {
+    updateQuery({ state: next.state, district: next.district, post: next.post, page: 1 });
   };
 
   return (
@@ -151,6 +157,11 @@ export default function SuperAdminEmployeeListPage() {
               <option value="asc">Ascending</option>
             </select>
           </label>
+        </div>
+
+        <div className="mt-4 border-t border-forest/10 pt-4">
+          <p className="form-label">Location — where this employee covers</p>
+          <LocationFilterFields compact onChange={handleLocationFilterChange} value={locationFilter} />
         </div>
       </section>
 

@@ -172,7 +172,7 @@ const nodeTypes = { org: OrgNode };
  * screen answers is "which organisation am I looking at", and an
  * everything-open chart buries that under a hundred nodes.
  */
-export default function OrgFlowChart({ detailPathFor, employees = [], performanceRows = [], regionNameFor }) {
+export default function OrgFlowChart({ detailPathFor, employees = [], performanceRows = [] }) {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(() => new Set());
 
@@ -193,19 +193,15 @@ export default function OrgFlowChart({ detailPathFor, employees = [], performanc
     [employees],
   );
 
-  // "Which ground does this branch cover" — names, not ids, and folded to
-  // a count once the list gets long enough to stop being readable.
-  const regionLabelFor = useCallback(
-    (rollup) => {
-      const ids = [...(rollup?.regionIds || [])];
-      if (!ids.length) return "No region set";
-      const names = ids.map((id) => regionNameFor?.(id)).filter(Boolean);
-      if (!names.length) return `${ids.length} region${ids.length === 1 ? "" : "s"}`;
-      if (names.length <= 2) return names.join(", ");
-      return `${names[0]}, ${names[1]} +${names.length - 2} more`;
-    },
-    [regionNameFor],
-  );
+  // "Which ground does this branch cover" — already names (states), no
+  // id lookup needed, folded to a count once the list gets long enough
+  // to stop being readable.
+  const regionLabelFor = useCallback((rollup) => {
+    const names = [...(rollup?.stateNames || [])];
+    if (!names.length) return "No state set";
+    if (names.length <= 2) return names.join(", ");
+    return `${names[0]}, ${names[1]} +${names.length - 2} more`;
+  }, []);
 
   // Opening a branch changes the diagram's whole footprint, and React
   // Flow only fits the view on mount — without this the new nodes land
@@ -355,9 +351,7 @@ export default function OrgFlowChart({ detailPathFor, employees = [], performanc
         rollup: { ...emptyRollup(), team: totalOf(rollups, employees) },
         totalsLabel: "Whole company",
         regionLabel: regionLabelFor({
-          regionIds: new Set(
-            employees.map((e) => e.region?._id || e.region).filter(Boolean).map(String),
-          ),
+          stateNames: new Set(employees.flatMap((e) => e.coverage?.states ?? [])),
         }),
         expanded: true,
         hasChildren: false,

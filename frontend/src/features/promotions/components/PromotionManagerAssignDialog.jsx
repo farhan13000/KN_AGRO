@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { getApiErrorMessage } from "../../../core/api";
 import Modal from "../../../shared/components/Modal";
+import SearchableSelect from "../../../shared/forms/SearchableSelect";
 import Select from "../../../shared/forms/Select";
 import { REQUIRED_MANAGER_ROLE, ROLE_LABELS, normalizeRoleName } from "../../../shared/constants";
-import { EMPLOYEE_STATUS, useEmployeeList, employeeOptionLabel } from "../../employees";
+import { EMPLOYEE_STATUS, useEmployeeList, employeeSelectOption } from "../../employees";
 import { usePromotionActions } from "../hooks";
 
 const activeEmployeeQuery = Object.freeze({
@@ -89,14 +90,14 @@ export default function PromotionManagerAssignDialog({ isOpen, onClose, onSucces
           reports to a {requiredRoleLabel}, so only those are listed.
         </p>
 
-        <Select
+        <SearchableSelect
           error={fieldError}
           id="promotion-new-manager"
           label={`New manager (${requiredRoleLabel})`}
           onChange={(event) => setManagerId(event.target.value)}
           options={[
             { label: `Select a ${requiredRoleLabel}`, value: "" },
-            ...candidates.map((employee) => ({ label: employeeOptionLabel(employee), value: employee._id })),
+            ...candidates.map(employeeSelectOption),
           ]}
           required
           value={managerId}

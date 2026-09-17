@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileText } from "lucide-react";
+import { FileText, UserRound } from "lucide-react";
 import { useAuth } from "../../../core/auth";
 import { getApiErrorMessage } from "../../../core/api";
 import EmptyState from "../../../shared/components/EmptyState";
@@ -17,6 +17,17 @@ import { useHiringActions, useHiringRequestList } from "../hooks";
 import HiringCompleteDialog from "./HiringCompleteDialog";
 import HiringRequestDetailsDialog from "./HiringRequestDetailsDialog";
 import HiringStatusBadge from "./HiringStatusBadge";
+
+/** The proposed area, short enough to sit on one line of the card. */
+const coverageSummary = (coverage) => {
+  const states = coverage?.states || [];
+  if (!states.length) return "";
+  const districts = (coverage?.districts || []).map((entry) => entry.district);
+  const places = districts.length ? districts : states;
+  const shown = places.slice(0, 3).join(", ");
+  const rest = places.length - 3;
+  return `${states.join(", ")}${districts.length ? ` / ${shown}${rest > 0 ? ` +${rest} more` : ""}` : ""}`;
+};
 
 const formatDate = (value) => {
   if (!value) return "";
@@ -169,12 +180,7 @@ export default function HiringPipelineView({ createHref, description, portalLabe
                       <span className="font-semibold text-ink">
                         {request.proposedRole?.name?.toUpperCase() || "—"}
                       </span>
-                      {request.proposedRegions?.length
-                        ? ` · ${request.proposedRegions.map((region) => region.name).join(", ")}`
-                        : ""}
-                      {request.proposedDistricts?.length
-                        ? ` / ${request.proposedDistricts.map((district) => district.name).join(", ")}`
-                        : ""}
+                      {coverageSummary(request.proposedCoverage) ? ` · ${coverageSummary(request.proposedCoverage)}` : ""}
                       {request.proposedDepartment ? ` · ${request.proposedDepartment}` : ""}
                       {request.proposedEmploymentType ? ` · ${request.proposedEmploymentType}` : ""}
                       {request.proposedManager?.user?.name
@@ -200,9 +206,16 @@ export default function HiringPipelineView({ createHref, description, portalLabe
                   </a>
                 ) : null}
 
-                <p className="mt-3 text-xs font-semibold text-muted">
-                  {request.requestedBy?.name ? `Requested by ${request.requestedBy.name}` : null}
-                  {formatDate(request.createdAt) ? ` on ${formatDate(request.createdAt)}` : null}
+                {/* Whoever has to decide on this needs to see who asked
+                    for it, without opening anything — so it is a chip,
+                    not a footnote. */}
+                <p className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold text-muted">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-mint px-2 py-1 font-bold text-forest">
+                    <UserRound className="h-3.5 w-3.5" />
+                    Requested by {request.requestedBy?.name || "—"}
+                  </span>
+                  {request.requestedBy?.email ? <span>{request.requestedBy.email}</span> : null}
+                  {formatDate(request.createdAt) ? <span>· {formatDate(request.createdAt)}</span> : null}
                 </p>
                 {request.rejectionReason ? (
                   <p className="mt-2 text-sm text-red-800">Rejected: {request.rejectionReason}</p>

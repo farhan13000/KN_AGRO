@@ -95,25 +95,7 @@ export const PERMISSIONS = Object.freeze({
   PAYMENTS_READ: "payments.read",
   PAYMENTS_CREATE: "payments.create",
 
-  // Org-hierarchy migration (SA/OA/GM/RM/ASM/SO/FO) — matches
-  // BACKEND/backend/src/constants/permissions.js byte-for-byte. Only the
-  // permissions this frontend's current migration phases actually need
-  // are added here; HIRING_*/SALARY_PROPOSAL_*/DSR_* are deferred to the
-  // phases that build their UI (F07/F08/F10) even though the backend
-  // already seeds them ahead of those modules being built.
-  REGION_READ: "region.read",
-  REGION_CREATE: "region.create",
-  REGION_UPDATE: "region.update",
-  REGION_MANAGE: "region.manage",
-  REGION_ASSIGN: "region.assign",
-
-  DISTRICT_READ: "district.read",
-  DISTRICT_CREATE: "district.create",
-  DISTRICT_UPDATE: "district.update",
-  DISTRICT_MANAGE: "district.manage",
-  DISTRICT_ASSIGN: "district.assign",
-  DISTRICT_TRANSFER: "district.transfer",
-
+  // Matches BACKEND/backend/src/constants/permissions.js byte-for-byte.
   EMPLOYEES_TRANSFER: "employees.transfer",
 
   // New tiered promotion workflow (backend Phase 7, verified) — distinct

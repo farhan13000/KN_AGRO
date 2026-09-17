@@ -4,6 +4,7 @@ import { ROUTES } from "../../../shared/constants";
 import { formatEmploymentType, getEmployeeDisplayName } from "../utils";
 import EmployeeRoleBadge from "./EmployeeRoleBadge";
 import EmployeeStatusBadge from "./EmployeeStatusBadge";
+import Avatar from "../../../shared/components/Avatar";
 
 const formatDate = (value) => {
   if (!value) return "Not Set";
@@ -42,7 +43,12 @@ export default function TeamMembersTable({
             {employees.map((employee) => (
               <tr className="align-top transition hover:bg-mint/35" key={employee._id}>
                 <td className="px-4 py-3 font-black text-forest">{employee.employeeCode || "Not Assigned"}</td>
-                <td className="px-4 py-3 font-bold text-ink">{getEmployeeDisplayName(employee)}</td>
+                <td className="px-4 py-3 font-bold text-ink">
+                  <span className="flex items-center gap-2">
+                    <Avatar name={getEmployeeDisplayName(employee)} src={employee.photo?.url || ""} />
+                    <span className="min-w-0 truncate">{getEmployeeDisplayName(employee)}</span>
+                  </span>
+                </td>
                 <td className="px-4 py-3">
                   <EmployeeRoleBadge employee={employee} />
                 </td>

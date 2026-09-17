@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
+import Avatar from "../components/Avatar";
 import { useLanguage } from "../../i18n/LanguageContext";
 
 /**
@@ -28,6 +29,9 @@ export default function SearchableSelect({
   const containerRef = useRef(null);
 
   const selectedOption = options.find((option) => option.value === value);
+  // An option may carry the person it names ({ url, name }); when one
+  // does, the picture is shown with the name here and in the list.
+  const selectedAvatar = selectedOption?.avatar;
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -96,7 +100,7 @@ export default function SearchableSelect({
           aria-describedby={error ? `${id}-error` : undefined}
           aria-invalid={Boolean(error)}
           autoComplete="off"
-          className="form-field pr-9"
+          className={`form-field pr-9 ${selectedAvatar && !isOpen ? "pl-11" : ""}`}
           disabled={disabled}
           id={id}
           onChange={(event) => {
@@ -109,6 +113,14 @@ export default function SearchableSelect({
           placeholder={selectedOption ? t(selectedOption.label) : t(placeholder)}
           value={isOpen ? query : selectedOption ? t(selectedOption.label) : ""}
         />
+        {selectedAvatar && !isOpen ? (
+          <Avatar
+            className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2"
+            name={selectedAvatar.name}
+            size="sm"
+            src={selectedAvatar.url}
+          />
+        ) : null}
         <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
         {isOpen ? (
           <ul
@@ -134,7 +146,14 @@ export default function SearchableSelect({
                   onMouseEnter={() => setHighlightedIndex(index)}
                   role="option"
                 >
-                  {t(option.label)}
+                  {option.avatar ? (
+                    <span className="flex items-center gap-2">
+                      <Avatar name={option.avatar.name} size="sm" src={option.avatar.url} />
+                      <span className="min-w-0 truncate">{t(option.label)}</span>
+                    </span>
+                  ) : (
+                    t(option.label)
+                  )}
                 </li>
               ))
             ) : (

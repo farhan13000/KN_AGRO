@@ -141,6 +141,23 @@ export function AuthProvider({ children }) {
     }
   }, [clearSession]);
 
+  /**
+   * Re-read the signed-in user without touching the session itself —
+   * used after someone changes their own profile photo, so the header
+   * shows the new one straight away instead of after a reload.
+   */
+  const refreshUser = useCallback(async () => {
+    try {
+      const currentUser = await authApi.getCurrentUser();
+      setAuthenticatedUser(currentUser);
+      return currentUser;
+    } catch {
+      // A failed refresh must never sign anybody out: the photo saved,
+      // and the old header is a cosmetic staleness, not a broken session.
+      return null;
+    }
+  }, [setAuthenticatedUser]);
+
   const hasPermission = useCallback(
     (permission) => {
       if (!permission) return true;
@@ -157,9 +174,10 @@ export function AuthProvider({ children }) {
       hasPermission,
       login,
       logout,
+      refreshUser,
       restoreSession,
     }),
-    [clearSession, hasPermission, login, logout, restoreSession, state],
+    [clearSession, hasPermission, login, logout, refreshUser, restoreSession, state],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

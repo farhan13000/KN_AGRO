@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { getApiErrorMessage } from "../../../core/api";
 import Button from "../../../shared/components/Button";
-import SearchableMultiSelect from "../../../shared/forms/SearchableMultiSelect";
 import SearchableSelect from "../../../shared/forms/SearchableSelect";
 import TextInput from "../../../shared/forms/TextInput";
 import { DEPARTMENT_OPTIONS } from "../../../shared/constants";
-import { useEligibleManagerCandidates, useEmployeeLocations } from "../../employees/hooks";
-import { employeeOptionLabel } from "../../employees/utils/employeeFormatters";
+import { useEligibleManagerCandidates } from "../../employees/hooks";
+import { EmployeeCoverageFields } from "../../employees/forms";
+import { employeeSelectOption } from "../../employees/utils/employeeFormatters";
 import { EMPLOYMENT_TYPE, EMPLOYMENT_TYPE_LABELS } from "../../employees/constants";
 import { FileUploadField, MEDIA_KIND } from "../../media";
 import { useRoleOptions } from "../../promotions/hooks";
@@ -18,8 +18,7 @@ const initialValues = {
   phone: "",
   resume: null,
   proposedRoleId: "",
-  proposedRegions: [],
-  proposedDistricts: [],
+  proposedCoverage: { states: [], districts: [], posts: [] },
   proposedDepartment: "",
   proposedEmploymentType: "",
   proposedManager: "",
@@ -38,7 +37,11 @@ const employmentTypeOptions = Object.values(EMPLOYMENT_TYPE).map((type) => ({
  * designation...) — matching the backend's split between createRequest
  * and completeHiring. Department and employment type are proposed here
  * (they narrow the search for a candidate) but stay overridable at
- * Complete, same as region/district/manager already were.
+ * Complete, same as manager already was.
+ *
+ * Locations are asked exactly as employee creation asks them — state,
+ * then districts, then post offices — because approving this request is
+ * what creates the employee, and it carries this area straight over.
  *
  * The resume is a real upload (Cloudinary, via POST /media/uploads/
  * RESUME). The file is stored the moment it is picked, so what this form
@@ -52,47 +55,22 @@ export default function HiringRequestForm({ cancelTo, onCreated }) {
   const [formError, setFormError] = useState("");
 
   const roleState = useRoleOptions();
-  const locations = useEmployeeLocations();
   const selectedRole = roleState.roles.find((role) => role._id === values.proposedRoleId);
   const managerState = useEligibleManagerCandidates({ forRoleName: selectedRole?.name });
   const actions = useHiringActions({ onSuccess: onCreated });
 
-  const districtOptionSource = values.proposedRegions.length
-    ? values.proposedRegions.flatMap((regionId) => locations.districtsForRegion(regionId))
-    : locations.districts;
-  const seenDistrictIds = new Set();
-  const districtOptions = districtOptionSource
-    .filter((district) => {
-      if (seenDistrictIds.has(district._id)) return false;
-      seenDistrictIds.add(district._id);
-      return true;
-    })
-    .map((district) => ({ value: district._id, label: `${district.name} (${district.code})` }));
-
   const handleChange = (event) => {
     const { name, value } = event.target;
     setValues((current) => {
-      if (name === "proposedRegions") {
-        // Same-state rule: dropping a region should drop any already-
-        // picked district that only belonged to it — but clearing every
-        // region entirely removes the state filter, so leave existing
-        // district picks alone in that case (mirrors districtOptions'
-        // own "no region selected -> show every district" fallback).
-        const nextDistricts = value.length
-          ? current.proposedDistricts.filter((districtId) =>
-              value.some((regionId) =>
-                locations.districtsForRegion(regionId).some((district) => district._id === districtId),
-              ),
-            )
-          : current.proposedDistricts;
-        return { ...current, proposedRegions: value, proposedDistricts: nextDistricts };
+      if (name === "coverage") {
+        return { ...current, proposedCoverage: value };
       }
       if (name === "proposedRoleId") {
         return { ...current, proposedRoleId: value, proposedManager: "" };
       }
       return { ...current, [name]: value };
     });
-    setFieldErrors((current) => ({ ...current, [name]: "" }));
+    setFieldErrors((current) => ({ ...current, [name]: "", ...(name === "coverage" ? { coverageStates: "" } : {}) }));
   };
 
   const handleSubmit = async (event) => {
@@ -104,6 +82,9 @@ export default function HiringRequestForm({ cancelTo, onCreated }) {
     if (!values.email.trim()) errors.email = "A valid candidate email is required.";
     if (values.phone.trim().length < 6) errors.phone = "Phone number is too short.";
     if (!values.proposedRoleId) errors.proposedRoleId = "Choose the role being hired for.";
+    if (!values.proposedCoverage.states.length) {
+      errors.coverageStates = "Pick at least one state this person will cover.";
+    }
     setFieldErrors(errors);
     if (Object.keys(errors).length) return;
 
@@ -117,8 +98,7 @@ export default function HiringRequestForm({ cancelTo, onCreated }) {
           : {}),
       },
       proposedRoleId: values.proposedRoleId,
-      ...(values.proposedRegions.length ? { proposedRegions: values.proposedRegions } : {}),
-      ...(values.proposedDistricts.length ? { proposedDistricts: values.proposedDistricts } : {}),
+      proposedCoverage: values.proposedCoverage,
       ...(values.proposedDepartment ? { proposedDepartment: values.proposedDepartment } : {}),
       ...(values.proposedEmploymentType ? { proposedEmploymentType: values.proposedEmploymentType } : {}),
       ...(values.proposedManager ? { proposedManager: values.proposedManager } : {}),
@@ -192,30 +172,9 @@ export default function HiringRequestForm({ cancelTo, onCreated }) {
             label="Reporting Manager (optional)"
             name="proposedManager"
             onChange={handleChange}
-            options={managerState.candidates.map((candidate) => ({
-              value: candidate._id,
-              label: employeeOptionLabel(candidate),
-            }))}
+            options={managerState.candidates.map(employeeSelectOption)}
             placeholder={managerState.isLoading ? "Loading managers..." : "Search managers..."}
             value={values.proposedManager}
-          />
-          <SearchableMultiSelect
-            id="hiring-regions"
-            label="Region / State (optional)"
-            name="proposedRegions"
-            onChange={handleChange}
-            options={locations.regions.map((region) => ({ value: region._id, label: `${region.name} (${region.code})` }))}
-            placeholder={locations.isLoading ? "Loading regions..." : "Search states..."}
-            value={values.proposedRegions}
-          />
-          <SearchableMultiSelect
-            id="hiring-districts"
-            label="District (optional)"
-            name="proposedDistricts"
-            onChange={handleChange}
-            options={districtOptions}
-            placeholder={locations.isLoading ? "Loading districts..." : "Search districts..."}
-            value={values.proposedDistricts}
           />
           <SearchableSelect
             id="hiring-department"
@@ -237,6 +196,14 @@ export default function HiringRequestForm({ cancelTo, onCreated }) {
           />
         </div>
       </section>
+
+      <EmployeeCoverageFields
+        errors={fieldErrors}
+        hint="State zaroori hai. District aur post office chaho to chuno — hire hone par yahi area is employee ko mil jayega."
+        onChange={handleChange}
+        title="Locations To Be Covered"
+        value={values.proposedCoverage}
+      />
 
       {formError ? (
         <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800">

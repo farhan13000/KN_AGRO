@@ -42,8 +42,7 @@ export default function HiringRequestDetailsDialog({ isOpen, onClose, request })
   if (!request) return null;
 
   const candidate = request.candidate || {};
-  const regions = (request.proposedRegions || []).map((region) => region.name).filter(Boolean);
-  const districts = (request.proposedDistricts || []).map((district) => district.name).filter(Boolean);
+  const coverage = request.proposedCoverage || { states: [], districts: [], posts: [] };
   const manager = request.proposedManager;
   const createdEmployee = request.createdEmployee;
 
@@ -85,8 +84,15 @@ export default function HiringRequestDetailsDialog({ isOpen, onClose, request })
               ? [manager.user.name, manager.employeeCode].filter(Boolean).join(" · ")
               : ""}
           </Field>
-          <Field label="Region">{regions.join(", ")}</Field>
-          <Field label="District">{districts.join(", ")}</Field>
+          <Field label="States Covered">{(coverage.states || []).join(", ")}</Field>
+          <Field label="Districts Covered">
+            {(coverage.districts || []).map((entry) => entry.district).join(", ")}
+          </Field>
+          {(coverage.posts || []).length ? (
+            <Field label="Post Offices">
+              {coverage.posts.map((post) => [post.name, post.pincode].filter(Boolean).join(" · ")).join(", ")}
+            </Field>
+          ) : null}
           <Field label="Department">{request.proposedDepartment}</Field>
           <Field label="Employment Type">{request.proposedEmploymentType}</Field>
         </Section>

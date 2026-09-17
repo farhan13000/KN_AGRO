@@ -16,7 +16,13 @@ const targetingSummary = (recommendation) => {
   const parts = [];
   if (recommendation.targetRole?.name) parts.push(`${recommendation.targetRole.name.toUpperCase()} role`);
   if (recommendation.targetTeam?.user?.name) parts.push(`${recommendation.targetTeam.user.name}'s team`);
-  if (recommendation.targetArea?.name) parts.push(recommendation.targetArea.name);
+  if (recommendation.targetArea?.state) {
+    parts.push(
+      recommendation.targetArea.district
+        ? `${recommendation.targetArea.district}, ${recommendation.targetArea.state}`
+        : recommendation.targetArea.state,
+    );
+  }
   return parts.length ? parts.join(" · ") : "Everyone";
 };
 

@@ -46,6 +46,17 @@ export const formatEmployeeRoleShort = (employee) => {
   return roleName ? roleName.toUpperCase() : "";
 };
 
+/**
+ * One employee as a dropdown option: the same label as before plus the
+ * person's photo, so whoever is picking a manager, an assignee or a
+ * teammate recognises the face and not just the name.
+ */
+export const employeeSelectOption = (employee) => ({
+  value: employee?._id,
+  label: employeeOptionLabel(employee),
+  avatar: { url: employee?.photo?.url || "", name: getEmployeeDisplayName(employee) },
+});
+
 export const employeeOptionLabel = (employee) => {
   const name = getEmployeeDisplayName(employee);
   const code = employee?.employeeCode ? ` (${employee.employeeCode})` : "";

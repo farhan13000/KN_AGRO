@@ -6,10 +6,17 @@ import { analyticsApi } from "../services";
  * Company-wide employee performance. Gated on ANALYTICS_ADMIN server-side
  * (Super Admin and Office Admin), so callers must only mount this where
  * the viewer actually holds it — a manager would get a 403.
+ *
+ * `state`/`district`/`post` narrow the roster to whoever's own coverage
+ * names that place — the same "search by location" filter Leads/Orders/
+ * Employees already use.
  */
-export const useEmployeePerformance = (options) => {
-  const request = useCallback(() => analyticsApi.getEmployeePerformance(), []);
-  return useAsyncResource(["analytics", "employee-performance"], request, options);
+export const useEmployeePerformance = ({ district = "", post = "", state = "", ...options } = {}) => {
+  const request = useCallback(
+    () => analyticsApi.getEmployeePerformance({ state: state || undefined, district: district || undefined, post: post || undefined }),
+    [state, district, post],
+  );
+  return useAsyncResource(["analytics", "employee-performance", state, district, post], request, options);
 };
 
 export const useAdminDashboard = (options) => {

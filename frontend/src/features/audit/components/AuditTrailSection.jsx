@@ -8,11 +8,11 @@ import AuditChangesList from "./AuditChangesList";
 import AuditLogDetailModal from "./AuditLogDetailModal";
 
 /**
- * Prompt 14.2's entity-scoped "Audit Trail" section — the same list
- * endpoint as the global viewer, filtered to one entityType/entityId, no
- * separate backend call. Used on Employee and District detail pages,
- * which have real per-record frontend routes to attach a section to
- * (see AuditTrailToggle for Promotion/Hiring Request, which don't).
+ * An entity-scoped "Audit Trail" section — the same list endpoint as the
+ * global viewer, filtered to one entityType/entityId, no separate
+ * backend call. Used on the Employee detail page, which has a real
+ * per-record frontend route to attach a section to (see
+ * AuditTrailToggle for Promotion/Hiring Request, which don't).
  */
 export default function AuditTrailSection({ entityId, entityType, limit = 10 }) {
   const [detailId, setDetailId] = useState(null);

@@ -9,6 +9,7 @@ import Pagination from "../../../shared/components/Pagination";
 import { useDebouncedValue } from "../../../shared/hooks";
 import { ORDER_STATUS_LABELS, ORDER_STATUSES } from "../constants";
 import { useOrderList } from "../hooks";
+import { LocationFilterFields } from "../../geo";
 import OrderTable from "./OrderTable";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
@@ -28,6 +29,7 @@ export default function OrderListView({
   createPath = "",
   detailPath,
   roleLabel = "CRM",
+  showLocationFilter = false,
   subtitle = "Review orders with server pagination, filters, and search.",
   title = "Orders",
 }) {
@@ -36,6 +38,10 @@ export default function OrderListView({
   const [searchParams, setSearchParams] = useSearchParams();
   const searchInput = getQueryValue(searchParams, "search");
   const debouncedSearch = useDebouncedValue(searchInput);
+  const locationFilter = {
+    state: getQueryValue(searchParams, "state"),
+    district: getQueryValue(searchParams, "district"),
+  };
   const query = {
     limit: Number(getQueryValue(searchParams, "limit", "10")),
     page: Number(getQueryValue(searchParams, "page", "1")),
@@ -43,6 +49,8 @@ export default function OrderListView({
     sortBy: getQueryValue(searchParams, "sortBy", "createdAt"),
     sortOrder: getQueryValue(searchParams, "sortOrder", "desc"),
     orderStatus: getQueryValue(searchParams, "orderStatus"),
+    state: locationFilter.state,
+    district: locationFilter.district,
   };
   const ordersState = useOrderList(query);
   const orders = ordersState.data?.orders || [];
@@ -59,6 +67,10 @@ export default function OrderListView({
 
   const handleFilterChange = (event) => {
     updateQuery({ [event.target.name]: event.target.value, page: 1 });
+  };
+
+  const handleLocationFilterChange = (next) => {
+    updateQuery({ state: next.state, district: next.district, page: 1 });
   };
 
   return (
@@ -123,6 +135,13 @@ export default function OrderListView({
             </select>
           </label>
         </div>
+
+        {showLocationFilter ? (
+          <div className="mt-4 border-t border-forest/10 pt-4">
+            <p className="form-label">Location — where the buyer is</p>
+            <LocationFilterFields compact onChange={handleLocationFilterChange} showPost={false} value={locationFilter} />
+          </div>
+        ) : null}
       </section>
 
       {ordersState.isLoading ? <PageLoader message="Loading orders..." /> : null}

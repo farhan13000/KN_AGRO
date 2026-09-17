@@ -10,12 +10,11 @@ export default function LeadTable({
   showAssignments = true,
   showSource = true,
   showPipelineValue = true,
-  // Org-hierarchy migration (Phase F09) — region/district, captured once
-  // at lead creation and never recomputed on transfer (see the backend's
-  // own Phase 10 design note). Defaults to mirroring showAssignments: the
-  // two describe the same "who/where this belongs to" context, so any
-  // view that already hides assignments for being redundant (e.g. an
-  // employee's own lead list) hides location too, unless overridden.
+  // The buyer's own state/district, from their address. Defaults to
+  // mirroring showAssignments: the two describe the same "who/where this
+  // belongs to" context, so any view that already hides assignments for
+  // being redundant (e.g. an employee's own lead list) hides location
+  // too, unless overridden.
   showLocation = showAssignments,
 }) {
   return (
@@ -34,7 +33,7 @@ export default function LeadTable({
               <th className="px-4 py-3">Handled By</th>
               {showAssignments ? <th className="px-4 py-3">Manager</th> : null}
               {showAssignments ? <th className="px-4 py-3">Employee</th> : null}
-              {showLocation ? <th className="px-4 py-3">Region</th> : null}
+              {showLocation ? <th className="px-4 py-3">State</th> : null}
               {showLocation ? <th className="px-4 py-3">District</th> : null}
               {showPipelineValue ? <th className="px-4 py-3">Expected Value</th> : null}
               <th className="px-4 py-3">Next Follow-Up</th>
@@ -92,8 +91,12 @@ export default function LeadTable({
                 {showAssignments ? (
                   <td className="px-4 py-3 text-muted">{formatEmployeeSummary(lead.assignedEmployee)}</td>
                 ) : null}
-                {showLocation ? <td className="px-4 py-3 text-muted">{formatGeoSummary(lead.region)}</td> : null}
-                {showLocation ? <td className="px-4 py-3 text-muted">{formatGeoSummary(lead.district)}</td> : null}
+                {showLocation ? (
+                  <td className="px-4 py-3 text-muted">{formatGeoSummary(lead.address?.state)}</td>
+                ) : null}
+                {showLocation ? (
+                  <td className="px-4 py-3 text-muted">{formatGeoSummary(lead.address?.district)}</td>
+                ) : null}
                 {showPipelineValue ? (
                   <td className="px-4 py-3 font-bold text-ink">{formatPipelineValue(lead.expectedValue)}</td>
                 ) : null}

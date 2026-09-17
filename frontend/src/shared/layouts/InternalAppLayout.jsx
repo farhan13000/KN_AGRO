@@ -3,18 +3,11 @@ import { ChevronDown, Download, KeyRound, LogOut, Menu, PanelLeftClose, UserCirc
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import logo from "../../assets/KN_AGRO_LOGO.png";
 import { useAuth } from "../../core/auth";
+import Avatar from "../components/Avatar";
 import { NotificationBell } from "../../features/notifications";
 import { PERMISSIONS, ROLE_LABELS, ROUTES } from "../constants";
 import InstallInstructionsDialog from "../components/InstallInstructionsDialog";
 import { useInstallPrompt } from "../hooks";
-
-const getInitials = (name = "") =>
-  name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("") || "KN";
 
 function NavigationItems({ collapsed = false, items, onNavigate }) {
   const { hasPermission } = useAuth();
@@ -70,9 +63,7 @@ function ProfileMenu() {
         onClick={() => setOpen((current) => !current)}
         type="button"
       >
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-forest text-sm font-black text-white">
-          {getInitials(displayName)}
-        </span>
+        <Avatar className="h-9 w-9 text-sm" name={displayName} src={user?.photo?.url || ""} />
         <span className="hidden min-w-0 md:block">
           <span className="block max-w-44 truncate text-sm font-bold text-ink">{displayName}</span>
           <span className="block max-w-44 truncate text-xs font-semibold text-muted">{roleLabel}</span>
@@ -86,6 +77,7 @@ function ProfileMenu() {
           role="menu"
         >
           <div className="border-b border-forest/10 px-3 py-3">
+            <Avatar className="mb-2" name={displayName} size="lg" src={user?.photo?.url || ""} />
             <p className="truncate text-sm font-black text-ink">{displayName}</p>
             <p className="mt-1 truncate text-xs font-semibold text-muted">{user?.email || "No email available"}</p>
             <p className="mt-2 inline-flex rounded-full bg-mint px-2.5 py-1 text-xs font-bold text-forest">

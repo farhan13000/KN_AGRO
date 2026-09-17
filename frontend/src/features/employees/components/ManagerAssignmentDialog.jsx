@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import Modal from "../../../shared/components/Modal";
 import { useEligibleManagerCandidates, useEmployeeActions } from "../hooks";
-import { employeeOptionLabel, getEmployeeDisplayName } from "../utils";
+import SearchableSelect from "../../../shared/forms/SearchableSelect";
+import { employeeSelectOption, getEmployeeDisplayName } from "../utils";
 
 export default function ManagerAssignmentDialog({ employee, isOpen, onClose, onSuccess }) {
   const [managerId, setManagerId] = useState("");
@@ -36,24 +37,19 @@ export default function ManagerAssignmentDialog({ employee, isOpen, onClose, onS
         <div className="rounded-lg bg-mint/60 p-4 text-sm font-semibold text-forest">
           Current manager: {employee?.manager?.user?.name || "Not assigned"}
         </div>
-        <div>
-          <label className="form-label" htmlFor="manager-assignment">
-            Manager
-          </label>
-          <select
-            className="form-field"
-            id="manager-assignment"
-            onChange={(event) => setManagerId(event.target.value)}
-            value={managerId}
-          >
-            <option value="">Clear manager assignment</option>
-            {candidates.map((candidate) => (
-              <option key={candidate._id} value={candidate._id}>
-                {employeeOptionLabel(candidate)} - {candidate.department || "No department"}
-              </option>
-            ))}
-          </select>
-        </div>
+        <SearchableSelect
+          id="manager-assignment"
+          label="Manager"
+          onChange={(event) => setManagerId(event.target.value)}
+          options={[
+            { value: "", label: "Clear manager assignment" },
+            ...candidates.map((candidate) => ({
+              ...employeeSelectOption(candidate),
+              label: `${employeeSelectOption(candidate).label} - ${candidate.department || "No department"}`,
+            })),
+          ]}
+          value={managerId}
+        />
 
         {managerState.isError ? (
           <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800">

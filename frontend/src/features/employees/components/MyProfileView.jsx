@@ -6,6 +6,7 @@ import { MySalaryCard } from "../../salary/components";
 import { useMyEmployeeProfile } from "../hooks";
 import { isMissingEmployeeProfileError } from "../utils/employeeErrors";
 import EmployeeDetailSections from "./EmployeeDetailSections";
+import ProfilePhotoCard from "./ProfilePhotoCard";
 
 /**
  * One self-profile implementation, used by every portal's thin wrapper
@@ -59,6 +60,10 @@ export default function MyProfileView({ actions = null, showHeading = true }) {
         />
       ) : (
         <>
+          {/* Changing your own photo is the one edit every role can make
+              from here, so it sits at the top rather than behind an
+              "edit profile" page only one portal has. */}
+          <ProfilePhotoCard employee={employee} onSaved={profileState.refetch} />
           <EmployeeDetailSections
             employee={employee}
             showAccountStatus={false}

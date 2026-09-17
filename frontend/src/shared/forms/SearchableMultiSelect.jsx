@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { X } from "lucide-react";
+import Avatar from "../components/Avatar";
 import { useLanguage } from "../../i18n/LanguageContext";
 
 /**
@@ -115,6 +116,7 @@ export default function SearchableMultiSelect({
               className="inline-flex items-center gap-1 rounded-lg bg-mint px-2 py-1 text-xs font-semibold text-forest"
               key={option.value}
             >
+              {option.avatar ? <Avatar name={option.avatar.name} size="xs" src={option.avatar.url} /> : null}
               {t(option.label)}
               <button
                 aria-label={`Remove ${t(option.label)}`}
@@ -167,7 +169,14 @@ export default function SearchableMultiSelect({
                   onMouseEnter={() => setHighlightedIndex(index)}
                   role="option"
                 >
-                  {t(option.label)}
+                  {option.avatar ? (
+                    <span className="flex items-center gap-2">
+                      <Avatar name={option.avatar.name} size="sm" src={option.avatar.url} />
+                      <span className="min-w-0 truncate">{t(option.label)}</span>
+                    </span>
+                  ) : (
+                    t(option.label)
+                  )}
                 </li>
               ))
             ) : (

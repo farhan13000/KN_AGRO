@@ -7,10 +7,10 @@ import {
   getEmployeeDisplayName,
   getEmployeeEmail,
 } from "../utils";
-import { useEmployeeLocations } from "../hooks/useEmployeeLocations";
 import EmployeeRoleBadge from "./EmployeeRoleBadge";
 import EmployeeStatusBadge from "./EmployeeStatusBadge";
 import UserAccountStatusBadge from "./UserAccountStatusBadge";
+import Avatar from "../../../shared/components/Avatar";
 
 const formatDate = (value) => {
   if (!value) return "Not Set";
@@ -19,18 +19,21 @@ const formatDate = (value) => {
   return parsed.toLocaleDateString();
 };
 
-const formatLocation = (regionLabel, districtLabel) => {
-  if (regionLabel && districtLabel) return `${regionLabel} / ${districtLabel}`;
-  return regionLabel || districtLabel || "Not Set";
+/** States (and, if narrow enough, districts) an employee's coverage names. */
+const formatCoverage = (coverage) => {
+  const states = coverage?.states ?? [];
+  if (!states.length) return "Not Set";
+  const districts = coverage?.districts ?? [];
+  if (districts.length && districts.length <= 3) {
+    return districts.map((entry) => entry.district).join(", ");
+  }
+  return states.join(", ");
 };
 
 export default function EmployeeTable({ employees = [], onApprove, onReject, showApprovalActions = false }) {
   const { hasPermission } = useAuth();
   const canUpdate = hasPermission(PERMISSIONS.EMPLOYEES_UPDATE);
   const canApprove = hasPermission(PERMISSIONS.EMPLOYEES_APPROVE);
-  // region/district arrive as raw ids on the employee payload, so names
-  // are resolved here rather than by the API.
-  const { districtName, regionName } = useEmployeeLocations();
 
   return (
     <div className="overflow-hidden rounded-lg border border-forest/10 bg-white shadow-sm">
@@ -58,7 +61,12 @@ export default function EmployeeTable({ employees = [], onApprove, onReject, sho
             {employees.map((employee) => (
               <tr className="align-top transition hover:bg-mint/35" key={employee._id}>
                 <td className="px-4 py-3 font-black text-forest">{employee.employeeCode || "Not Assigned"}</td>
-                <td className="px-4 py-3 font-bold text-ink">{getEmployeeDisplayName(employee)}</td>
+                <td className="px-4 py-3 font-bold text-ink">
+                  <span className="flex items-center gap-2">
+                    <Avatar name={getEmployeeDisplayName(employee)} src={employee.photo?.url || ""} />
+                    <span className="min-w-0 truncate">{getEmployeeDisplayName(employee)}</span>
+                  </span>
+                </td>
                 <td className="px-4 py-3">
                   <EmployeeRoleBadge employee={employee} />
                 </td>
@@ -77,7 +85,7 @@ export default function EmployeeTable({ employees = [], onApprove, onReject, sho
                 </td>
                 <td className="px-4 py-3 text-muted">{employee.manager?.user?.name || "Not Assigned"}</td>
                 <td className="px-4 py-3 text-muted">
-                  {formatLocation(regionName(employee.region), districtName(employee.district))}
+                  {formatCoverage(employee.coverage)}
                 </td>
                 <td className="px-4 py-3 text-muted">{formatDate(employee.dateOfJoining)}</td>
                 <td className="px-4 py-3">

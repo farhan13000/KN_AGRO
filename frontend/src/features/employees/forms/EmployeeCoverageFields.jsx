@@ -25,12 +25,19 @@ const Chip = ({ children, onRemove, title }) => (
  * (the same one the Locations map is drawn from). Post offices are
  * searched live from India Post, so the name and PIN stored are real.
  */
-export default function EmployeeCoverageFields({ errors = {}, onChange, value }) {
+export default function EmployeeCoverageFields({
+  errors = {},
+  hint = "State zaroori hai. District aur post office chaho to chuno — inse area aur chhota ho jaata hai.",
+  onChange,
+  title = "Locations Covered",
+  value,
+}) {
   const coverage = value || EMPTY;
   const statesState = useIndiaStates();
   const districtsState = useIndiaDistricts(coverage.states);
 
   const [postQuery, setPostQuery] = useState("");
+  const [postSearched, setPostSearched] = useState(false);
   const [postDistrict, setPostDistrict] = useState("");
   const [postResults, setPostResults] = useState([]);
   const [postError, setPostError] = useState("");
@@ -79,28 +86,43 @@ export default function EmployeeCoverageFields({ errors = {}, onChange, value })
     emit({ ...coverage, posts: [...coverage.posts, entry] });
   };
 
+  // Keep the post-office search pointed at a real district: with one
+  // chosen, its offices can be listed without anything typed at all.
+  useEffect(() => {
+    if (!coverage.districts.length) {
+      if (postDistrict) setPostDistrict("");
+      return;
+    }
+    if (!coverage.districts.some((entry) => districtKey(entry) === postDistrict)) {
+      setPostDistrict(districtKey(coverage.districts[0]));
+    }
+  }, [coverage.districts, postDistrict]);
+
   // The search runs once typing settles, so every keystroke is not a request.
   useEffect(() => {
     const query = postQuery.trim();
-    if (query.length < 3) {
+    const [state, district] = postDistrict ? postDistrict.split("||") : [undefined, undefined];
+    if (query.length < 3 && !district) {
       setPostResults([]);
       setPostError("");
+      setPostSearched(false);
       return undefined;
     }
     let cancelled = false;
     setIsSearching(true);
     const timer = setTimeout(async () => {
       try {
-        const [state, district] = postDistrict ? postDistrict.split("||") : [undefined, undefined];
-        const data = await geoApi.searchPostOffices({ q: query, state, district });
+        const data = await geoApi.searchPostOffices({ q: query.length >= 3 ? query : undefined, state, district });
         if (!cancelled) {
           setPostResults(data.postOffices || []);
           setPostError("");
+          setPostSearched(true);
         }
       } catch (error) {
         if (!cancelled) {
           setPostResults([]);
           setPostError(getApiErrorMessage(error));
+          setPostSearched(true);
         }
       } finally {
         if (!cancelled) setIsSearching(false);
@@ -115,9 +137,9 @@ export default function EmployeeCoverageFields({ errors = {}, onChange, value })
   return (
     <section data-employee-coverage>
       <h2 className="text-lg font-black text-ink">
-        Locations Covered <span className="text-red-700">*</span>
+        {title} <span className="text-red-700">*</span>
       </h2>
-      <p className="mt-1 text-sm text-muted">Pehle state, phir us state ke districts, phir chaho to post offices.</p>
+      <p className="mt-1 text-sm text-muted">{hint}</p>
 
       <div className="mt-4 grid gap-5">
         <div>
@@ -137,7 +159,7 @@ export default function EmployeeCoverageFields({ errors = {}, onChange, value })
           <SearchableMultiSelect
             disabled={!coverage.states.length}
             id="coverage-districts"
-            label="Districts"
+            label="Districts (optional)"
             onChange={(event) => setDistricts(event.target.value)}
             options={districtOptions}
             placeholder={
@@ -147,7 +169,6 @@ export default function EmployeeCoverageFields({ errors = {}, onChange, value })
                   ? "Loading districts…"
                   : "Search a district…"
             }
-            required
             value={selectedDistrictKeys}
           />
           {errors.coverageDistricts ? <p className="form-error mt-1">{errors.coverageDistricts}</p> : null}
@@ -164,7 +185,6 @@ export default function EmployeeCoverageFields({ errors = {}, onChange, value })
               onChange={(event) => setPostDistrict(event.target.value)}
               value={postDistrict}
             >
-              <option value="">All picked districts</option>
               {coverage.districts.map((entry) => (
                 <option key={districtKey(entry)} value={districtKey(entry)}>
                   {entry.district} · {entry.state}
@@ -178,13 +198,20 @@ export default function EmployeeCoverageFields({ errors = {}, onChange, value })
                 disabled={!coverage.districts.length}
                 id="coverage-post-search"
                 onChange={(event) => setPostQuery(event.target.value)}
-                placeholder={coverage.districts.length ? "Post office name or 6-digit PIN" : "Pick a district first"}
+                placeholder={
+                  coverage.districts.length ? "Filter by post office name or 6-digit PIN" : "Pick a district first"
+                }
                 value={postQuery}
               />
             </span>
           </div>
 
           {isSearching ? <p className="mt-2 text-xs text-muted">Searching India Post…</p> : null}
+          {!isSearching && postSearched && !postResults.length && !postError ? (
+            <p className="mt-2 text-xs text-muted">
+              India Post par is district ke liye kuch nahi mila. PIN code se dhoondhne par list pakki aati hai.
+            </p>
+          ) : null}
           {postError ? <p className="form-error mt-2">{postError}</p> : null}
           {postResults.length ? (
             <ul className="mt-2 max-h-56 overflow-auto rounded-lg border border-forest/15 bg-white" data-post-results>

@@ -16,7 +16,13 @@ const MAX_PAGES = 20; // hard stop so a bad `pages` value can't spin forever
  * each page to the actor's own downline, so paging here never widens
  * what someone can see.
  */
-export const useAllEmployees = ({ employeeStatus = "ACTIVE", enabled = true } = {}) => {
+export const useAllEmployees = ({
+  district = "",
+  employeeStatus = "ACTIVE",
+  enabled = true,
+  post = "",
+  state = "",
+} = {}) => {
   const request = useCallback(async () => {
     const collected = [];
     let page = 1;
@@ -27,6 +33,11 @@ export const useAllEmployees = ({ employeeStatus = "ACTIVE", enabled = true } = 
         page,
         limit: PAGE_SIZE,
         employeeStatus,
+        // Search by location — narrows to whoever's own coverage names
+        // this state/district/post office.
+        state: state || undefined,
+        district: district || undefined,
+        post: post || undefined,
         sortBy: "employeeCode",
         sortOrder: "asc",
       });
@@ -36,9 +47,9 @@ export const useAllEmployees = ({ employeeStatus = "ACTIVE", enabled = true } = 
     } while (page <= totalPages && page <= MAX_PAGES);
 
     return collected;
-  }, [employeeStatus]);
+  }, [district, employeeStatus, post, state]);
 
-  const state = useAsyncResource(["employees", "all", employeeStatus], request, { enabled });
+  const asyncState = useAsyncResource(["employees", "all", employeeStatus, state, district, post], request, { enabled });
 
-  return { ...state, employees: state.data || [] };
+  return { ...asyncState, employees: asyncState.data || [] };
 };

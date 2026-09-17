@@ -1,6 +1,7 @@
 export { isMissingEmployeeProfileError } from "./employeeErrors";
 export {
   employeeOptionLabel,
+  employeeSelectOption,
   formatEmployeeCode,
   formatEmployeeRole,
   formatEmployeeRoleShort,

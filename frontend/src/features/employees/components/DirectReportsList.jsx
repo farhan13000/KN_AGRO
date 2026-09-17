@@ -7,6 +7,7 @@ import { useDirectReports } from "../hooks";
 import { getEmployeeDisplayName } from "../utils";
 import EmployeeRoleBadge from "./EmployeeRoleBadge";
 import EmployeeStatusBadge from "./EmployeeStatusBadge";
+import Avatar from "../../../shared/components/Avatar";
 
 export default function DirectReportsList({ employeeId }) {
   const reportsState = useDirectReports(employeeId, { page: 1, limit: 10 });
@@ -46,7 +47,12 @@ export default function DirectReportsList({ employeeId }) {
                     {report.employeeCode || "Not Assigned"}
                   </Link>
                 </td>
-                <td className="px-4 py-3 font-bold text-ink">{getEmployeeDisplayName(report)}</td>
+                <td className="px-4 py-3 font-bold text-ink">
+                  <span className="flex items-center gap-2">
+                    <Avatar name={getEmployeeDisplayName(report)} src={report.photo?.url || ""} />
+                    <span className="min-w-0 truncate">{getEmployeeDisplayName(report)}</span>
+                  </span>
+                </td>
                 <td className="px-4 py-3">
                   <EmployeeRoleBadge employee={report} />
                 </td>

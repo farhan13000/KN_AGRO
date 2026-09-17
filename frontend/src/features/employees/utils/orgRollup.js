@@ -93,13 +93,11 @@ export const buildRollups = ({ childrenByManager, employees = [], performanceRow
     const own = ownByEmployeeId.get(id) || { ...ZERO };
     const kids = childrenByManager.get(id) || [];
 
-    // Regions COVERED by this node: this person's own, plus every region
-    // anyone beneath them sits in. A set, not a count — "which ground does
-    // this branch cover" is the question, and two people in one region
-    // must not read as two regions.
-    const regionIds = new Set();
-    const ownRegion = employee.region?._id || employee.region;
-    if (ownRegion) regionIds.add(String(ownRegion));
+    // States COVERED by this node: this person's own, plus every state
+    // anyone beneath them covers. A set, not a count — "which ground does
+    // this branch cover" is the question, and two people covering one
+    // state must not read as two states.
+    const stateNames = new Set(employee.coverage?.states ?? []);
 
     let team = own;
     let headcount = 0;
@@ -107,10 +105,10 @@ export const buildRollups = ({ childrenByManager, employees = [], performanceRow
       const kidRollup = visit(kid);
       team = addMetrics(team, kidRollup.team);
       headcount += 1 + kidRollup.headcount;
-      kidRollup.regionIds.forEach((regionId) => regionIds.add(regionId));
+      kidRollup.stateNames.forEach((state) => stateNames.add(state));
     }
 
-    const entry = { own, team, headcount, directReports: kids.length, regionIds };
+    const entry = { own, team, headcount, directReports: kids.length, stateNames };
     rollups.set(id, entry);
     return entry;
   };
@@ -124,5 +122,5 @@ export const emptyRollup = () => ({
   team: { ...ZERO },
   headcount: 0,
   directReports: 0,
-  regionIds: new Set(),
+  stateNames: new Set(),
 });

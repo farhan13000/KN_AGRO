@@ -4,7 +4,8 @@ import { MANAGER_TIER_ROLES } from "../../../shared/constants";
 import TextInput from "../../../shared/forms/TextInput";
 import { useEmployeeActions, useEmployeeList } from "../hooks";
 import { pickApprovalPayload, validateApprovalForm } from "../schemas";
-import { employeeOptionLabel, getEmployeeDisplayName } from "../utils";
+import SearchableSelect from "../../../shared/forms/SearchableSelect";
+import { employeeSelectOption, getEmployeeDisplayName } from "../utils";
 import { EMPLOYEE_STATUS } from "../constants";
 
 export default function EmployeeApprovalDialog({ employee, isOpen, onClose, onSuccess }) {
@@ -99,25 +100,14 @@ export default function EmployeeApprovalDialog({ employee, isOpen, onClose, onSu
             value={values.dateOfJoining}
             error={errors.dateOfJoining}
           />
-          <div>
-            <label className="form-label" htmlFor="approval-manager">
-              Manager
-            </label>
-            <select
-              className="form-field"
-              id="approval-manager"
-              name="manager"
-              onChange={handleChange}
-              value={values.manager}
-            >
-              <option value="">No manager assigned</option>
-              {candidates.map((candidate) => (
-                <option key={candidate._id} value={candidate._id}>
-                  {employeeOptionLabel(candidate)}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SearchableSelect
+            id="approval-manager"
+            label="Manager"
+            name="manager"
+            onChange={handleChange}
+            options={[{ value: "", label: "No manager assigned" }, ...candidates.map(employeeSelectOption)]}
+            value={values.manager}
+          />
         </div>
 
         {actions.approveEmployee.isError ? (

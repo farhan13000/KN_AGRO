@@ -34,10 +34,6 @@ const ACTION_ROUTE_BUILDERS = Object.freeze({
   // My Profile pages, so this now resolves in every portal — closing the
   // gap Phase F13 disclosed rather than guessed around.
   VIEW_MY_PROFILE: (routes) => routes.PROFILE || routes.MY_PROFILE || null,
-  VIEW_DISTRICT: (routes, id) =>
-    routes.DISTRICT_DETAIL && id ? routes.DISTRICT_DETAIL.replace(":districtId", id) : null,
-  REVIEW_DISTRICT_ASSIGNMENT: (routes, id) =>
-    routes.DISTRICT_DETAIL && id ? routes.DISTRICT_DETAIL.replace(":districtId", id) : null,
   // Promotion/Salary Proposal/Hiring have no per-record frontend detail
   // route (only a list/pipeline/approvals view) — link to that hub.
   VIEW_PROMOTION: (routes) => routes.PROMOTION_APPROVALS || null,

@@ -5,7 +5,6 @@ export const formatOrderStatus = (status) => ORDER_STATUS_LABELS[status] || stat
 
 export const formatOrderAmount = (value) => formatMoney(value);
 
-// region/district come back as {_id, name, code} or null (backend
-// order.serializer.js's toGeoSummary) — captured once at order creation,
-// never recomputed on a later employee transfer.
-export const formatGeoSummary = (geo) => (geo?.name ? geo.name : "Not Set");
+// state/district come back as plain strings (or empty) on the order — a
+// snapshot of the lead's own buyer address, taken once at order creation.
+export const formatGeoSummary = (value) => (value ? value : "Not Set");

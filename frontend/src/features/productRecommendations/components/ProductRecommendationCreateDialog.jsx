@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { getApiErrorMessage } from "../../../core/api";
 import Modal from "../../../shared/components/Modal";
+import SearchableSelect from "../../../shared/forms/SearchableSelect";
 import Select from "../../../shared/forms/Select";
 import Textarea from "../../../shared/forms/Textarea";
 import { MANAGER_TIER_ROLES, normalizeRoleName } from "../../../shared/constants";
-import { EMPLOYEE_STATUS, useEmployeeList, employeeOptionLabel } from "../../employees";
-import { useDistrictList } from "../../districts";
+import { EMPLOYEE_STATUS, useEmployeeList, employeeSelectOption } from "../../employees";
+import { useIndiaDistricts, useIndiaStates } from "../../geo";
 import { PRODUCT_STATUS, useProductList } from "../../products";
 import { useProductRecommendationActions, useRoleOptions } from "../hooks";
 
@@ -25,7 +26,8 @@ export default function ProductRecommendationCreateDialog({ isOpen, onClose, onS
   const [product, setProduct] = useState("");
   const [targetRole, setTargetRole] = useState("");
   const [targetTeam, setTargetTeam] = useState("");
-  const [targetArea, setTargetArea] = useState("");
+  const [targetState, setTargetState] = useState("");
+  const [targetDistrict, setTargetDistrict] = useState("");
   const [reason, setReason] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState("");
@@ -33,7 +35,8 @@ export default function ProductRecommendationCreateDialog({ isOpen, onClose, onS
   const productState = useProductList(activeProductQuery, { enabled: isOpen });
   const roleState = useRoleOptions({ enabled: isOpen });
   const employeeState = useEmployeeList(activeEmployeeQuery, { enabled: isOpen });
-  const districtState = useDistrictList({ page: 1, limit: 100 }, { enabled: isOpen });
+  const statesState = useIndiaStates({ enabled: isOpen });
+  const districtsState = useIndiaDistricts(targetState ? [targetState] : [], { enabled: isOpen && Boolean(targetState) });
   const actions = useProductRecommendationActions({
     onSuccess: async (recommendation) => {
       await onSuccess?.(recommendation);
@@ -50,7 +53,8 @@ export default function ProductRecommendationCreateDialog({ isOpen, onClose, onS
       setProduct("");
       setTargetRole("");
       setTargetTeam("");
-      setTargetArea("");
+      setTargetState("");
+      setTargetDistrict("");
       setReason("");
       setFieldErrors({});
       setFormError("");
@@ -72,7 +76,7 @@ export default function ProductRecommendationCreateDialog({ isOpen, onClose, onS
         product,
         targetRole: targetRole || undefined,
         targetTeam: targetTeam || undefined,
-        targetArea: targetArea || undefined,
+        targetArea: targetState ? { state: targetState, district: targetDistrict || undefined } : undefined,
         reason: reason.trim(),
       });
       onClose();
@@ -117,29 +121,49 @@ export default function ProductRecommendationCreateDialog({ isOpen, onClose, onS
           value={targetRole}
         />
 
-        <Select
+        <SearchableSelect
           id="recommendation-target-team"
           label="Target Team (optional — a manager's downline)"
           name="targetTeam"
           onChange={(event) => setTargetTeam(event.target.value)}
           options={[
             { value: "", label: employeeState.isLoading ? "Loading managers..." : "Any team" },
-            ...managerTierEmployees.map((employee) => ({ value: employee._id, label: employeeOptionLabel(employee) })),
+            ...managerTierEmployees.map(employeeSelectOption),
           ]}
           value={targetTeam}
         />
 
-        <Select
-          id="recommendation-target-area"
-          label="Target District (optional)"
-          name="targetArea"
-          onChange={(event) => setTargetArea(event.target.value)}
-          options={[
-            { value: "", label: districtState.isLoading ? "Loading districts..." : "Any district" },
-            ...(districtState.data?.districts || []).map((district) => ({ value: district._id, label: district.name })),
-          ]}
-          value={targetArea}
-        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <SearchableSelect
+            id="recommendation-target-state"
+            label="Target State (optional)"
+            name="targetState"
+            onChange={(event) => {
+              setTargetState(event.target.value);
+              setTargetDistrict("");
+            }}
+            options={[
+              { value: "", label: statesState.isLoading ? "Loading states..." : "Any state" },
+              ...statesState.states.map((entry) => ({ value: entry.state, label: entry.state })),
+            ]}
+            value={targetState}
+          />
+          <SearchableSelect
+            disabled={!targetState}
+            id="recommendation-target-district"
+            label="Target District (optional)"
+            name="targetDistrict"
+            onChange={(event) => setTargetDistrict(event.target.value)}
+            options={[
+              {
+                value: "",
+                label: !targetState ? "Pick a state first" : districtsState.isLoading ? "Loading districts..." : "Any district in this state",
+              },
+              ...districtsState.districts.map((district) => ({ value: district.district, label: district.district })),
+            ]}
+            value={targetDistrict}
+          />
+        </div>
 
         <Textarea
           error={fieldErrors.reason}

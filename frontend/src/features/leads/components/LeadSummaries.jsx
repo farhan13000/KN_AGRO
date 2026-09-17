@@ -44,16 +44,15 @@ export const LeadAssignmentSummary = ({ lead }) => (
         <dt className="text-xs font-black uppercase tracking-[0.12em] text-muted">Employee</dt>
         <dd className="mt-1 text-sm font-semibold text-ink">{formatEmployeeSummary(lead?.assignedEmployee)}</dd>
       </div>
-      {/* Captured once at creation, never recomputed on a later transfer
-          of the owning employee — see backend lead.service.js's own
-          Phase 10 comment on this. */}
+      {/* The buyer's own address, from the enquiry (or blank for a
+          staff-entered lead with no address on file). */}
       <div className="rounded-lg border border-forest/10 bg-mint/50 px-4 py-3">
-        <dt className="text-xs font-black uppercase tracking-[0.12em] text-muted">Region</dt>
-        <dd className="mt-1 text-sm font-semibold text-ink">{formatGeoSummary(lead?.region)}</dd>
+        <dt className="text-xs font-black uppercase tracking-[0.12em] text-muted">State</dt>
+        <dd className="mt-1 text-sm font-semibold text-ink">{formatGeoSummary(lead?.address?.state)}</dd>
       </div>
       <div className="rounded-lg border border-forest/10 bg-mint/50 px-4 py-3">
         <dt className="text-xs font-black uppercase tracking-[0.12em] text-muted">District</dt>
-        <dd className="mt-1 text-sm font-semibold text-ink">{formatGeoSummary(lead?.district)}</dd>
+        <dd className="mt-1 text-sm font-semibold text-ink">{formatGeoSummary(lead?.address?.district)}</dd>
       </div>
     </dl>
   </Card>

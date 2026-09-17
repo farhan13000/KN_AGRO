@@ -10,6 +10,10 @@ const defaultQuery = {
   employmentType: "",
   department: "",
   designation: "",
+  // Search by where someone works — matched against their own coverage.
+  state: "",
+  district: "",
+  post: "",
   sortBy: "createdAt",
   sortOrder: "desc",
 };
@@ -38,6 +42,9 @@ const readQuery = (searchParams, overrides = {}) =>
       searchParams.get("employmentType") || overrides.employmentType || defaultQuery.employmentType,
     department: searchParams.get("department") || overrides.department || defaultQuery.department,
     designation: searchParams.get("designation") || overrides.designation || defaultQuery.designation,
+    state: searchParams.get("state") || overrides.state || defaultQuery.state,
+    district: searchParams.get("district") || overrides.district || defaultQuery.district,
+    post: searchParams.get("post") || overrides.post || defaultQuery.post,
     sortBy: searchParams.get("sortBy") || overrides.sortBy || defaultQuery.sortBy,
     sortOrder: searchParams.get("sortOrder") || overrides.sortOrder || defaultQuery.sortOrder,
   });

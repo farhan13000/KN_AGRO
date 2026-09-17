@@ -15,9 +15,10 @@ import {
   validateCreateEmployeeForm,
 } from "../../../features/employees";
 import { PhotoUploadField } from "../../../features/media";
+import SearchableSelect from "../../../shared/forms/SearchableSelect";
 import Select from "../../../shared/forms/Select";
-import { useEligibleManagerCandidates, useEmployeeLocations } from "../../../features/employees";
-import { employeeOptionLabel } from "../../../features/employees";
+import { useEligibleManagerCandidates } from "../../../features/employees";
+import { employeeSelectOption } from "../../../features/employees";
 import { useRoleOptions } from "../../../features/promotions";
 
 const initialValues = {
@@ -31,8 +32,6 @@ const initialValues = {
   employmentType: "",
   roleId: "",
   manager: "",
-  region: "",
-  district: "",
   photo: null,
   address: {},
   emergencyContact: {},
@@ -44,9 +43,9 @@ const initialValues = {
  * form is submitted, with no approval step. Everyone else raises a hiring
  * request instead (see the Employees list page's own note).
  *
- * Role, region, district and manager are chosen here — without them this
- * form could only ever produce a Field Officer, which is what it did
- * before and made "add any employee" untrue.
+ * Role, coverage and manager are chosen here — without them this form
+ * could only ever produce a Field Officer, which is what it did before
+ * and made "add any employee" untrue.
  */
 export default function SuperAdminEmployeeCreatePage() {
   const navigate = useNavigate();
@@ -55,7 +54,6 @@ export default function SuperAdminEmployeeCreatePage() {
   const actions = useEmployeeActions();
 
   const roleState = useRoleOptions();
-  const locations = useEmployeeLocations();
   const selectedRole = roleState.roles.find((role) => role._id === values.roleId);
   // Offer only the tier this role must structurally report to; the
   // backend re-checks it either way.
@@ -65,9 +63,6 @@ export default function SuperAdminEmployeeCreatePage() {
     const { name, value } = event.target;
     setValues((current) => {
       const next = updateNestedValue(current, name, value);
-      // Districts belong to a region, so changing the region invalidates
-      // whatever district was picked under the old one.
-      if (name === "region") next.district = "";
       // A manager eligible for one role is usually not eligible for
       // another, so clear it rather than submitting a stale pairing.
       if (name === "roleId") next.manager = "";
@@ -126,47 +121,16 @@ export default function SuperAdminEmployeeCreatePage() {
                 ]}
                 value={values.roleId}
               />
-              <Select
+              <SearchableSelect
                 id="employee-manager"
                 label="Reporting Manager (optional)"
                 name="manager"
                 onChange={handleChange}
                 options={[
                   { value: "", label: managerState.isLoading ? "Loading managers..." : "Not specified" },
-                  ...managerState.candidates.map((candidate) => ({
-                    value: candidate._id,
-                    label: employeeOptionLabel(candidate),
-                  })),
+                  ...managerState.candidates.map(employeeSelectOption),
                 ]}
                 value={values.manager}
-              />
-              <Select
-                id="employee-region"
-                label="Region (optional)"
-                name="region"
-                onChange={handleChange}
-                options={[
-                  { value: "", label: locations.isLoading ? "Loading regions..." : "Not specified" },
-                  ...locations.regions.map((region) => ({
-                    value: region._id,
-                    label: `${region.name} (${region.code})`,
-                  })),
-                ]}
-                value={values.region}
-              />
-              <Select
-                id="employee-district"
-                label="District (optional)"
-                name="district"
-                onChange={handleChange}
-                options={[
-                  { value: "", label: locations.isLoading ? "Loading districts..." : "Not specified" },
-                  ...locations.districtsForRegion(values.region).map((district) => ({
-                    value: district._id,
-                    label: `${district.name} (${district.code})`,
-                  })),
-                ]}
-                value={values.district}
               />
             </div>
           </section>

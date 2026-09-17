@@ -33,21 +33,6 @@ const SuperAdminEmployeeDetailPage = lazy(
 const SuperAdminEmployeeEditPage = lazy(
   () => import("../super-admin/pages/employees/SuperAdminEmployeeEditPage"),
 );
-const SuperAdminRegionCreatePage = lazy(
-  () => import("../super-admin/pages/regions/SuperAdminRegionCreatePage"),
-);
-const SuperAdminRegionEditPage = lazy(
-  () => import("../super-admin/pages/regions/SuperAdminRegionEditPage"),
-);
-const SuperAdminDistrictCreatePage = lazy(
-  () => import("../super-admin/pages/districts/SuperAdminDistrictCreatePage"),
-);
-const SuperAdminDistrictDetailPage = lazy(
-  () => import("../super-admin/pages/districts/SuperAdminDistrictDetailPage"),
-);
-const SuperAdminDistrictEditPage = lazy(
-  () => import("../super-admin/pages/districts/SuperAdminDistrictEditPage"),
-);
 const SuperAdminApprovalsPage = lazy(
   () => import("../super-admin/pages/approvals/SuperAdminApprovalsPage"),
 );
@@ -59,9 +44,6 @@ const SuperAdminStockPage = lazy(
 );
 const SuperAdminLeadsWorkspacePage = lazy(
   () => import("../super-admin/pages/crm/SuperAdminLeadsWorkspacePage"),
-);
-const SuperAdminTerritoryPage = lazy(
-  () => import("../super-admin/pages/territory/SuperAdminTerritoryPage"),
 );
 const SuperAdminCataloguePage = lazy(
   () => import("../super-admin/pages/catalogue/SuperAdminCataloguePage"),
@@ -180,43 +162,8 @@ export const superAdminRouteConfig = {
         { path: ROUTES.SUPER_ADMIN.EMPLOYEE_EDIT, element: <SuperAdminEmployeeEditPage /> },
         { path: ROUTES.SUPER_ADMIN.EMPLOYEE_DETAIL, element: <SuperAdminEmployeeDetailPage /> },
         {
-          path: ROUTES.SUPER_ADMIN.TERRITORY,
-          element: <SuperAdminTerritoryPage />,
-        },
-        {
           path: ROUTES.SUPER_ADMIN.LOCATIONS,
           element: <SuperAdminLocationsPage />,
-        },
-        // Regions and districts are one screen now. The old paths stay as
-        // redirects into the matching tab, because links to them exist all
-        // over the app (and in people's bookmarks).
-        {
-          path: ROUTES.SUPER_ADMIN.REGIONS,
-          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.TERRITORY}?tab=regions`} />,
-        },
-        {
-          path: ROUTES.SUPER_ADMIN.REGION_CREATE,
-          element: withPermission(PERMISSIONS.REGION_CREATE, <SuperAdminRegionCreatePage />),
-        },
-        {
-          path: ROUTES.SUPER_ADMIN.REGION_EDIT,
-          element: withPermission(PERMISSIONS.REGION_UPDATE, <SuperAdminRegionEditPage />),
-        },
-        {
-          path: ROUTES.SUPER_ADMIN.DISTRICTS,
-          element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.TERRITORY}?tab=districts`} />,
-        },
-        {
-          path: ROUTES.SUPER_ADMIN.DISTRICT_CREATE,
-          element: withPermission(PERMISSIONS.DISTRICT_CREATE, <SuperAdminDistrictCreatePage />),
-        },
-        {
-          path: ROUTES.SUPER_ADMIN.DISTRICT_DETAIL,
-          element: withPermission(PERMISSIONS.DISTRICT_READ, <SuperAdminDistrictDetailPage />),
-        },
-        {
-          path: ROUTES.SUPER_ADMIN.DISTRICT_EDIT,
-          element: withPermission(PERMISSIONS.DISTRICT_UPDATE, <SuperAdminDistrictEditPage />),
         },
         {
           path: ROUTES.SUPER_ADMIN.HIRING_CREATE,

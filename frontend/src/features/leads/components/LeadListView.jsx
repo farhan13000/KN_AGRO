@@ -16,6 +16,7 @@ import {
 } from "../constants";
 import { useLeadList } from "../hooks";
 import { getLeadCapabilities } from "../utils/leadCapabilities";
+import { LocationFilterFields } from "../../geo";
 import LeadTable from "./LeadTable";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
@@ -33,6 +34,7 @@ export default function LeadListView({
   roleLabel = "CRM",
   showAssignments = true,
   showHeading = true,
+  showLocationFilter = false,
   showPipelineValue = true,
   showSource = true,
   subtitle = "Review backend-scoped leads with server pagination, filters, and search.",
@@ -44,6 +46,11 @@ export default function LeadListView({
   const [searchParams, setSearchParams] = useSearchParams();
   const searchInput = getQueryValue(searchParams, "search");
   const debouncedSearch = useDebouncedValue(searchInput);
+  const locationFilter = {
+    state: getQueryValue(searchParams, "addressState"),
+    district: getQueryValue(searchParams, "addressDistrict"),
+    post: getQueryValue(searchParams, "addressPostOffice"),
+  };
   const query = {
     page: Number(getQueryValue(searchParams, "page", "1")),
     limit: Number(getQueryValue(searchParams, "limit", "10")),
@@ -51,6 +58,9 @@ export default function LeadListView({
     status: getQueryValue(searchParams, "status"),
     priority: getQueryValue(searchParams, "priority"),
     source: getQueryValue(searchParams, "source"),
+    addressState: locationFilter.state,
+    addressDistrict: locationFilter.district,
+    addressPostOffice: locationFilter.post,
     sortBy: getQueryValue(searchParams, "sortBy", "createdAt"),
     sortOrder: getQueryValue(searchParams, "sortOrder", "desc"),
   };
@@ -69,6 +79,15 @@ export default function LeadListView({
 
   const handleFilterChange = (event) => {
     updateQuery({ [event.target.name]: event.target.value, page: 1 });
+  };
+
+  const handleLocationFilterChange = (next) => {
+    updateQuery({
+      addressState: next.state,
+      addressDistrict: next.district,
+      addressPostOffice: next.post,
+      page: 1,
+    });
   };
 
   return (
@@ -161,6 +180,13 @@ export default function LeadListView({
             </select>
           </label>
         </div>
+
+        {showLocationFilter ? (
+          <div className="mt-4 border-t border-forest/10 pt-4">
+            <p className="form-label">Location — where the buyer is</p>
+            <LocationFilterFields compact onChange={handleLocationFilterChange} value={locationFilter} />
+          </div>
+        ) : null}
       </section>
 
       {leadsState.isLoading ? <PageLoader message="Loading leads..." /> : null}

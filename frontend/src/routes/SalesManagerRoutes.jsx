@@ -17,9 +17,6 @@ const SalesManagerBillingPage = lazy(
 const SalesManagerLeadsWorkspacePage = lazy(
   () => import("../sales-manager/pages/crm/SalesManagerLeadsWorkspacePage"),
 );
-const SalesManagerTerritoryPage = lazy(
-  () => import("../sales-manager/pages/territory/SalesManagerTerritoryPage"),
-);
 const SalesManagerDSRWorkspacePage = lazy(
   () => import("../sales-manager/pages/dsr/SalesManagerDSRWorkspacePage"),
 );
@@ -39,9 +36,6 @@ const SalesManagerDashboardPage = lazy(
 const SalesManagerTeamPage = lazy(() => import("../sales-manager/pages/team/SalesManagerTeamPage"));
 const SalesManagerTeamMemberDetailPage = lazy(
   () => import("../sales-manager/pages/team/SalesManagerTeamMemberDetailPage"),
-);
-const SalesManagerDistrictDetailPage = lazy(
-  () => import("../sales-manager/pages/districts/SalesManagerDistrictDetailPage"),
 );
 const SalesManagerHiringCreatePage = lazy(
   () => import("../sales-manager/pages/hiring/SalesManagerHiringCreatePage"),
@@ -127,26 +121,8 @@ export const salesManagerRouteConfig = {
         { path: ROUTES.SALES_MANAGER.TEAM, element: <SalesManagerTeamPage /> },
         { path: ROUTES.SALES_MANAGER.TEAM_MEMBER_DETAIL, element: <SalesManagerTeamMemberDetailPage /> },
         {
-          path: ROUTES.SALES_MANAGER.TERRITORY,
-          element: <SalesManagerTerritoryPage />,
-        },
-        {
           path: ROUTES.SALES_MANAGER.LOCATIONS,
           element: <SalesManagerLocationsPage />,
-        },
-        // Old per-view paths stay as redirects into the matching tab:
-        // links to them exist across the app and in bookmarks.
-        {
-          path: ROUTES.SALES_MANAGER.REGIONS,
-          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.TERRITORY}?tab=regions`} />,
-        },
-        {
-          path: ROUTES.SALES_MANAGER.DISTRICTS,
-          element: <Navigate replace to={`${ROUTES.SALES_MANAGER.TERRITORY}?tab=districts`} />,
-        },
-        {
-          path: ROUTES.SALES_MANAGER.DISTRICT_DETAIL,
-          element: withPermission(PERMISSIONS.DISTRICT_READ, <SalesManagerDistrictDetailPage />),
         },
         {
           path: ROUTES.SALES_MANAGER.HIRING_CREATE,

@@ -87,13 +87,12 @@ export default function OrderDetailView({
           ) : null}
         </Card>
 
-        {/* Captured once at order creation, never recomputed on a later
-            transfer of the owning employee — same "snapshot, don't
-            recompute" rule Lead's own region/district already follows. */}
+        {/* Captured once at order creation, from the Lead's own buyer
+            address — never recomputed afterward. */}
         <Card className="p-5">
           <h2 className="text-lg font-black text-ink">Location</h2>
           <dl className="mt-4 grid gap-3">
-            <DetailRow label="Region" value={formatGeoSummary(order.region)} />
+            <DetailRow label="State" value={formatGeoSummary(order.state)} />
             <DetailRow label="District" value={formatGeoSummary(order.district)} />
           </dl>
         </Card>

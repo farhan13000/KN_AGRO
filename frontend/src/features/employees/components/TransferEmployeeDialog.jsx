@@ -1,31 +1,33 @@
 import { useEffect, useState } from "react";
 import { getApiErrorMessage } from "../../../core/api";
 import Modal from "../../../shared/components/Modal";
-import Select from "../../../shared/forms/Select";
 import TextInput from "../../../shared/forms/TextInput";
 import Textarea from "../../../shared/forms/Textarea";
-import { useEligibleManagerCandidates, useEmployeeActions, useEmployeeLocations } from "../hooks";
-import { employeeOptionLabel, getEmployeeDisplayName } from "../utils";
+import { useEligibleManagerCandidates, useEmployeeActions } from "../hooks";
+import SearchableSelect from "../../../shared/forms/SearchableSelect";
+import EmployeeCoverageFields from "../forms/EmployeeCoverageFields";
+import { employeeSelectOption, getEmployeeDisplayName } from "../utils";
 
 const NO_CHANGE = "";
+const EMPTY_COVERAGE = { states: [], districts: [], posts: [] };
 
 const emptyForm = {
   toManager: NO_CHANGE,
-  toRegion: NO_CHANGE,
-  toDistrict: NO_CHANGE,
   reason: "",
   effectiveAt: "",
 };
 
 /**
- * Manager / region / district are each independently optional here,
- * matching the backend: one transfer may change any subset of the three,
- * so anything left on "No change" is simply omitted from the payload
- * (omitted means unchanged; the API distinguishes that from an explicit
- * null, which would clear the field).
+ * Manager and coverage are each independently optional here, matching
+ * the backend: one transfer may change either or both, so leaving
+ * coverage untouched (the "Change coverage" toggle off) omits it from
+ * the payload entirely — omitted means unchanged, distinct from an
+ * explicit (empty) value.
  */
 export default function TransferEmployeeDialog({ employee, isOpen, onClose, onSuccess }) {
   const [values, setValues] = useState(emptyForm);
+  const [changeCoverage, setChangeCoverage] = useState(false);
+  const [coverage, setCoverage] = useState(EMPTY_COVERAGE);
   const [formError, setFormError] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
 
@@ -33,7 +35,6 @@ export default function TransferEmployeeDialog({ employee, isOpen, onClose, onSu
     enabled: isOpen,
     excludeEmployeeId: employee?._id,
   });
-  const locations = useEmployeeLocations({ enabled: isOpen });
   const actions = useEmployeeActions({
     onSuccess: async () => {
       await onSuccess?.();
@@ -43,19 +44,22 @@ export default function TransferEmployeeDialog({ employee, isOpen, onClose, onSu
   useEffect(() => {
     if (isOpen) {
       setValues(emptyForm);
+      setChangeCoverage(false);
+      setCoverage(employee?.coverage || EMPTY_COVERAGE);
       setFormError("");
       setFieldErrors({});
     }
-  }, [isOpen]);
+  }, [isOpen, employee]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setValues((current) => {
-      // Switching region invalidates a district chosen under the old one.
-      if (name === "toRegion") return { ...current, toRegion: value, toDistrict: NO_CHANGE };
-      return { ...current, [name]: value };
-    });
+    setValues((current) => ({ ...current, [name]: value }));
     setFieldErrors((current) => ({ ...current, [name]: "" }));
+  };
+
+  const handleCoverageChange = (event) => {
+    setCoverage(event.target.value);
+    setFieldErrors((current) => ({ ...current, coverageStates: "" }));
   };
 
   const handleSubmit = async (event) => {
@@ -64,16 +68,18 @@ export default function TransferEmployeeDialog({ employee, isOpen, onClose, onSu
 
     const errors = {};
     if (!values.reason.trim()) errors.reason = "A reason is required.";
-    if (!values.toManager && !values.toRegion && !values.toDistrict) {
-      errors.toManager = "Choose at least one of manager, region, or district to change.";
+    if (!values.toManager && !changeCoverage) {
+      errors.toManager = "Choose a new manager, or turn on coverage change, to transfer this employee.";
+    }
+    if (changeCoverage && !coverage.states.length) {
+      errors.coverageStates = "Pick at least one state this employee will cover.";
     }
     setFieldErrors(errors);
     if (Object.keys(errors).length) return;
 
     const payload = {
       ...(values.toManager ? { toManager: values.toManager } : {}),
-      ...(values.toRegion ? { toRegion: values.toRegion } : {}),
-      ...(values.toDistrict ? { toDistrict: values.toDistrict } : {}),
+      ...(changeCoverage ? { toCoverage: coverage } : {}),
       reason: values.reason.trim(),
       ...(values.effectiveAt ? { effectiveAt: values.effectiveAt } : {}),
     };
@@ -89,17 +95,15 @@ export default function TransferEmployeeDialog({ employee, isOpen, onClose, onSu
     }
   };
 
-  const districtOptions = locations.districtsForRegion(values.toRegion);
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`Transfer ${getEmployeeDisplayName(employee)}`}>
       <form className="space-y-4" onSubmit={handleSubmit}>
         <p className="rounded-lg bg-mint/60 p-4 text-sm font-semibold text-forest">
-          Leave a field on "No change" to keep it as it is. At least one change is required, and
-          every transfer is recorded permanently in this employee's history.
+          Leave manager on "No change" to keep it as it is. At least one of manager or coverage must
+          change, and every transfer is recorded permanently in this employee's history.
         </p>
 
-        <Select
+        <SearchableSelect
           error={fieldErrors.toManager}
           id="transfer-manager"
           label="New Manager"
@@ -107,43 +111,30 @@ export default function TransferEmployeeDialog({ employee, isOpen, onClose, onSu
           onChange={handleChange}
           options={[
             { value: NO_CHANGE, label: managerState.isLoading ? "Loading managers..." : "No change" },
-            ...managerState.candidates.map((candidate) => ({
-              value: candidate._id,
-              label: employeeOptionLabel(candidate),
-            })),
+            ...managerState.candidates.map(employeeSelectOption),
           ]}
           value={values.toManager}
         />
 
-        <Select
-          id="transfer-region"
-          label="New Region"
-          name="toRegion"
-          onChange={handleChange}
-          options={[
-            { value: NO_CHANGE, label: locations.isLoading ? "Loading regions..." : "No change" },
-            ...locations.regions.map((region) => ({
-              value: region._id,
-              label: `${region.name} (${region.code})`,
-            })),
-          ]}
-          value={values.toRegion}
-        />
+        <label className="flex items-center gap-2 text-sm font-bold text-ink">
+          <input
+            checked={changeCoverage}
+            className="h-4 w-4 rounded border-forest/30"
+            onChange={(event) => setChangeCoverage(event.target.checked)}
+            type="checkbox"
+          />
+          Change coverage (locations covered)
+        </label>
 
-        <Select
-          id="transfer-district"
-          label="New District"
-          name="toDistrict"
-          onChange={handleChange}
-          options={[
-            { value: NO_CHANGE, label: locations.isLoading ? "Loading districts..." : "No change" },
-            ...districtOptions.map((district) => ({
-              value: district._id,
-              label: `${district.name} (${district.code})`,
-            })),
-          ]}
-          value={values.toDistrict}
-        />
+        {changeCoverage ? (
+          <EmployeeCoverageFields
+            errors={fieldErrors}
+            hint="Naya coverage — jo pehle se assign tha wo replace ho jayega."
+            onChange={handleCoverageChange}
+            title="New Coverage"
+            value={coverage}
+          />
+        ) : null}
 
         <Textarea
           error={fieldErrors.reason}

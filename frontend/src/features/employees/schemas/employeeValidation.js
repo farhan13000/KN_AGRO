@@ -56,15 +56,12 @@ const validateDate = (errors, values, field, label, required = false) => {
 
 const result = (errors) => ({ errors, isValid: Object.keys(errors).length === 0 });
 
-// Where the person works. A state alone is not enough to route leads or
-// draw them on the map, so at least one district of it is required too.
+// Where the person works. Only the state is required — districts and
+// post offices narrow it down when the business knows them.
 const validateCoverage = (errors, values) => {
   const coverage = values.coverage || {};
   if (!(coverage.states || []).length) {
     errors.coverageStates = "Pick at least one state this employee covers.";
-  }
-  if (!(coverage.districts || []).length) {
-    errors.coverageDistricts = "Pick at least one district.";
   }
 };
 

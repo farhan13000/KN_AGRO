@@ -30,6 +30,16 @@ function ChangeRow({ from, label, to }) {
 
 const managerLabel = (manager) => manager?.employeeCode || "";
 const namedLabel = (entity) => (entity?.name ? `${entity.name} (${entity.code})` : "");
+/** States (and districts, if narrow) a coverage snapshot names. */
+const coverageLabel = (coverage) => {
+  const states = coverage?.states ?? [];
+  if (!states.length) return "";
+  const districts = coverage?.districts ?? [];
+  if (districts.length && districts.length <= 3) {
+    return districts.map((entry) => entry.district).join(", ");
+  }
+  return states.join(", ");
+};
 const roleLabel = (role) => (role?.name ? role.name.toUpperCase() : "");
 
 export default function TransferHistoryList({ employeeId }) {
@@ -81,14 +91,9 @@ export default function TransferHistoryList({ employeeId }) {
                   to={managerLabel(transfer.toManager)}
                 />
                 <ChangeRow
-                  from={namedLabel(transfer.fromRegion)}
-                  label="Region"
-                  to={namedLabel(transfer.toRegion)}
-                />
-                <ChangeRow
-                  from={namedLabel(transfer.fromDistrict)}
-                  label="District"
-                  to={namedLabel(transfer.toDistrict)}
+                  from={coverageLabel(transfer.fromCoverage)}
+                  label="Coverage"
+                  to={coverageLabel(transfer.toCoverage)}
                 />
                 <ChangeRow
                   from={roleLabel(transfer.fromRole)}

@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import Button from "../../../shared/components/Button";
 import Modal from "../../../shared/components/Modal";
+import SearchableSelect from "../../../shared/forms/SearchableSelect";
 import Select from "../../../shared/forms/Select";
 import TextInput from "../../../shared/forms/TextInput";
 import Textarea from "../../../shared/forms/Textarea";
 import { BACKEND_ROLES, MANAGER_TIER_ROLES, normalizeRoleName } from "../../../shared/constants";
 import { useAuth } from "../../../core/auth";
-import { EMPLOYEE_STATUS, useEmployeeList, useMyTeam, employeeOptionLabel } from "../../employees";
+import { EMPLOYEE_STATUS, useEmployeeList, useMyTeam, employeeSelectOption } from "../../employees";
 import { useProductList } from "../../products";
 import { LEAD_STATUS, LEAD_STATUSES, LEAD_STATUS_LABELS } from "../constants";
 import { useLeadActions } from "../hooks";
@@ -283,16 +284,13 @@ export function AssignmentDialog({ assignmentType = "employee", isOpen, lead, on
         <div className="rounded-lg bg-mint/60 p-4 text-sm font-semibold text-forest">
           Current assignment: {formatEmployeeSummary(currentAssignment)}
         </div>
-        <Select
+        <SearchableSelect
           id={`lead-${assignmentType}-assignment`}
           label={`New ${isManagerAssignment ? "Manager" : "Employee"}`}
           onChange={(event) => setSelectedEmployeeId(event.target.value)}
           options={[
             { label: `Clear ${isManagerAssignment ? "manager" : "employee"} assignment`, value: "" },
-            ...candidates.map((employee) => ({
-              label: employeeOptionLabel(employee),
-              value: employee._id,
-            })),
+            ...candidates.map(employeeSelectOption),
           ]}
           value={selectedEmployeeId}
         />

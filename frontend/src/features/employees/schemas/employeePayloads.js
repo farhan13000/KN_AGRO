@@ -17,8 +17,6 @@ export const pickCreateEmployeePayload = (values) => ({
   // Omitted rather than sent empty: the backend treats a missing roleId
   // as "the default FO", and an empty string would fail id validation.
   roleId: values.roleId || undefined,
-  region: values.region || undefined,
-  district: values.district || undefined,
   // The states/districts/post offices this person covers.
   coverage: values.coverage,
   dateOfJoining: values.dateOfJoining,

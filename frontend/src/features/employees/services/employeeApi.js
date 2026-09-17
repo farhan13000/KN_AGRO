@@ -89,9 +89,9 @@ export const employeeApi = {
     return get(API_ENDPOINTS.EMPLOYEES.HIERARCHY);
   },
 
-  // Org-hierarchy migration — a transfer is how manager/region/district
-  // actually change (the create/update endpoints don't accept region or
-  // district at all); every one writes an immutable history record.
+  // A transfer is how manager/coverage change on an existing employee
+  // (the update endpoint's coverage change is silent; this one instead
+  // writes an immutable history record alongside the change).
   async transferEmployee(employeeId, payload) {
     return post(API_ENDPOINTS.EMPLOYEES.TRANSFER(employeeId), payload);
   },
