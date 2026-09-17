@@ -17,6 +17,7 @@ import {
   UserCircle,
   Users,
   UsersRound,
+  Target,
   Wallet,
   Warehouse,
 } from "lucide-react";
@@ -94,6 +95,11 @@ export const superAdminNavigation = [
     route: ROUTES.SUPER_ADMIN.DSR,
     icon: ClipboardList,
     permission: PERMISSIONS.DSR_READ_ALL,
+  },
+  {
+    label: "Sales Targets",
+    route: ROUTES.SUPER_ADMIN.SALES_TARGETS,
+    icon: Target,
   },
   {
     label: "Product Recommendations",

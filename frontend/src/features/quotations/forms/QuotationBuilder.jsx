@@ -379,7 +379,7 @@ export default function QuotationBuilder({
             <label className="form-label" htmlFor="quotation-valid-until">
               Valid Until <span className="text-red-700">*</span>
             </label>
-            <input
+            <input required
               aria-describedby={errors.validUntil ? "quotation-valid-until-error" : undefined}
               aria-invalid={Boolean(errors.validUntil)}
               className="form-field"

@@ -2,6 +2,8 @@ import Card from "../../../shared/components/Card";
 import { LeadActivityTimeline } from "../../lead-activities";
 import { QuotationsForLeadSection } from "../../quotations";
 import LeadActionsPanel from "./LeadActionsPanel";
+import LeadActionRequestsPanel from "./LeadActionRequestsPanel";
+import LeadHandlerBanner from "./LeadHandlerBanner";
 import { LeadPriorityBadge, LeadSourceBadge, LeadStatusBadge } from "./LeadBadges";
 import {
   LeadAssignmentSummary,
@@ -113,6 +115,8 @@ export default function LeadDetailView({
         </p>
       </div>
       <LeadOverviewSection lead={lead} />
+      <LeadHandlerBanner lead={lead} onChanged={onMutationSuccess} />
+      <LeadActionRequestsPanel lead={lead} />
       <LeadActionsPanel lead={lead} onSuccess={onMutationSuccess} quotationCreatePath={quotationCreatePath} />
       <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
         <div className="space-y-6">

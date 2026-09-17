@@ -116,7 +116,7 @@ export default function PayrollGenerateDialog({ isOpen, onClose, onSuccess }) {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Select
-            id="payroll-month"
+ required            id="payroll-month"
             label="Month"
             name="month"
             onChange={handleChange}
@@ -124,7 +124,7 @@ export default function PayrollGenerateDialog({ isOpen, onClose, onSuccess }) {
             value={values.month}
           />
           <TextInput
-            id="payroll-year"
+ required            id="payroll-year"
             label="Year"
             max="2100"
             min="2000"

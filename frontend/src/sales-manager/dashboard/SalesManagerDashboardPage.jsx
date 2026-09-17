@@ -5,6 +5,7 @@ import { PERMISSIONS } from "../../shared/constants";
 import { OrderAttributionWidget } from "../../features/orders";
 import { ManagerDashboardContent, SalesOfficerDashboardContent } from "../../features/analytics";
 import { AttendanceTodayWidget } from "../../features/attendance";
+import { SalesTargetProgressCard, TeamTargetProgressCard } from "../../features/salesTargets";
 
 /**
  * GM/RM/ASM/legacy SALES_MANAGER (all hold ANALYTICS_MANAGER) get the full
@@ -35,6 +36,8 @@ export default function SalesManagerDashboardPage() {
           every manager-tier role (all hold ATTENDANCE_CHECK_IN). */}
       <PermissionGuard permission={PERMISSIONS.ATTENDANCE_CHECK_IN}>
         <AttendanceTodayWidget />
+        <SalesTargetProgressCard />
+        <TeamTargetProgressCard />
       </PermissionGuard>
       {hasPermission(PERMISSIONS.ANALYTICS_MANAGER) ? (
         <ManagerDashboardContent />

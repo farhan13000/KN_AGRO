@@ -144,6 +144,7 @@ const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const DSRPrintRouteView = lazy(() => import("../features/dsr/components/DSRPrintRouteView"));
 
+const SuperAdminSalesTargetsPage = lazy(() => import("../super-admin/pages/salesTargets/SuperAdminSalesTargetsPage"));
 const withPermission = (permission, element) => (
   <PermissionGuard
     fallback={<Navigate replace to={ROUTES.ERROR.UNAUTHORIZED} />}
@@ -386,6 +387,10 @@ export const superAdminRouteConfig = {
         {
           path: ROUTES.SUPER_ADMIN.INVOICE_PRINT,
           element: withPermission(PERMISSIONS.INVOICES_READ, <SuperAdminInvoicePrintPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.SALES_TARGETS,
+          element: <SuperAdminSalesTargetsPage />,
         },
         {
           path: ROUTES.SUPER_ADMIN.DSR_PRINT,

@@ -31,6 +31,7 @@ export default function LeadTable({
               {showSource ? <th className="px-4 py-3">Source</th> : null}
               <th className="px-4 py-3">Priority</th>
               <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Handled By</th>
               {showAssignments ? <th className="px-4 py-3">Manager</th> : null}
               {showAssignments ? <th className="px-4 py-3">Employee</th> : null}
               {showLocation ? <th className="px-4 py-3">Region</th> : null}
@@ -44,7 +45,22 @@ export default function LeadTable({
             {leads.map((lead) => (
               <tr className="align-top transition hover:bg-mint/35" key={lead._id}>
                 <td className="px-4 py-3 font-black text-forest">{lead.leadCode || "Pending"}</td>
-                <td className="px-4 py-3 font-black text-ink">{lead.name || "Unnamed Lead"}</td>
+                <td className="px-4 py-3 font-black text-ink">
+                  <span className="inline-flex items-center gap-2">
+                    {lead.pendingActionRequests > 0 ? (
+                      <span
+                        aria-label={`${lead.pendingActionRequests} pending request${lead.pendingActionRequests > 1 ? "s" : ""}`}
+                        className="relative flex h-2.5 w-2.5 shrink-0"
+                        data-lead-request-dot
+                        title="Your team is waiting on a request for this lead"
+                      >
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75 motion-reduce:hidden" />
+                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-600" />
+                      </span>
+                    ) : null}
+                    {lead.name || "Unnamed Lead"}
+                  </span>
+                </td>
                 <td className="px-4 py-3 text-muted">{lead.companyName || "Not Set"}</td>
                 <td className="px-4 py-3 text-muted">{lead.phone || "Not Set"}</td>
                 {showSource ? (
@@ -57,6 +73,18 @@ export default function LeadTable({
                 </td>
                 <td className="px-4 py-3">
                   <LeadStatusBadge status={lead.status} />
+                </td>
+                <td className="px-4 py-3 text-muted" data-lead-handled-by>
+                  {lead.handledBy ? (
+                    <span className="inline-flex flex-wrap items-center gap-1.5">
+                      <span className="font-semibold text-ink">{lead.handledBy.name}</span>
+                      {lead.handledBy.roleLabel ? (
+                        <span className="rounded bg-mint px-1.5 py-0.5 text-[10px] font-black text-forest">{lead.handledBy.roleLabel}</span>
+                      ) : null}
+                    </span>
+                  ) : (
+                    "—"
+                  )}
                 </td>
                 {showAssignments ? (
                   <td className="px-4 py-3 text-muted">{formatEmployeeSummary(lead.assignedManager)}</td>

@@ -207,6 +207,20 @@ export const API_ENDPOINTS = Object.freeze({
   PAYMENTS: {
     BASE: "/payments",
   },
+  LEAD_HANDLERS: {
+    RELEASE: (leadId) => `/lead-handlers/${leadId}/release`,
+  },
+  LEAD_ACTION_REQUESTS: {
+    BASE: "/lead-action-requests",
+    COMPLETE: (requestId) => `/lead-action-requests/${requestId}/complete`,
+    CANCEL: (requestId) => `/lead-action-requests/${requestId}/cancel`,
+  },
+  SALES_TARGETS: {
+    BASE: "/sales-targets",
+    ROLE: (role) => `/sales-targets/${role}`,
+    MY_PROGRESS: "/sales-targets/me/progress",
+    TEAM_PROGRESS: "/sales-targets/team/progress",
+  },
   PRODUCT_RECOMMENDATIONS: {
     BASE: "/product-recommendations",
     APPROVE: (recommendationId) => `/product-recommendations/${recommendationId}/approve`,

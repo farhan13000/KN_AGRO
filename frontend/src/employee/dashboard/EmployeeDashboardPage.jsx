@@ -3,6 +3,7 @@ import { PermissionGuard } from "../../core/auth";
 import { PERMISSIONS } from "../../shared/constants";
 import { EmployeeDashboardContent } from "../../features/analytics";
 import { AttendanceTodayWidget } from "../../features/attendance";
+import { SalesTargetProgressCard } from "../../features/salesTargets";
 
 export default function EmployeeDashboardPage() {
   return (
@@ -16,6 +17,7 @@ export default function EmployeeDashboardPage() {
           stats inside EmployeeDashboardContent below. */}
       <PermissionGuard permission={PERMISSIONS.ATTENDANCE_CHECK_IN}>
         <AttendanceTodayWidget />
+        <SalesTargetProgressCard />
       </PermissionGuard>
       {/* Org-hierarchy migration (Phase F12) — attendance/DSR/leave/
           payroll now genuinely arrive here, via the pre-existing central

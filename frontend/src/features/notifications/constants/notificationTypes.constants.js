@@ -52,6 +52,8 @@ export const NOTIFICATION_TYPE = Object.freeze({
   LEAD_ASSIGNED: "LEAD_ASSIGNED",
   LEAD_REASSIGNED: "LEAD_REASSIGNED",
   LEAD_STATUS_CHANGED: "LEAD_STATUS_CHANGED",
+  LEAD_ACTION_REQUESTED: "LEAD_ACTION_REQUESTED",
+  LEAD_ACTION_COMPLETED: "LEAD_ACTION_COMPLETED",
   FOLLOW_UP_DUE: "FOLLOW_UP_DUE",
   FOLLOW_UP_OVERDUE: "FOLLOW_UP_OVERDUE",
 
@@ -147,6 +149,8 @@ export const NOTIFICATION_TYPE_META = Object.freeze({
   [NOTIFICATION_TYPE.LEAD_ASSIGNED]: { icon: UserPlus, label: "Lead assigned" },
   [NOTIFICATION_TYPE.LEAD_REASSIGNED]: { icon: UserPlus, label: "Lead reassigned" },
   [NOTIFICATION_TYPE.LEAD_STATUS_CHANGED]: { icon: GitPullRequest, label: "Lead status updated" },
+  [NOTIFICATION_TYPE.LEAD_ACTION_REQUESTED]: { icon: MessageCircle, label: "Request from your team" },
+  [NOTIFICATION_TYPE.LEAD_ACTION_COMPLETED]: { icon: CheckCircle2, label: "Request done" },
   [NOTIFICATION_TYPE.FOLLOW_UP_DUE]: { icon: AlarmClock, label: "Follow-up due" },
   [NOTIFICATION_TYPE.FOLLOW_UP_OVERDUE]: { icon: AlarmClock, label: "Follow-up overdue" },
 

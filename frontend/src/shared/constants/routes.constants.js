@@ -86,6 +86,7 @@ export const ROUTES = Object.freeze({
     PAYMENTS: "/super-admin/payments",
     DSR: "/super-admin/dsr",
     DSR_PRINT: "/super-admin/dsr/:dsrId/print",
+    SALES_TARGETS: "/super-admin/sales-targets",
     PRODUCT_RECOMMENDATIONS: "/super-admin/product-recommendations",
     AUDIT_LOG: "/super-admin/audit-log",
     ATTENDANCE: "/super-admin/attendance",

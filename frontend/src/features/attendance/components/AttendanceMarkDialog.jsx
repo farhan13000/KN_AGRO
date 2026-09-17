@@ -47,7 +47,7 @@ function CameraSlot({ capture, hint, icon: Icon, label, onChange, value }) {
     <div className="rounded-xl border border-forest/10 bg-white p-3">
       <div className="flex items-center gap-2">
         <Icon className="h-4 w-4 text-forest" />
-        <span className="text-sm font-black text-ink">{label}</span>
+        <span className="text-sm font-black text-ink">{label} <span className="text-red-700">*</span></span>
         {value ? <span className="ml-auto text-xs font-bold text-green-700">Attached</span> : null}
       </div>
       <p className="mt-1 text-xs text-muted">{hint}</p>
@@ -262,7 +262,7 @@ export default function AttendanceMarkDialog({
         </div>
 
         <label className="block">
-          <span className="form-label">Meter reading (km)</span>
+          <span className="form-label">Meter reading (km) <span className="text-red-700">*</span></span>
           <input
             className="form-field"
             inputMode="decimal"
