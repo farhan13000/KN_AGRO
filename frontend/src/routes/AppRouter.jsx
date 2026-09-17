@@ -1,10 +1,11 @@
 import { lazy, Suspense } from "react";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 import SkeletonCard from "../shared/components/SkeletonCard";
 import { ROUTES } from "../shared/constants";
 import { accountRouteConfig } from "./AccountRoutes";
 import { employeeRouteConfig } from "./EmployeeRoutes";
 import { publicRouteConfig } from "./PublicRoutes";
+import RootErrorBoundary from "./RootErrorBoundary";
 import { salesManagerRouteConfig } from "./SalesManagerRoutes";
 import { superAdminRouteConfig } from "./SuperAdminRoutes";
 
@@ -29,14 +30,26 @@ const withSuspense = (route) => ({
   children: route.children?.map(withSuspense),
 });
 
-export const router = createBrowserRouter(
-  [
-    { path: ROUTES.AUTH.LOGIN, element: <LoginPage /> },
-    { path: ROUTES.ERROR.UNAUTHORIZED, element: <UnauthorizedPage /> },
-    accountRouteConfig,
-    superAdminRouteConfig,
-    salesManagerRouteConfig,
-    employeeRouteConfig,
-    publicRouteConfig,
-  ].map(withSuspense),
-);
+export const router = createBrowserRouter([
+  {
+    // Pathless layout route wrapping every real route below — URL
+    // matching, params, and rendering for each child are unchanged; the
+    // only thing this adds is errorElement, which React Router applies to
+    // its whole subtree. Without this, each of the entries below was its
+    // own independent root with no shared ancestor to attach one
+    // errorElement to, so an unhandled error anywhere (a lazy chunk that
+    // fails to fetch, or any other uncaught render error) fell through to
+    // React Router's own default fallback — a raw, unstyled stack trace.
+    element: <Outlet />,
+    errorElement: <RootErrorBoundary />,
+    children: [
+      { path: ROUTES.AUTH.LOGIN, element: <LoginPage /> },
+      { path: ROUTES.ERROR.UNAUTHORIZED, element: <UnauthorizedPage /> },
+      accountRouteConfig,
+      superAdminRouteConfig,
+      salesManagerRouteConfig,
+      employeeRouteConfig,
+      publicRouteConfig,
+    ].map(withSuspense),
+  },
+]);

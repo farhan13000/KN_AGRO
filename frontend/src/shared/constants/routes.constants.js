@@ -24,7 +24,14 @@ export const ROUTES = Object.freeze({
     DASHBOARD: "/super-admin/dashboard",
     EMPLOYEES: "/super-admin/employees",
     EMPLOYEE_PENDING: "/super-admin/employees/pending",
-    EMPLOYEE_HIERARCHY: "/super-admin/employees/hierarchy",
+    // Deliberately NOT nested under /super-admin/employees/... — it is a
+    // sibling top-level sidebar entry (its own icon, label and permission
+    // check in superAdminNavigation.js), not a sub-page of Employees. A
+    // nested path made NavLink's default prefix matching highlight
+    // "Employees" too whenever this page was open, since React Router
+    // treats any path starting with another link's own path as a match
+    // for it unless `end` is set.
+    EMPLOYEE_HIERARCHY: "/super-admin/org-hierarchy",
     EMPLOYEE_CREATE: "/super-admin/employees/create",
     EMPLOYEE_DETAIL: "/super-admin/employees/:employeeId",
     EMPLOYEE_EDIT: "/super-admin/employees/:employeeId/edit",

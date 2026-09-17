@@ -1,98 +1,20 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { getApiErrorMessage } from "../../../core/api";
+import { useMemo } from "react";
+import { useAsyncMutation, useAsyncResource } from "../../../shared/hooks";
 import { DEFAULT_EMPLOYEE_QUERY } from "../constants";
 import { employeeApi } from "../services/employeeApi";
 import { employeeQueryKeys } from "./employeeQueryKeys";
 
 const withDefaultQuery = (query) => ({ ...DEFAULT_EMPLOYEE_QUERY, ...query });
 
-const useAsyncQuery = (queryKey, request, { enabled = true } = {}) => {
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(Boolean(enabled));
-  const [refreshIndex, setRefreshIndex] = useState(0);
-  const stableKey = JSON.stringify(queryKey);
-
-  const refetch = useCallback(() => {
-    setRefreshIndex((value) => value + 1);
-  }, []);
-
-  useEffect(() => {
-    if (!enabled) {
-      setIsLoading(false);
-      return undefined;
-    }
-
-    let isCurrent = true;
-    setIsLoading(true);
-    setError(null);
-
-    request()
-      .then((payload) => {
-        if (isCurrent) {
-          setData(payload);
-        }
-      })
-      .catch((requestError) => {
-        if (isCurrent) {
-          setError(requestError);
-        }
-      })
-      .finally(() => {
-        if (isCurrent) {
-          setIsLoading(false);
-        }
-      });
-
-    return () => {
-      isCurrent = false;
-    };
-  }, [enabled, refreshIndex, stableKey]);
-
-  return {
-    data,
-    error,
-    errorMessage: error ? getApiErrorMessage(error) : "",
-    isError: Boolean(error),
-    isLoading,
-    queryKey,
-    refetch,
-  };
-};
-
-const useEmployeeMutation = (mutationFn, { onSuccess } = {}) => {
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const mutate = useCallback(
-    async (...args) => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const payload = await mutationFn(...args);
-        if (onSuccess) {
-          await onSuccess(payload);
-        }
-        return payload;
-      } catch (mutationError) {
-        setError(mutationError);
-        throw mutationError;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [mutationFn, onSuccess],
-  );
-
-  return {
-    error,
-    errorMessage: error ? getApiErrorMessage(error) : "",
-    isError: Boolean(error),
-    isLoading,
-    mutate,
-  };
-};
+/**
+ * These were verbatim copies of the shared hooks — identical fetch and
+ * mutate logic, identical return shapes — which quietly kept this entire
+ * feature outside the app's cache once the shared ones moved to TanStack
+ * Query. Aliased here rather than renamed at all ~15 call sites below, so
+ * the whole feature joins the cache as a two-line change.
+ */
+const useAsyncQuery = useAsyncResource;
+const useEmployeeMutation = useAsyncMutation;
 
 export const useEmployeeList = (query = {}, options) => {
   const requestQuery = useMemo(() => withDefaultQuery(query), [query]);
