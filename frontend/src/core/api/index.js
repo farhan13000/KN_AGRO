@@ -9,4 +9,10 @@ export {
   unwrapApiData,
 } from "./apiClient";
 export { FrontendApiError, normalizeApiError } from "./apiError";
-export { API_ERROR_TYPES, getApiErrorMessage, getApiErrorType, getApiState } from "./apiState";
+export {
+  API_ERROR_TYPES,
+  describeApiError,
+  getApiErrorMessage,
+  getApiErrorType,
+  getApiState,
+} from "./apiState";

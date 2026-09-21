@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/KN_AGRO_LOGO.png";
+import { getApiErrorMessage } from "../../core/api";
 import { useAuth } from "../../core/auth";
 import { getPortalRouteForRole } from "../../core/auth";
 import { ROUTES } from "../../shared/constants";
@@ -73,7 +74,7 @@ export default function LoginPage() {
 
       navigate(result.redirectTo, { replace: true });
     } catch (error) {
-      setApiError(error?.friendlyMessage || error?.message || "Unable to log in right now.");
+      setApiError(getApiErrorMessage(error));
     } finally {
       setSubmitting(false);
     }

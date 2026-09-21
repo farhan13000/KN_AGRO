@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Eye, EyeOff, KeyRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { authApi } from "../services/authApi";
+import { getApiErrorMessage } from "../../core/api";
 import { useAuth } from "../../core/auth";
 import { useToast } from "../../shared/feedback/ToastContext";
 import { ROUTES } from "../../shared/constants";
@@ -105,7 +106,7 @@ export default function ChangePasswordPage() {
       clearSession();
       navigate(ROUTES.AUTH.LOGIN, { replace: true });
     } catch (error) {
-      setApiError(error?.friendlyMessage || error?.message || "Unable to change password right now.");
+      setApiError(getApiErrorMessage(error));
     } finally {
       setSubmitting(false);
     }

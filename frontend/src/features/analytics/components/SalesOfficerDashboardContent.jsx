@@ -32,7 +32,10 @@ export default function SalesOfficerDashboardContent() {
           </StatGrid>
         </Section>
 
-        <Section title={`My FO Team (${d.team?.size ?? 0})`}>
+        {/* "My Team", not "My FO Team": an SO's downline can hold another
+            SO as well as Field Officers, and the figures below cover
+            everyone underneath them either way. */}
+        <Section title={`My Team (${d.team?.size ?? 0})`}>
           <StatGrid>
             <Stat label="Team Leads" value={d.team?.leads} />
             <Stat label="Team Orders" value={d.team?.orders} />

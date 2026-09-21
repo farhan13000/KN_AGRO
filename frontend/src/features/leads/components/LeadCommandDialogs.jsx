@@ -14,6 +14,7 @@ import { useLeadActions } from "../hooks";
 import {
   formatEmployeeSummary,
   formatPipelineValue,
+  getCrmErrorDetails,
   getCrmErrorMessage,
   shouldRefetchAfterCrmError,
 } from "../utils";
@@ -38,12 +39,22 @@ const getEmployeeRole = (employee) => normalizeRoleName(employee?.user?.role?.na
 
 const ignoreHandledError = () => {};
 
-const CrmActionError = ({ error, fallback }) =>
-  error ? (
-    <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800" role="alert">
-      {getCrmErrorMessage(error, fallback)}
-    </p>
-  ) : null;
+const CrmActionError = ({ error, fallback }) => {
+  if (!error) return null;
+  const details = getCrmErrorDetails(error);
+  return (
+    <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800" role="alert">
+      <p>{getCrmErrorMessage(error, fallback)}</p>
+      {details.length ? (
+        <ul className="mt-1 list-disc space-y-0.5 pl-5 font-medium">
+          {details.map((detail) => (
+            <li key={detail}>{detail}</li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  );
+};
 
 const useLeadDialogActions = ({ onClose, onSuccess }) =>
   useLeadActions({

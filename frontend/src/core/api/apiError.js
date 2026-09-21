@@ -19,13 +19,15 @@ export const normalizeApiError = (error) => {
   const isTimeoutError = error?.code === "ECONNABORTED" || error?.message?.includes("timeout");
 
   return new FrontendApiError({
+    // Written for whoever is holding the phone, not for whoever set the
+    // server up: "MongoDB", "CORS CLIENT_URL" and "the backend" were
+    // instructions no Field Officer can follow, on the two errors they
+    // are most likely to hit out in the field.
     message:
       payload.message ||
-      (isTimeoutError
-        ? "The backend took too long to respond. Make sure the backend is running, MongoDB is connected, and then refresh the page."
-        : "") ||
+      (isTimeoutError ? "The server is taking too long to respond. Please try again in a moment." : "") ||
       (isNetworkError
-        ? "Cannot reach the backend. Make sure the backend is running and the frontend URL matches the backend CORS CLIENT_URL."
+        ? "Cannot reach the server. Check your internet connection and try again."
         : error?.message) ||
       DEFAULT_ERROR_MESSAGE,
     status: response?.status || payload.statusCode || 0,
