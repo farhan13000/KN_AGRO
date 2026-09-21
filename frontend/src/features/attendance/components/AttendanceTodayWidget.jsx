@@ -11,6 +11,8 @@ import {
 } from "../utils/attendancePolicy";
 import AttendanceDayDetails from "./AttendanceDayDetails";
 import AttendanceMarkDialog from "./AttendanceMarkDialog";
+import { useAuth } from "../../../core/auth";
+import { requiresMeterReading } from "../utils/attendanceRoles";
 import { AttendanceReviewRequestDialog } from "./AttendanceReviewDialogs";
 
 /**
@@ -22,6 +24,7 @@ import { AttendanceReviewRequestDialog } from "./AttendanceReviewDialogs";
  * shown are the times enforced.
  */
 export default function AttendanceTodayWidget() {
+  const { role } = useAuth();
   const todayState = useMyAttendanceToday();
   // null when closed, "in" or "out" while the photos are being taken.
   const [marking, setMarking] = useState(null);
@@ -114,6 +117,7 @@ export default function AttendanceTodayWidget() {
       <AttendanceMarkDialog
         isOpen={Boolean(marking)}
         minMeterReading={marking === "out" ? today?.checkInMeterReading ?? null : null}
+        requireMeter={requiresMeterReading(role)}
         mode={marking || "in"}
         onClose={() => setMarking(null)}
         onConfirm={confirmMark}

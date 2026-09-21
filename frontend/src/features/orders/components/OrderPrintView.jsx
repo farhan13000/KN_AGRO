@@ -1,3 +1,4 @@
+import PrintWatermark from "../../../shared/components/PrintWatermark";
 import { formatBusinessDateTime } from "../../../shared/utils";
 import { formatOrderAmount } from "../utils";
 import OrderStatusBadge from "./OrderStatusBadge";
@@ -12,7 +13,9 @@ import OrderStatusBadge from "./OrderStatusBadge";
 // block.
 export default function OrderPrintView({ order }) {
   return (
-    <div className="mx-auto max-w-3xl bg-white p-8 text-ink print:max-w-none print:p-0">
+    <div className="relative mx-auto max-w-3xl bg-white p-8 text-ink print:max-w-none print:p-0">
+      <PrintWatermark />
+      <div className="relative">
       <div className="flex flex-wrap items-start justify-between gap-6 border-b-2 border-ink/80 pb-6">
         <div>
           <h1 className="text-2xl font-black">KN Agro</h1>
@@ -114,6 +117,7 @@ export default function OrderPrintView({ order }) {
           <p className="mt-1 whitespace-pre-wrap text-sm leading-6">{order.notes}</p>
         </div>
       ) : null}
+      </div>
     </div>
   );
 }

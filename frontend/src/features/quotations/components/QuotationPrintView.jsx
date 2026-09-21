@@ -1,3 +1,4 @@
+import PrintWatermark from "../../../shared/components/PrintWatermark";
 import { formatBusinessDateTime } from "../../../shared/utils";
 import QuotationAmountSummary from "./QuotationAmountSummary";
 import QuotationStatusBadge from "./QuotationStatusBadge";
@@ -10,7 +11,9 @@ import { formatQuotationAmount, formatQuotationItemDiscount } from "../utils";
 // a live Product lookup.
 export default function QuotationPrintView({ quotation }) {
   return (
-    <div className="mx-auto max-w-3xl bg-white p-8 text-ink print:max-w-none print:p-0">
+    <div className="relative mx-auto max-w-3xl bg-white p-8 text-ink print:max-w-none print:p-0">
+      <PrintWatermark />
+      <div className="relative">
       <div className="flex flex-wrap items-start justify-between gap-6 border-b-2 border-ink/80 pb-6">
         <div>
           <h1 className="text-2xl font-black">{quotation.company?.name || "KN Agro"}</h1>
@@ -96,6 +99,7 @@ export default function QuotationPrintView({ quotation }) {
           <p className="mt-1 whitespace-pre-wrap text-sm leading-6">{quotation.notes}</p>
         </div>
       ) : null}
+      </div>
     </div>
   );
 }

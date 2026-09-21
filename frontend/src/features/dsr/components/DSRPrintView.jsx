@@ -1,4 +1,4 @@
-import logo from "../../../assets/KN_AGRO_LOGO.png";
+import PrintWatermark from "../../../shared/components/PrintWatermark";
 import { formatMoney } from "../../../shared/utils";
 
 /**
@@ -47,12 +47,7 @@ export default function DSRPrintView({ dsr }) {
       `}</style>
 
       {/* Faint logo behind the table, like the printed sheet. */}
-      <img
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 w-[45%] max-w-[420px] -translate-x-1/2 -translate-y-1/2 opacity-[0.07]"
-        src={logo}
-      />
+      <PrintWatermark className="w-[45%]" />
 
       <div className="relative">
         <header className="text-center">

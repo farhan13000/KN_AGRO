@@ -111,10 +111,15 @@ const SuperAdminInvoicePrintPage = lazy(
   () => import("../super-admin/pages/invoices/SuperAdminInvoicePrintPage"),
 );
 const SuperAdminAllDSRListPage = lazy(() => import("../super-admin/pages/dsr/SuperAdminAllDSRListPage"));
+const SuperAdminDSRSubmitPage = lazy(() => import("../super-admin/pages/dsr/SuperAdminDSRSubmitPage"));
+const SuperAdminMyDSRListPage = lazy(() => import("../super-admin/pages/dsr/SuperAdminMyDSRListPage"));
 const SuperAdminProductRecommendationsPage = lazy(
   () => import("../super-admin/pages/productRecommendations/SuperAdminProductRecommendationsPage"),
 );
 const SuperAdminAuditLogListPage = lazy(() => import("../super-admin/pages/audit/SuperAdminAuditLogListPage"));
+const SuperAdminMyAttendancePage = lazy(
+  () => import("../super-admin/pages/attendance/SuperAdminMyAttendancePage"),
+);
 const SuperAdminAllAttendancePage = lazy(
   () => import("../super-admin/pages/attendance/SuperAdminAllAttendancePage"),
 );
@@ -344,6 +349,16 @@ export const superAdminRouteConfig = {
           path: ROUTES.SUPER_ADMIN.SALES_TARGETS,
           element: <SuperAdminSalesTargetsPage />,
         },
+        // Fixed segments before the dynamic /:dsrId route, so neither
+        // "submit" nor "me" is ever read as a DSR id.
+        {
+          path: ROUTES.SUPER_ADMIN.DSR_SUBMIT,
+          element: withPermission(PERMISSIONS.DSR_CREATE, <SuperAdminDSRSubmitPage />),
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.DSR_ME,
+          element: withPermission(PERMISSIONS.DSR_READ_SELF, <SuperAdminMyDSRListPage />),
+        },
         {
           path: ROUTES.SUPER_ADMIN.DSR_PRINT,
           element: withPermission(PERMISSIONS.DSR_READ_ALL, <DSRPrintRouteView backTo={ROUTES.SUPER_ADMIN.DSR} />),
@@ -363,6 +378,12 @@ export const superAdminRouteConfig = {
         {
           path: ROUTES.SUPER_ADMIN.AUDIT_LOG,
           element: withPermission(PERMISSIONS.AUDIT_READ, <SuperAdminAuditLogListPage />),
+        },
+        // Fixed segment before the company-wide listing, so "me" is never
+        // read as part of it.
+        {
+          path: ROUTES.SUPER_ADMIN.ATTENDANCE_ME,
+          element: withPermission(PERMISSIONS.ATTENDANCE_READ_SELF, <SuperAdminMyAttendancePage />),
         },
         {
           path: ROUTES.SUPER_ADMIN.ATTENDANCE,

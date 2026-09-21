@@ -83,11 +83,18 @@ export const ROUTES = Object.freeze({
     INVOICE_PRINT: "/super-admin/invoices/:invoiceId/print",
     PAYMENTS: "/super-admin/payments",
     DSR: "/super-admin/dsr",
+    // The Office Admin files their own DSR from this portal too — it has
+    // no manager above it, so it goes to the Super Admin.
+    DSR_SUBMIT: "/super-admin/dsr/submit",
+    DSR_ME: "/super-admin/dsr/me",
     DSR_PRINT: "/super-admin/dsr/:dsrId/print",
     SALES_TARGETS: "/super-admin/sales-targets",
     PRODUCT_RECOMMENDATIONS: "/super-admin/product-recommendations",
     AUDIT_LOG: "/super-admin/audit-log",
     ATTENDANCE: "/super-admin/attendance",
+    // The Office Admin marks their own attendance from this portal;
+    // the Super Admin is who verifies it.
+    ATTENDANCE_ME: "/super-admin/attendance/me",
     LEAVES: "/super-admin/leaves",
     REPORT_REQUESTS: "/super-admin/report-requests",
     PAYROLL: "/super-admin/payroll",

@@ -4,16 +4,28 @@ import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import logo from "../../assets/KN_AGRO_LOGO.png";
 import { useAuth } from "../../core/auth";
 import Avatar from "../components/Avatar";
+import BackButton from "../components/BackButton";
 import { NotificationBell } from "../../features/notifications";
-import { PERMISSIONS, ROLE_LABELS, ROUTES } from "../constants";
+import { PERMISSIONS, ROLE_LABELS, ROUTES, normalizeRoleName } from "../constants";
 import InstallInstructionsDialog from "../components/InstallInstructionsDialog";
 import { useInstallPrompt } from "../hooks";
 
 function NavigationItems({ collapsed = false, items, onNavigate }) {
-  const { hasPermission } = useAuth();
+  const { hasPermission, role } = useAuth();
+  const normalizedRole = normalizeRoleName(role);
+  // `permission` answers "may this account do it at all"; the optional
+  // `roles` narrows an entry further, for the few screens that a
+  // permission alone would put in front of the wrong person — the Office
+  // Admin's own DSR is one, since the Super Admin holds the same
+  // permission but is who the report goes TO.
   const visibleItems = useMemo(
-    () => items.filter((item) => !item.permission || hasPermission(item.permission)),
-    [hasPermission, items],
+    () =>
+      items.filter(
+        (item) =>
+          (!item.permission || hasPermission(item.permission)) &&
+          (!item.roles || item.roles.includes(normalizedRole)),
+      ),
+    [hasPermission, items, normalizedRole],
   );
 
   return (
@@ -120,6 +132,8 @@ export default function InternalAppLayout({ navigationItems, portalLabel }) {
   const handleInstall = async () => {
     if ((await promptInstall()) === "manual") setShowInstallSteps(true);
   };
+  // The screens the sidebar reaches directly: Back hides itself on these.
+  const rootPaths = useMemo(() => navigationItems.map((item) => item.route), [navigationItems]);
   const desktopSidebarClass = desktopCollapsed ? "lg:w-24" : "lg:w-72";
   const desktopContentClass = desktopCollapsed ? "lg:pl-24" : "lg:pl-72";
 
@@ -206,6 +220,9 @@ export default function InternalAppLayout({ navigationItems, portalLabel }) {
               >
                 <PanelLeftClose className="h-5 w-5" />
               </button>
+              {/* Shown on every screen except the ones the sidebar links
+                  straight to — those have nothing above them. */}
+              <BackButton rootPaths={rootPaths} />
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
                 <p className="text-sm font-semibold text-muted">Dashboard workspace</p>

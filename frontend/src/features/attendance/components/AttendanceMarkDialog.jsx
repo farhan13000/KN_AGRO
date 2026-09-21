@@ -131,10 +131,16 @@ function LocationStatus({ state, onRetry }) {
 }
 
 /**
- * Marking attendance: a selfie, a photo of the vehicle's meter, and the
- * reading on it — all three required, at check-in and at check-out. The
- * backend refuses the request without them; this dialog simply does not
- * let the button be pressed until they are there.
+ * Marking attendance: a selfie and the location, always — plus a photo
+ * of the vehicle's meter and the reading on it for anyone who travels.
+ * The backend refuses the request without them; this dialog simply does
+ * not let the button be pressed until they are there.
+ *
+ * `requireMeter` is false for an office-based role (the Office Admin),
+ * who has no vehicle to read a meter from: the two meter fields are not
+ * shown at all, rather than shown and left blank. The selfie and the
+ * location are still asked for — they are what says who marked
+ * attendance, and from where.
  *
  * The timing banner at the top is the warning the person must see before
  * acting (late check-in / early check-out = half day). It re-evaluates
@@ -147,6 +153,7 @@ export default function AttendanceMarkDialog({
   onClose,
   onConfirm,
   policy = DEFAULT_ATTENDANCE_POLICY,
+  requireMeter = true,
 }) {
   const [selfie, setSelfie] = useState(null);
   const [meterPhoto, setMeterPhoto] = useState(null);
@@ -199,8 +206,9 @@ export default function AttendanceMarkDialog({
   const timing = isCheckOut ? describeCheckOut(now, policy) : describeCheckIn(now, policy);
 
   const readingNumber = meterReading === "" ? null : Number(meterReading);
-  const readingProblem =
-    readingNumber === null
+  const readingProblem = !requireMeter
+    ? ""
+    : readingNumber === null
       ? "Enter the meter reading."
       : !Number.isFinite(readingNumber) || readingNumber < 0
         ? "Enter a valid meter reading."
@@ -209,14 +217,16 @@ export default function AttendanceMarkDialog({
           : "";
 
   const location = locationState.status === "ready" ? locationState.location : null;
-  const canSubmit = Boolean(selfie && meterPhoto && location && !readingProblem && !isSubmitting);
+  const canSubmit = Boolean(
+    selfie && location && (!requireMeter || meterPhoto) && !readingProblem && !isSubmitting,
+  );
 
   const handleSubmit = async () => {
     if (!canSubmit) {
       setError(
         !selfie
           ? "Take your selfie first."
-          : !meterPhoto
+          : requireMeter && !meterPhoto
             ? "Take a photo of the meter."
             : readingProblem || (!location ? "Your location is needed to continue." : ""),
       );
@@ -225,7 +235,11 @@ export default function AttendanceMarkDialog({
     setError("");
     setIsSubmitting(true);
     try {
-      await onConfirm({ selfie, meterPhoto, meterReading: readingNumber, location });
+      // The meter fields are left out entirely when they were not asked
+      // for, rather than sent as nulls the backend would have to ignore.
+      await onConfirm(
+        requireMeter ? { selfie, meterPhoto, meterReading: readingNumber, location } : { selfie, location },
+      );
     } catch (submitError) {
       setError(getApiErrorMessage(submitError));
     } finally {
@@ -242,7 +256,7 @@ export default function AttendanceMarkDialog({
 
         <LocationStatus onRetry={captureLocation} state={locationState} />
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className={`grid gap-3 ${requireMeter ? "sm:grid-cols-2" : ""}`}>
           <CameraSlot
             capture="user"
             hint="Front camera. Your face must be clearly visible."
@@ -251,34 +265,38 @@ export default function AttendanceMarkDialog({
             onChange={setSelfie}
             value={selfie}
           />
-          <CameraSlot
-            capture="environment"
-            hint="Rear camera. The reading must be readable."
-            icon={Gauge}
-            label="Meter reading photo"
-            onChange={setMeterPhoto}
-            value={meterPhoto}
-          />
+          {requireMeter ? (
+            <CameraSlot
+              capture="environment"
+              hint="Rear camera. The reading must be readable."
+              icon={Gauge}
+              label="Meter reading photo"
+              onChange={setMeterPhoto}
+              value={meterPhoto}
+            />
+          ) : null}
         </div>
 
+        {requireMeter ? (
         <label className="block">
-          <span className="form-label">Meter reading (km) <span className="text-red-700">*</span></span>
-          <input
-            className="form-field"
-            inputMode="decimal"
-            min={isCheckOut && typeof minMeterReading === "number" ? minMeterReading : 0}
-            name="meterReading"
-            onChange={(event) => setMeterReading(event.target.value)}
-            placeholder={isCheckOut && typeof minMeterReading === "number" ? `≥ ${minMeterReading}` : "e.g. 45230"}
-            required
-            step="any"
-            type="number"
-            value={meterReading}
-          />
-          {meterReading !== "" && readingProblem ? (
-            <span className="mt-1 block text-xs font-semibold text-red-700">{readingProblem}</span>
-          ) : null}
-        </label>
+            <span className="form-label">Meter reading (km) <span className="text-red-700">*</span></span>
+            <input
+              className="form-field"
+              inputMode="decimal"
+              min={isCheckOut && typeof minMeterReading === "number" ? minMeterReading : 0}
+              name="meterReading"
+              onChange={(event) => setMeterReading(event.target.value)}
+              placeholder={isCheckOut && typeof minMeterReading === "number" ? `≥ ${minMeterReading}` : "e.g. 45230"}
+              required
+              step="any"
+              type="number"
+              value={meterReading}
+            />
+            {meterReading !== "" && readingProblem ? (
+              <span className="mt-1 block text-xs font-semibold text-red-700">{readingProblem}</span>
+            ) : null}
+          </label>
+        ) : null}
 
         {error ? <p className="text-sm font-semibold text-red-700">{error}</p> : null}
 
