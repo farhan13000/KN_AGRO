@@ -1,4 +1,4 @@
-import { getEligibleManagerRoles, MANAGER_TIER_ROLES } from "../../../shared/constants";
+import { getEligibleManagerRoles, MANAGER_ASSIGNABLE_ROLES } from "../../../shared/constants";
 import { EMPLOYEE_STATUS } from "../constants";
 import { useAllEmployees } from "./useAllEmployees";
 
@@ -14,7 +14,7 @@ import { useAllEmployees } from "./useAllEmployees";
  * `forRoleName`, when given (e.g. the hiring form's currently-selected
  * proposed Role), narrows candidates to exactly the one tier a role of
  * that name must report to (see getEligibleManagerRoles) instead of the
- * static MANAGER_TIER_ROLES list. Omitted, this keeps the original
+ * static MANAGER_ASSIGNABLE_ROLES list. Omitted, this keeps the original
  * unfiltered-by-role behavior that TransferEmployeeDialog/
  * ManagerAssignmentDialog rely on.
  *
@@ -25,7 +25,7 @@ import { useAllEmployees } from "./useAllEmployees";
 export const useEligibleManagerCandidates = ({ enabled = true, excludeEmployeeId, forRoleName } = {}) => {
   const state = useAllEmployees({ enabled });
 
-  const eligibleRoles = forRoleName ? getEligibleManagerRoles(forRoleName) : MANAGER_TIER_ROLES;
+  const eligibleRoles = forRoleName ? getEligibleManagerRoles(forRoleName) : MANAGER_ASSIGNABLE_ROLES;
 
   const candidates = state.employees.filter(
     (candidate) =>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Modal from "../../../shared/components/Modal";
-import { MANAGER_TIER_ROLES } from "../../../shared/constants";
+import { MANAGER_ASSIGNABLE_ROLES } from "../../../shared/constants";
 import TextInput from "../../../shared/forms/TextInput";
 import { useEmployeeActions, useEmployeeList } from "../hooks";
 import { pickApprovalPayload, validateApprovalForm } from "../schemas";
@@ -52,7 +52,8 @@ export default function EmployeeApprovalDialog({ employee, isOpen, onClose, onSu
       candidate.user?.status === "ACTIVE" &&
       // Was hardcoded to the removed legacy "sales_manager" role, which
       // would now match nobody and leave this picker permanently empty.
-      MANAGER_TIER_ROLES.includes(candidate.user?.role?.name),
+      // The wider list, so an OA can be picked for a GM.
+      MANAGER_ASSIGNABLE_ROLES.includes(candidate.user?.role?.name),
   );
 
   const handleChange = (event) => {

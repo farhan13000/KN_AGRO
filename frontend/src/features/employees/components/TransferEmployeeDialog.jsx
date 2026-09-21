@@ -31,9 +31,13 @@ export default function TransferEmployeeDialog({ employee, isOpen, onClose, onSu
   const [formError, setFormError] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
 
+  // Narrowed to the one tier this employee's role must report to, so the
+  // list cannot offer a pairing the backend will then refuse — a GM, for
+  // instance, is only ever shown Office Admins.
   const managerState = useEligibleManagerCandidates({
     enabled: isOpen,
     excludeEmployeeId: employee?._id,
+    forRoleName: employee?.user?.role?.name,
   });
   const actions = useEmployeeActions({
     onSuccess: async () => {

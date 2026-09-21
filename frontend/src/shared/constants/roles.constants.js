@@ -66,18 +66,26 @@ export const REQUIRED_MANAGER_ROLE = Object.freeze({
   [BACKEND_ROLES.SO]: BACKEND_ROLES.ASM,
   [BACKEND_ROLES.ASM]: BACKEND_ROLES.RM,
   [BACKEND_ROLES.RM]: BACKEND_ROLES.GM,
+  // The top step, where the chain leaves sales: a GM reports to the
+  // Office Admin. The Super Admin is never in this table — SA usually
+  // has no Employee record to point a manager field at.
+  [BACKEND_ROLES.GM]: BACKEND_ROLES.OA,
 });
+
+// Mirrors the backend's MANAGER_ASSIGNABLE_ROLES — every role that may
+// be picked as somebody's manager. Wider than MANAGER_TIER_ROLES by the
+// Office Admin, who a GM reports to. Same "pickers only" rule as above.
+export const MANAGER_ASSIGNABLE_ROLES = Object.freeze([...MANAGER_TIER_ROLES, BACKEND_ROLES.OA]);
 
 /**
  * Which roles should be offered as reporting-manager candidates for a
- * given role name. Roles with a fixed one-tier-up rule (FO/SO/ASM/RM)
- * resolve to exactly that one role; every other role (GM/OA/SA, or no
- * role picked yet) falls back to the full MANAGER_TIER_ROLES list,
- * matching the picker's original unfiltered behavior.
+ * given role name. Roles with a fixed one-tier-up rule (FO/SO/ASM/RM/GM)
+ * resolve to exactly that one role; anything else (OA/SA, or no role
+ * picked yet) falls back to the full list.
  */
 export const getEligibleManagerRoles = (roleName) => {
   const normalized = normalizeRoleName(roleName);
   const requiredRole = REQUIRED_MANAGER_ROLE[normalized];
-  return requiredRole ? [requiredRole] : MANAGER_TIER_ROLES;
+  return requiredRole ? [requiredRole] : MANAGER_ASSIGNABLE_ROLES;
 };
 

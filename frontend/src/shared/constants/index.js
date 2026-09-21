@@ -4,6 +4,7 @@ export {
   ROLE_KEYS,
   ROLE_LABELS,
   MANAGER_TIER_ROLES,
+  MANAGER_ASSIGNABLE_ROLES,
   REQUIRED_MANAGER_ROLE,
   getEligibleManagerRoles,
   normalizeRoleName,

@@ -216,24 +216,44 @@ export default function OrgFlowChart({ detailPathFor, employees = [], performanc
   }, [expanded]);
 
   const { childrenByManager, byId } = useMemo(() => buildOrgIndex(employees), [employees]);
+
+  // A root is anyone the list holds no manager for — they either report
+  // to nobody, or their manager is outside the viewer's scope.
+  const roots = useMemo(
+    () =>
+      employees.filter((employee) => {
+        if (roleOf(employee) === "sa") return false;
+        const managerId = employee.manager?._id ? String(employee.manager._id) : null;
+        return !managerId || !byId.has(managerId);
+      }),
+    [byId, employees],
+  );
+
+  // The top row starts open, so the chart reads as an org chart on
+  // arrival rather than as one lonely row of cards. Re-seeded whenever
+  // the roots change (a filter, a reassignment), and only for roots —
+  // anything deeper stays closed until asked for.
+  const seededFor = useRef(null);
+  useEffect(() => {
+    const key = roots.map((root) => String(root._id)).join(",");
+    if (seededFor.current === key) return;
+    seededFor.current = key;
+    setExpanded(new Set(roots.map((root) => String(root._id))));
+  }, [roots]);
   const rollups = useMemo(
     () => buildRollups({ childrenByManager, employees, performanceRows }),
     [childrenByManager, employees, performanceRows],
   );
 
   const { nodes, edges } = useMemo(() => {
-    const generalManagers = employees.filter((employee) => roleOf(employee) === "gm");
-    const officeAdmins = employees.filter((employee) => roleOf(employee) === "oa");
-
-    const gmIds = new Set(generalManagers.map((gm) => String(gm._id)));
-    const oaIds = new Set(officeAdmins.map((oa) => String(oa._id)));
-    const detached = employees.filter((employee) => {
-      const id = String(employee._id);
-      if (gmIds.has(id) || oaIds.has(id) || roleOf(employee) === "sa") return false;
-      const managerId = employee.manager?._id ? String(employee.manager._id) : null;
-      return !managerId || !byId.has(managerId);
-    });
-
+    // Everyone hangs off their REAL manager, from `roots` down.
+    //
+    // This used to be a hardcoded spine: every GM was drawn under the
+    // first Office Admin, whatever their `manager` actually said, and any
+    // further OA was drawn childless. That put GMs who report to nobody
+    // under an OA they had no link to, hid the GMs who really did report
+    // to a different OA, and left an OA's card claiming a team it was
+    // never drawn with. Reading the links is both simpler and correct.
     const outNodes = [];
     const outEdges = [];
     let cursor = 0;
@@ -285,58 +305,11 @@ export default function OrgFlowChart({ detailPathFor, employees = [], performanc
       return x;
     };
 
-    // Owner -> Office Admins -> General Managers -> their chains.
-    const oaXs = [];
-    for (const oa of officeAdmins) {
-      const oaId = String(oa._id);
-      const gmXs = generalManagers.map((gm) => place(gm, 2, oaId));
-      const oaX = gmXs.length ? (gmXs[0] + gmXs[gmXs.length - 1]) / 2 : (cursor += SIBLING_GAP) - SIBLING_GAP;
+    // The owner sits above every root. SA has no Employee record to point
+    // a `manager` field at, so this one edge is drawn rather than read.
+    const rootXs = roots.map((root) => place(root, 1, "sa-root"));
 
-      outNodes.push({
-        id: oaId,
-        type: "org",
-        position: { x: oaX, y: TIER_GAP },
-        data: {
-          employee: oa,
-          kind: "oa",
-          rollup: rollups.get(oaId) || emptyRollup(),
-          regionLabel: regionLabelFor(rollups.get(oaId)),
-          expanded: false,
-          hasChildren: false,
-          onToggle: () => {},
-          onOpen: detailPathFor ? () => navigate(detailPathFor(oa)) : undefined,
-        },
-      });
-      oaXs.push(oaX);
-      break; // one spine — additional OAs are listed but never re-parent the GMs
-    }
-
-    // Any remaining OAs sit beside the first without owning the GM branches.
-    for (const oa of officeAdmins.slice(1)) {
-      const oaId = String(oa._id);
-      const x = (cursor += SIBLING_GAP) - SIBLING_GAP;
-      outNodes.push({
-        id: oaId,
-        type: "org",
-        position: { x, y: TIER_GAP },
-        data: {
-          employee: oa, kind: "oa", rollup: rollups.get(oaId) || emptyRollup(),
-          regionLabel: regionLabelFor(rollups.get(oaId)),
-          expanded: false, hasChildren: false, onToggle: () => {},
-          onOpen: detailPathFor ? () => navigate(detailPathFor(oa)) : undefined,
-        },
-      });
-      oaXs.push(x);
-    }
-
-    // No Office Admin: the owner connects straight to the GMs.
-    if (!officeAdmins.length) {
-      generalManagers.forEach((gm) => place(gm, 2, "sa-root"));
-    }
-
-    for (const employee of detached) place(employee, 2, null);
-
-    const saX = oaXs.length ? (oaXs[0] + oaXs[oaXs.length - 1]) / 2 : Math.max(cursor / 2 - SIBLING_GAP / 2, 0);
+    const saX = rootXs.length ? (rootXs[0] + rootXs[rootXs.length - 1]) / 2 : Math.max(cursor / 2 - SIBLING_GAP / 2, 0);
     outNodes.push({
       id: "sa-root",
       type: "org",
@@ -359,10 +332,9 @@ export default function OrgFlowChart({ detailPathFor, employees = [], performanc
         onOpen: undefined,
       },
     });
-    for (const oa of officeAdmins) outEdges.push(edge("sa-root", String(oa._id)));
 
     return { nodes: outNodes, edges: outEdges };
-  }, [byId, childrenByManager, detailPathFor, employees, expanded, navigate, regionLabelFor, rollups, toggle]);
+  }, [childrenByManager, detailPathFor, employees, expanded, navigate, regionLabelFor, rollups, roots, toggle]);
 
   if (!employees.length) {
     return <EmptyState description="No active employees are visible to you." title="No hierarchy data" />;
