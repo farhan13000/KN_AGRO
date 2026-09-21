@@ -30,7 +30,7 @@ const TABS = [
     label: "Promotions",
     permission: PERMISSIONS.PROMOTION_READ,
     blurb:
-      "Promotions awaiting a decision. Approving completes the role change immediately; the backend still enforces which tier may decide each one.",
+      "Promotions waiting for a decision. Approving changes the role straight away, and each promotion can only be decided by the tier it belongs to.",
     render: () => (
       <PendingApprovalsView showHeading={false} />
     ),

@@ -233,9 +233,9 @@ export default function QuotationLifecycleActions({
       <Modal isOpen={dialog === "create-order"} onClose={closeDialog} title="Create order">
         <form className="space-y-4" onSubmit={handleCreateOrder}>
           <p className="text-sm leading-6 text-muted">
-            Create an Order from {quotation.quotationNumber}? The backend resolves/creates the Customer,
-            creates the Order from this quotation&apos;s saved items and totals, and moves this Quotation to
-            Converted. This cannot be undone from here.
+            Create an order from {quotation.quotationNumber}? The customer is found or created for you, the order
+            is made from this quotation&apos;s saved items and totals, and the quotation is marked Converted.
+            This cannot be undone from here.
           </p>
           <TextInput
             id="order-expected-delivery-date"

@@ -3,7 +3,7 @@ import { SalaryProposalPipelineView } from "../../../features/salaryProposals";
 export default function SuperAdminSalaryProposalApprovalsPage() {
   return (
     <SalaryProposalPipelineView
-      description="Salary change proposals across the org. Approve and finalize are Super Admin-only; the backend still enforces which stage each actor may act on."
+      description="Salary change proposals from across the company. Only the Super Admin can approve and finalize, and each proposal moves one stage at a time."
       portalLabel="Org Structure"
     />
   );

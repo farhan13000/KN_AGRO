@@ -9,7 +9,7 @@ export default function SalesManagerLeadListPage({ showHeading = true }) {
       roleLabel="Manager CRM"
       showAssignments
       showHeading={showHeading}
-      subtitle="Review leads returned by your backend manager scope. The browser does not filter global lead data."
+      subtitle="Leads from you and your team, with filters and search."
       title="Assigned Leads"
     />
   );

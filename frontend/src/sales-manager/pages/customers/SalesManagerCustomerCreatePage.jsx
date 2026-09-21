@@ -48,8 +48,8 @@ export default function SalesManagerCustomerCreatePage() {
         <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Manager CRM</p>
         <h1 className="mt-2 text-3xl font-black text-ink">Create Customer</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Create a new customer record. This never auto-merges with an existing customer — a duplicate
-          phone/email match is rejected by the backend rather than silently combined.
+          Add a new customer. Records are never merged on their own — if the phone or email already belongs to
+          a customer, you will be told instead.
         </p>
       </div>
       {formError ? <ErrorState message={formError} title="Unable to create customer" /> : null}

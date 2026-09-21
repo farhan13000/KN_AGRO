@@ -180,7 +180,7 @@ export default function LeadForm({
       </section>
 
       <p className="rounded-lg border border-forest/10 bg-mint px-4 py-3 text-sm font-semibold text-muted">
-        Lead code, status, conversion, closure, and activity history are owned by the backend.
+        The lead code, its status and its history are kept automatically — you do not need to fill them in.
       </p>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">

@@ -36,8 +36,8 @@ export default function EmployeeOrderCreatePage() {
         <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Field Officer</p>
         <h1 className="mt-2 text-3xl font-black text-ink">Take Order</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Record an order the customer has already agreed to. Prices and totals are recalculated by the
-          backend on save; a manager confirms and bills it afterwards.
+          Record an order the customer has already agreed to. Prices and totals are worked out again when you
+          save; a manager confirms and bills it afterwards.
         </p>
       </div>
 

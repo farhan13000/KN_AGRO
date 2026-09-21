@@ -73,8 +73,8 @@ export default function EmployeeProfileEditPage() {
         <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{getPortalLabelForRole(role)}</p>
         <h1 className="mt-2 text-3xl font-black text-ink">Edit My Profile</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          You can update only the self-editable fields allowed by the backend: your photo, phone,
-          address, and emergency contact.
+          You can change your photo, phone, address and emergency contact here. For anything else, ask your
+          manager or the Super Admin.
         </p>
       </div>
 

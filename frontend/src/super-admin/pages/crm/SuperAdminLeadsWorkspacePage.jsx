@@ -14,7 +14,7 @@ const TABS = [
     id: "list",
     label: "All leads",
     permission: PERMISSIONS.LEADS_READ,
-    blurb: "Every backend-scoped lead, with filters, assignment and pipeline value.",
+    blurb: "Every lead in the company, with filters, assignment and pipeline value.",
     render: () => <SuperAdminLeadListPage showHeading={false} />,
   },
   {

@@ -24,7 +24,7 @@ const TABS = [
     id: "low",
     label: "Low stock",
     permission: PERMISSIONS.INVENTORY_READ,
-    blurb: "Products at or below their backend-defined minimum threshold.",
+    blurb: "Products at or below the minimum level set for them.",
     render: () => <SuperAdminLowStockPage showHeading={false} />,
   },
   {

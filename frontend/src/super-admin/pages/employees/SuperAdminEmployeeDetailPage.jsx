@@ -63,7 +63,7 @@ export default function SuperAdminEmployeeDetailPage() {
           <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Employee Details</p>
           <h1 className="mt-2 text-3xl font-black text-ink">{getEmployeeDisplayName(employee)}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-            Identity, profile, manager, account, and lifecycle fields from the backend employee record.
+            This employee's details, their manager, their account and their current status.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -102,7 +102,7 @@ export default function SuperAdminEmployeeDetailPage() {
           <div>
             <h2 className="text-lg font-black text-ink">Lifecycle Actions</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-              These actions call dedicated backend endpoints and then reload the authoritative record.
+              These change whether the employee is active, and the page refreshes to show the result.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">

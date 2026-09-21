@@ -133,9 +133,9 @@ export default function CustomerHistoryPanel({ historyState }) {
             {activeTab === "outstanding" ? (
               <div>
                 <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-900">
-                  This reflects only the {history.invoices.latest.length} most recently created invoices (of{" "}
-                  {history.invoices.count} total) — it is not a guaranteed complete outstanding total. A full,
-                  backend-computed Outstanding Receivables view is a separate feature.
+                  This shows only the {history.invoices.latest.length} most recent invoices (of{" "}
+                  {history.invoices.count} in total), so it is not the full amount outstanding. See Outstanding
+                  Receivables for that.
                 </p>
                 <div className="mt-3 rounded-lg border border-forest/10">
                   {history.invoices.latest.filter((invoice) => invoice.paymentStatus !== INVOICE_PAYMENT_STATUS.PAID).length ? (

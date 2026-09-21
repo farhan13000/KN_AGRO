@@ -39,8 +39,8 @@ export default function SuperAdminQuotationCreatePage() {
         <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">CRM</p>
         <h1 className="mt-2 text-3xl font-black text-ink">Create Quotation</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Backend services remain responsible for the quotation number, DRAFT status, item snapshots, and every
-          total.
+          The quotation number, its draft status and every total are filled in for you — you only pick the lead
+          and the items.
         </p>
       </div>
       {leadId && leadState.isError ? (

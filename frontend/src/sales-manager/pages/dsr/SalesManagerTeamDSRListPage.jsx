@@ -4,7 +4,7 @@ import { TeamDSRListView } from "../../../features/dsr";
 export default function SalesManagerTeamDSRListPage({ showHeading = true }) {
   return (
     <TeamDSRListView
-      description="DSRs from your downline. Review and Acknowledge are only available if the backend confirms you manage this employee."
+      description="Daily reports from your team. Review and Acknowledge are available only for the people you manage."
       portalLabel="My Team"
       printRoute={ROUTES.SALES_MANAGER.DSR_PRINT}
       showHeading={showHeading}

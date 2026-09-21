@@ -48,7 +48,7 @@ export default function SuperAdminLowStockPage({ showHeading = true }) {
           <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Inventory Control</p>
           <h1 className="mt-2 text-3xl font-black text-ink">Low Stock</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-            Review products where available stock is at or below the backend-defined minimum threshold.
+            Products whose available stock has reached or fallen below the minimum level set for them.
           </p>
         </div>
       ) : null}

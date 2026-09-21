@@ -419,7 +419,7 @@ export default function QuotationBuilder({
       <section>
         <h2 className="text-lg font-black text-ink">Preview Summary</h2>
         <p className="mt-1 text-xs font-semibold uppercase tracking-[0.1em] text-muted">
-          Preview only — the backend response after saving is authoritative.
+          A preview. The final figures are confirmed when you save.
         </p>
         <div className="mt-4 rounded-lg border border-forest/10 bg-white p-5">
           <QuotationAmountSummary quotation={previewTotals} />

@@ -45,7 +45,7 @@ export default function SuperAdminCategoryCreatePage() {
         <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Catalog Setup</p>
         <h1 className="mt-2 text-3xl font-black text-ink">Create Category</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Add a backend-backed category. Public visibility remains controlled through category status.
+          Add a category for the catalogue. Whether customers can see it is controlled by its status.
         </p>
       </div>
       {formError ? <ErrorState message={formError} title="Unable to create category" /> : null}

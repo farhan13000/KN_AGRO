@@ -60,8 +60,8 @@ export default function SalesManagerLeadCreatePage() {
         <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Manager CRM</p>
         <h1 className="mt-2 text-3xl font-black text-ink">Create Lead</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Create an internal CRM lead. Backend services remain responsible for status, lead code, ownership rules,
-          and history.
+          Add a lead your team has found. The lead code, its starting status and who it belongs to are set for
+          you.
         </p>
       </div>
       {productsState.isError ? (

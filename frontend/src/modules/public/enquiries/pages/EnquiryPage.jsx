@@ -29,7 +29,7 @@ export default function EnquiryPage() {
       />
       <PageHero
         breadcrumbs={[{ label: "Send Enquiry" }]}
-        description="Share your product, category, quantity and contact preference. KN Agro can use this flow for backend enquiry management in the next phase."
+        description="Share your product, category, quantity and contact preference, and our team will get back to you."
         eyebrow="Product Enquiry"
         image={heroImages.soil}
         title="Request Product Information and Availability"
@@ -43,7 +43,7 @@ export default function EnquiryPage() {
             </h2>
             <p className="mt-4 text-base leading-8 text-muted">
               {t(
-                "The form is built for catalogue enquiries, dealer requirements and product availability requests. It validates on the frontend and keeps the API integration isolated.",
+                "Use this form for catalogue enquiries, dealer requirements and product availability requests.",
               )}
             </p>
             <div className="mt-8 grid gap-4">

@@ -29,7 +29,7 @@ export default function CategoryForm({
           label="Slug"
           name="slug"
           onChange={onChange}
-          placeholder="Optional; backend normalizes it"
+          placeholder="Optional — leave blank and it is filled in from the name"
           value={values.slug}
         />
         <TextInput

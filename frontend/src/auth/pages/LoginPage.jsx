@@ -100,7 +100,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <p className="text-sm text-white/70">Authentication is verified by the K N Agro backend.</p>
+          <p className="text-sm text-white/70">Your sign-in is checked securely by K N Agro.</p>
         </section>
 
         <section className="flex min-h-screen items-center justify-center px-5 py-10 sm:px-8">

@@ -48,7 +48,7 @@ export default function SuperAdminOutOfStockPage({ showHeading = true }) {
           <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Inventory Control</p>
           <h1 className="mt-2 text-3xl font-black text-ink">Out Of Stock</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-            Review products where backend-filtered available stock is zero or below.
+            Products with no available stock left.
           </p>
         </div>
       ) : null}

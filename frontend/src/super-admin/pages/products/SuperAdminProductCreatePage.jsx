@@ -54,7 +54,7 @@ export default function SuperAdminProductCreatePage() {
         <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Product Catalog</p>
         <h1 className="mt-2 text-3xl font-black text-ink">Create Product</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Create catalog data only. The backend initializes inventory separately with zero stock.
+          This adds the product to the catalogue. It starts with zero stock — add stock from the Inventory page.
         </p>
       </div>
       {categoriesState.isError ? (

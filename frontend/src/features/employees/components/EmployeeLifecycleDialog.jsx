@@ -7,25 +7,25 @@ const actionConfig = {
   deactivate: {
     title: "Deactivate employee",
     confirmLabel: "Deactivate",
-    description: "This will ask the backend to deactivate the employee record. The employee is not deleted.",
+    description: "This deactivates the employee. Their record and history are kept, and they can be reactivated later.",
     tone: "danger",
   },
   reactivate: {
     title: "Reactivate employee",
     confirmLabel: "Reactivate",
-    description: "This will ask the backend to reactivate this inactive employee.",
+    description: "This makes the employee active again, so they can sign in and be assigned work.",
     tone: "success",
   },
   resign: {
     title: "Mark as resigned",
     confirmLabel: "Confirm Resignation",
-    description: "This will ask the backend to mark this employee as resigned.",
+    description: "This marks the employee as resigned. Their record and history are kept.",
     tone: "danger",
   },
   terminate: {
     title: "Terminate employee",
     confirmLabel: "Terminate",
-    description: "This is a high-risk lifecycle action. The backend controls final status and account policy.",
+    description: "This changes whether the employee can sign in and be given work. Check you have picked the right person.",
     tone: "danger",
   },
 };

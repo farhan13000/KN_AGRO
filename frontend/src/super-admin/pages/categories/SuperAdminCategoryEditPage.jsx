@@ -75,7 +75,7 @@ export default function SuperAdminCategoryEditPage() {
         <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Catalog Setup</p>
         <h1 className="mt-2 text-3xl font-black text-ink">Edit Category</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Update category naming, image, description, and sort order without bypassing backend validation.
+          Change the category's name, image, description and the order it appears in.
         </p>
       </div>
       {formError ? <ErrorState message={formError} title="Unable to update category" /> : null}

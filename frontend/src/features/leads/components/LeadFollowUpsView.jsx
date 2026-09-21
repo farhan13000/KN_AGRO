@@ -60,7 +60,7 @@ export default function LeadFollowUpsView({
           <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{roleLabel}</p>
           <h1 className="mt-2 text-3xl font-black text-ink">{title}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-            Follow-up lists are loaded from backend scoped endpoints for today, overdue, and upcoming work.
+            Your follow-ups due today, the ones already overdue, and what is coming up.
           </p>
         </div>
       ) : null}

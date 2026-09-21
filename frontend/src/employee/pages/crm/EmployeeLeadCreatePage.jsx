@@ -60,8 +60,8 @@ export default function EmployeeLeadCreatePage() {
         <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Employee CRM</p>
         <h1 className="mt-2 text-3xl font-black text-ink">Create Lead</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Capture a lead you have met in the field. Backend services remain responsible for status, lead code,
-          ownership rules, and history.
+          Capture a lead you have met in the field. The lead code, its starting status and who it belongs to are
+          set for you.
         </p>
       </div>
       {productsState.isError ? (

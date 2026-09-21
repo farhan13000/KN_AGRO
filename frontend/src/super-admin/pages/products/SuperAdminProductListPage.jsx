@@ -104,7 +104,7 @@ export default function SuperAdminProductListPage({ showHeading = true }) {
             <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Product Catalog</p>
             <h1 className="mt-2 text-3xl font-black text-ink">Products</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-              Manage product records, catalog status, price fields, and reorder settings from the backend API.
+              Manage products — their catalogue status, prices and reorder levels.
             </p>
           </div>
         ) : null}

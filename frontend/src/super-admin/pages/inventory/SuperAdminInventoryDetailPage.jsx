@@ -53,7 +53,7 @@ export default function SuperAdminInventoryDetailPage() {
   const canManage = hasPermission(PERMISSIONS.INVENTORY_MANAGE);
   const actionButtons = [
     {
-      description: "Record the one-time initial stock balance. The backend rejects this if opening stock is no longer valid.",
+      description: "Record the opening stock balance. This can only be set once, before any other stock movement.",
       icon: PlusCircle,
       key: "opening",
       label: "Opening Stock",
@@ -62,7 +62,7 @@ export default function SuperAdminInventoryDetailPage() {
       submitLabel: "Record Opening Stock",
     },
     {
-      description: "Record received stock. Backend calculates the authoritative resulting stock.",
+      description: "Record stock received. The new balance is worked out for you.",
       icon: ArrowUpCircle,
       key: "stockIn",
       label: "Stock In",
@@ -71,7 +71,7 @@ export default function SuperAdminInventoryDetailPage() {
       submitLabel: "Record Stock In",
     },
     {
-      description: "Record stock leaving inventory. The backend enforces sufficient available stock.",
+      description: "Record stock going out. You cannot take out more than is available.",
       icon: ArrowDownCircle,
       key: "stockOut",
       label: "Stock Out",
@@ -99,7 +99,7 @@ export default function SuperAdminInventoryDetailPage() {
       submitLabel: "Record Adjustment Out",
     },
     {
-      description: "Record damaged stock as an inventory transaction. The backend enforces sufficient available stock.",
+      description: "Record damaged stock. You cannot write off more than is available.",
       icon: AlertTriangle,
       key: "damaged",
       label: "Damaged Stock",
@@ -207,8 +207,8 @@ export default function SuperAdminInventoryDetailPage() {
           <div>
             <h2 className="text-lg font-black text-ink">Stock Actions</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-              Manual actions create immutable stock transactions. Reserved, released, and sale movements are
-              system-driven and are intentionally not exposed as manual Phase 3 buttons.
+              Every action here is recorded permanently and cannot be edited afterwards. Stock reserved,
+              released or sold moves on its own with the order, so there are no buttons for those.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">

@@ -80,7 +80,7 @@ export default function SuperAdminCategoryListPage({ showHeading = true }) {
             <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Catalog Setup</p>
             <h1 className="mt-2 text-3xl font-black text-ink">Categories</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-              Maintain catalog categories with backend search, sort order, and safe status updates.
+              Manage catalogue categories — search them, set the order they appear in, and change their status.
             </p>
           </div>
         ) : null}

@@ -9,7 +9,7 @@ export default function EmployeeDashboardPage() {
   return (
     <div className="space-y-6">
       <DashboardShell
-        description="Your access starts with account identity and a protected workspace."
+        description="Your leads, visits, reports and attendance for the day, all in one place."
         title="My Dashboard"
       />
       {/* Org-hierarchy migration (Phase F17) — real check-in/check-out,

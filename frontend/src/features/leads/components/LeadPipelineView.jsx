@@ -76,7 +76,7 @@ export default function LeadPipelineView({
           <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{roleLabel}</p>
           <h1 className="mt-2 text-3xl font-black text-ink">{title}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-            Pipeline stages use status-filtered backend requests. Status changes stay explicit actions on lead detail.
+            Your leads grouped by stage. To move a lead, open it and change its status.
           </p>
         </div>
       ) : null}

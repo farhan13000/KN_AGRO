@@ -58,8 +58,8 @@ export default function SuperAdminInventoryTransactionsPage({ showHeading = true
           <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Inventory Ledger</p>
           <h1 className="mt-2 text-3xl font-black text-ink">Transaction History</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
-            Review immutable stock ledger records. Reserved, released, and sale transactions are read-only
-            system-driven movements for future order workflows, not manual Phase 3 actions.
+            Every stock movement, permanently recorded and never edited. Reserved, released and sold entries
+            are made automatically by orders, not by hand.
           </p>
         </div>
       ) : null}

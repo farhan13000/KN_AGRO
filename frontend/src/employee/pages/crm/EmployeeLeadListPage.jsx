@@ -10,7 +10,7 @@ export default function EmployeeLeadListPage({ showHeading = true }) {
       showAssignments={false}
       showHeading={showHeading}
       showSource={false}
-      subtitle="Review leads returned by your backend employee scope. Assignment controls are not shown here."
+      subtitle="The leads assigned to you. Reassigning a lead is done by your manager."
       title="My Leads"
     />
   );

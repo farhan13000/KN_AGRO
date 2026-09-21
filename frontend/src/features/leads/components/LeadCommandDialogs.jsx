@@ -205,8 +205,8 @@ export function LeadEditDialog({ isOpen, lead, onClose, onSuccess }) {
           </div>
         </div>
         <p className="rounded-lg border border-forest/10 bg-white px-3 py-2 text-sm font-semibold text-muted">
-          This form sends only ordinary lead details. Status, priority, assignment, expected value, product interest,
-          and system fields use dedicated backend actions.
+          This form changes the lead's basic details only. Status, priority, assignment, expected value and
+          products each have their own button.
         </p>
         <CrmActionError error={actions.updateLead.error} fallback="Unable to update lead details." />
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
@@ -374,7 +374,7 @@ export function StatusChangeDialog({ isOpen, lead, onClose, onSuccess }) {
           />
         ) : null}
         <p className="rounded-lg border border-forest/10 bg-white px-3 py-2 text-sm font-semibold text-muted">
-          The backend validates allowed transitions and creates status history.
+          Only the next steps allowed from the current status are offered, and the change is added to the lead's history.
         </p>
         <CrmActionError error={actions.changeStatus.error} fallback="Unable to update lead status." />
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
@@ -517,7 +517,7 @@ export function FollowUpScheduleDialog({ isOpen, lead, onClose, onSuccess }) {
           value={note}
         />
         <p className="rounded-lg border border-forest/10 bg-white px-3 py-2 text-sm font-semibold text-muted">
-          The backend updates next follow-up and creates follow-up history.
+          This becomes the lead's next follow-up and is added to its history.
         </p>
         <CrmActionError error={actions.scheduleFollowUp.error} fallback="Unable to schedule follow-up." />
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
@@ -573,7 +573,7 @@ export function FollowUpCompleteDialog({ isOpen, lead, onClose, onSuccess }) {
           value={nextFollowUpAt}
         />
         <p className="rounded-lg border border-forest/10 bg-white px-3 py-2 text-sm font-semibold text-muted">
-          Completion and optional rescheduling happen atomically in the backend.
+          Completing this follow-up and scheduling the next one are saved together — either both happen or neither does.
         </p>
         <CrmActionError error={actions.completeFollowUp.error} fallback="Unable to complete follow-up." />
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
@@ -638,7 +638,7 @@ export function QualifyLeadDialog({ isOpen, lead, onClose, onSuccess }) {
     <Modal isOpen={isOpen} onClose={onClose} title="Mark lead qualified">
       <div className="space-y-4">
         <p className="text-sm leading-6 text-muted">
-          Qualified means ready for quotation. This action does not create a quotation or any Phase 5 record.
+          Qualified means this lead is ready for a quotation. This only changes the status — it does not create the quotation.
         </p>
         <CrmActionError error={actions.changeStatus.error} fallback="Unable to qualify this lead." />
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
@@ -665,8 +665,8 @@ export function CloseLeadDialog({ isOpen, lead, onClose, onSuccess }) {
     <Modal isOpen={isOpen} onClose={onClose} title="Close lead">
       <div className="space-y-4">
         <p className="text-sm leading-6 text-muted">
-          Close this lead using the backend status endpoint. Closed is distinct from lost and the backend remains
-          responsible for validating whether this transition is allowed.
+          Closing is not the same as marking a lead lost — close it when the work on it is finished. If the lead's
+          current status does not allow closing, you will be told.
         </p>
         <CrmActionError error={actions.closeLead.error} fallback="Unable to close this lead." />
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">

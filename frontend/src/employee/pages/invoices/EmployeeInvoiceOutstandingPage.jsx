@@ -11,8 +11,7 @@ export default function EmployeeInvoiceOutstandingPage({ showHeading = true }) {
           <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Employee CRM</p>
           <h1 className="mt-2 text-3xl font-black text-ink">Outstanding Receivables</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-            Real, backend-aggregated totals across invoices tied to your own assigned leads, plus a browsable
-            list.
+            Money still to be collected on invoices for the leads assigned to you.
           </p>
         </div>
       ) : null}

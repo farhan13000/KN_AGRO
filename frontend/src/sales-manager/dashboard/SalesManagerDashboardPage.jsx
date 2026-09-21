@@ -23,7 +23,7 @@ export default function SalesManagerDashboardPage() {
   return (
     <div className="space-y-6">
       <DashboardShell
-        description="Manager access starts with a secure portal shell. Team workflows, leads, reports, and approvals belong to later phases."
+        description="Your team's leads, sales, attendance and reports, with the approvals waiting on you."
         title="Manager Dashboard"
       />
       {/* Org-hierarchy migration (Phase F09) — sales attribution rollup by

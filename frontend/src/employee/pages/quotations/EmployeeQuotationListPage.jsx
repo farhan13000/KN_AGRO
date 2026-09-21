@@ -9,7 +9,7 @@ export default function EmployeeQuotationListPage() {
     <QuotationListView
       detailPath={(quotation) => `${ROUTES.EMPLOYEE.QUOTATIONS}/${quotation._id}`}
       roleLabel="Employee CRM"
-      subtitle="View quotations for your own leads, backend-scoped, with status, date, and search filters."
+      subtitle="Quotations for your own leads, with status, date and search filters."
       title="Quotations"
     />
   );

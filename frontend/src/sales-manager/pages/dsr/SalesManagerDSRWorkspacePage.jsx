@@ -16,7 +16,7 @@ const TABS = [
     label: "My team",
     permission: PERMISSIONS.DSR_READ_TEAM,
     blurb:
-      "DSRs from your downline. Review and Acknowledge appear only where the backend confirms you manage that employee.",
+      "Daily reports from your team. Review and Acknowledge appear only for the people you manage.",
     render: () => <SalesManagerTeamDSRListPage showHeading={false} />,
   },
 ];

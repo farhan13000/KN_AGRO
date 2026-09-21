@@ -33,7 +33,7 @@ export default function ContactPage() {
             <h2 className="mt-4 text-3xl font-extrabold leading-tight text-ink">{t("Quick ways to reach KN Agro.")}</h2>
             <p className="mt-4 text-base leading-8 text-muted">
               {t(
-                "Share your product requirement, category interest or business enquiry. The current form simulates a successful submission and is ready for backend integration.",
+                "Share your product requirement, category interest or business enquiry. Our team replies during working hours.",
               )}
             </p>
             <div className="mt-8 grid gap-4">
@@ -76,7 +76,7 @@ export default function ContactPage() {
             <p className="mt-5 text-white/78">{t(companyConfig.businessHours)}</p>
             <div className="mt-8 rounded-2xl bg-white/10 p-5 text-sm leading-7 text-white/80">
               {t(
-                "For urgent product details, WhatsApp is the quickest contact option. Backend delivery channels can be connected in the next phase.",
+                "For urgent product details, WhatsApp is the quickest way to reach us.",
               )}
             </div>
           </div>

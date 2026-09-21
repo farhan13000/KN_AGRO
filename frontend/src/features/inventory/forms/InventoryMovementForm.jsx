@@ -51,8 +51,8 @@ export default function InventoryMovementForm({
         value={values.remarks}
       />
       <p className="rounded-lg border border-forest/10 bg-mint px-4 py-3 text-sm font-semibold text-muted">
-        The frontend submits movement details only. Previous stock, new stock, reserved stock, transaction code,
-        and performer are calculated by the backend ledger.
+        You only enter the movement itself. The previous and new stock, the reserved quantity, the entry number
+        and who recorded it are filled in automatically.
       </p>
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
         <Button onClick={onCancel} variant="secondary">

@@ -65,7 +65,7 @@ export default function SuperAdminEmployeeListPage() {
           <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Employee Management</p>
           <h1 className="mt-2 text-3xl font-black text-ink">Employees</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-            Search and manage employee profiles using backend pagination and scoped permissions.
+            Search and manage employees. You see everyone your role allows.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">

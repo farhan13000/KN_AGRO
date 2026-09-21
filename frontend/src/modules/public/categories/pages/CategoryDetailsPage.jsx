@@ -125,7 +125,7 @@ export default function CategoryDetailsPage() {
               </h2>
               <p className="mt-4 text-base leading-7 text-muted">
                 {t(
-                  "These products are loaded through the public product service layer and can later connect directly to backend category APIs.",
+                  "Browse everything KN Agro offers in this category.",
                 )}
               </p>
             </div>

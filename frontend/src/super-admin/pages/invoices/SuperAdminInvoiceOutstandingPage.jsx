@@ -17,7 +17,7 @@ export default function SuperAdminInvoiceOutstandingPage({ showHeading = true })
           <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">CRM</p>
           <h1 className="mt-2 text-3xl font-black text-ink">Outstanding Receivables</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-            Real, backend-aggregated totals across every invoice you can see, plus a browsable, sortable list.
+            Money still to be collected across every invoice in the company, soonest due first.
           </p>
         </div>
       ) : null}

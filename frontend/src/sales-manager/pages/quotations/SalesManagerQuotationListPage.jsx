@@ -7,7 +7,7 @@ export default function SalesManagerQuotationListPage() {
       createPath={ROUTES.SALES_MANAGER.QUOTATION_CREATE}
       detailPath={(quotation) => `${ROUTES.SALES_MANAGER.QUOTATIONS}/${quotation._id}`}
       roleLabel="Manager CRM"
-      subtitle="View your team's quotations, backend-scoped, with status, date, and search filters."
+      subtitle="Your team's quotations, with status, date and search filters."
       title="Quotations"
     />
   );

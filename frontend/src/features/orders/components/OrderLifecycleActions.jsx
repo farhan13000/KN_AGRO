@@ -204,8 +204,8 @@ export default function OrderLifecycleActions({ onSuccess, order }) {
             value={cancelReason}
           />
           <p className="text-xs font-semibold text-muted">
-            If stock was already reserved for this order, the backend releases it automatically — never
-            consumed stock, since this order hasn&apos;t been dispatched.
+            Any stock held for this order is released back automatically. Nothing has left the godown, because
+            this order has not been dispatched.
           </p>
           <ActionError message={actions.cancelOrder.errorMessage} />
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">

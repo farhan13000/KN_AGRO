@@ -25,13 +25,13 @@ export default function PrivacyPolicyPage() {
       <h2>{t("Data Sharing")}</h2>
       <p>
         {t(
-          "KN Agro does not present this public frontend as a payment or checkout system. Enquiry details should only be shared with authorized team members or service providers when needed to respond to the request.",
+          "This website does not take payments and has no checkout. Your enquiry details are shared only with the KN Agro team members and service providers who need them to answer you.",
         )}
       </p>
       <h2>{t("Security")}</h2>
       <p>
         {t(
-          "The current frontend is prepared for backend integration. Once connected, enquiry and contact data should be handled with authentication, validation, role-based access and audit practices defined in the project rules.",
+          "Enquiry and contact details are kept on secured systems. Only signed-in KN Agro staff whose role allows it can open them, and every change is recorded.",
         )}
       </p>
       <h2>{t("Contact")}</h2>

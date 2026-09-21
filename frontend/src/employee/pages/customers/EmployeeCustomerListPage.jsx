@@ -9,7 +9,7 @@ export default function EmployeeCustomerListPage() {
     <CustomerListView
       detailPath={(customer) => `${ROUTES.EMPLOYEE.CUSTOMERS}/${customer._id}`}
       roleLabel="Employee CRM"
-      subtitle="View customers with status, type, and search filters. Customer records are unscoped shared master data."
+      subtitle="Customers with status, type and search filters. The customer list is shared by the whole company."
       title="Customers"
     />
   );

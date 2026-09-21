@@ -21,7 +21,7 @@ const TABS = [
     id: "outstanding",
     label: "Outstanding",
     permission: PERMISSIONS.INVOICES_READ,
-    blurb: "Backend-aggregated receivables, listed soonest-due first.",
+    blurb: "Money still to be collected, soonest due first.",
     render: () => <SuperAdminInvoiceOutstandingPage showHeading={false} />,
   },
   {

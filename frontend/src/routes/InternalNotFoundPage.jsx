@@ -14,7 +14,7 @@ export default function InternalNotFoundPage() {
         <p className="mt-6 text-sm font-bold uppercase tracking-[0.16em] text-agriculture">404</p>
         <h1 className="mt-3 text-3xl font-black text-ink">This workspace page does not exist.</h1>
         <p className="mt-4 text-sm leading-6 text-muted">
-          The route may be unavailable in Phase 1 or reserved for a later business module.
+          The link may be out of date, or this page may not be available for your role.
         </p>
         <Link
           className="mt-8 inline-flex min-h-11 items-center justify-center rounded-xl bg-forest px-5 py-3 text-sm font-bold text-white shadow-soft transition hover:bg-agriculture"

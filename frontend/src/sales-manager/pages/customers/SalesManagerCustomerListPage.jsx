@@ -7,7 +7,7 @@ export default function SalesManagerCustomerListPage() {
       createPath={ROUTES.SALES_MANAGER.CUSTOMER_CREATE}
       detailPath={(customer) => `${ROUTES.SALES_MANAGER.CUSTOMERS}/${customer._id}`}
       roleLabel="Manager CRM"
-      subtitle="View all customers with status, type, and search filters. Customer records are unscoped shared master data."
+      subtitle="Customers with status, type and search filters. The customer list is shared by the whole company."
       title="Customers"
     />
   );

@@ -37,7 +37,7 @@ export default function LeadListView({
   showLocationFilter = false,
   showPipelineValue = true,
   showSource = true,
-  subtitle = "Review backend-scoped leads with server pagination, filters, and search.",
+  subtitle = "Every lead you can see, with filters and search.",
   title = "Leads",
 }) {
   const { hasPermission } = useAuth();

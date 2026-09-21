@@ -88,7 +88,7 @@ export default function SuperAdminEmployeeCreatePage() {
         <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">Employee Management</p>
         <h1 className="mt-2 text-3xl font-black text-ink">Create Employee</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Create the user account and employee profile through the backend employee endpoint.
+          Create the login account and the employee's profile together, in one step.
         </p>
       </div>
 

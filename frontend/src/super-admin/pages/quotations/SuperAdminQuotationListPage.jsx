@@ -7,7 +7,7 @@ export default function SuperAdminQuotationListPage() {
       createPath={ROUTES.SUPER_ADMIN.QUOTATION_CREATE}
       detailPath={(quotation) => `${ROUTES.SUPER_ADMIN.QUOTATIONS}/${quotation._id}`}
       roleLabel="CRM"
-      subtitle="View all backend-scoped quotations with status, date, and search filters."
+      subtitle="Every quotation in the company, with status, date and search filters."
       title="Quotations"
     />
   );

@@ -9,7 +9,7 @@ export default function SuperAdminLeadListPage({ showHeading = true }) {
       roleLabel="CRM"
       showHeading={showHeading}
       showLocationFilter
-      subtitle="View all backend-scoped leads with CRM filters, assignments, and pipeline value."
+      subtitle="Every lead in the company, with filters, assignment and pipeline value."
       title="Leads"
     />
   );

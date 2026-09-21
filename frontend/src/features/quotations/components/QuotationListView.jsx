@@ -26,7 +26,7 @@ export default function QuotationListView({
   createPath = "",
   detailPath,
   roleLabel = "CRM",
-  subtitle = "Review backend-scoped quotations with server pagination, filters, and search.",
+  subtitle = "Every quotation you can see, with filters and search.",
   title = "Quotations",
 }) {
   const { hasPermission } = useAuth();
