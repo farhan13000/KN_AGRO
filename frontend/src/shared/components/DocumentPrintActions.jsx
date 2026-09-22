@@ -52,13 +52,23 @@ export default function DocumentPrintActions({
   };
 
   useEffect(() => {
-    if (!autoDownload || startedRef.current) return;
-    startedRef.current = true;
+    if (!autoDownload) return undefined;
     // A short wait so webfonts and the sheet's own layout have settled —
     // html2canvas photographs whatever is there at that instant.
-    const timer = setTimeout(handleDownload, 800);
+    //
+    // The "only once" guard is claimed when the timer FIRES, not when it
+    // is scheduled. React's development StrictMode mounts, unmounts and
+    // remounts every component: a guard taken at schedule time was
+    // claimed by the first mount, whose timer the unmount then cancelled,
+    // and the second mount refused to schedule another — so the download
+    // never happened at all, in exactly the mode it is developed in.
+    const timer = setTimeout(() => {
+      if (startedRef.current) return;
+      startedRef.current = true;
+      handleDownload();
+    }, 800);
     return () => clearTimeout(timer);
-    // Deliberately once, on mount: re-running would download again.
+    // Deliberately keyed only on the flag: re-running would download again.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoDownload]);
 
