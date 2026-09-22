@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { DataTable, rowActionClass } from "../../../shared/components";
 import { formatBusinessDateTime } from "../../../shared/utils";
 import { LeadPriorityBadge, LeadSourceBadge, LeadStatusBadge } from "./LeadBadges";
-import { formatEmployeeSummary, formatGeoSummary, formatPipelineValue } from "../utils";
+import { formatEmployeeSummary, formatLeadLocation, formatPipelineValue } from "../utils";
 
 export default function LeadTable({
   detailPath,
@@ -11,11 +11,11 @@ export default function LeadTable({
   showAssignments = true,
   showSource = true,
   showPipelineValue = true,
-  // The buyer's own state/district, from their address. Defaults to
-  // mirroring showAssignments: the two describe the same "who/where this
-  // belongs to" context, so any view that already hides assignments for
-  // being redundant (e.g. an employee's own lead list) hides location
-  // too, unless overridden.
+  // Where the buyer is, as the person who entered the lead wrote it.
+  // Defaults to mirroring showAssignments: the two describe the same
+  // "who/where this belongs to" context, so any view that already hides
+  // assignments for being redundant (e.g. an employee's own lead list)
+  // hides location too, unless overridden.
   showLocation = showAssignments,
 }) {
   const columns = [
@@ -118,17 +118,15 @@ export default function LeadTable({
       cellClassName: "text-muted",
       cell: (lead) => formatEmployeeSummary(lead.assignedEmployee),
     },
+    // One column, not a State and a District pair: the two were reading
+    // a structured address that only website enquiries ever have, so on
+    // a staff-entered lead they were two columns of "Not Set" side by
+    // side. See formatLeadLocation.
     showLocation && {
-      key: "state",
-      header: "State",
-      cellClassName: "text-muted",
-      cell: (lead) => formatGeoSummary(lead.address?.state),
-    },
-    showLocation && {
-      key: "district",
-      header: "District",
-      cellClassName: "text-muted",
-      cell: (lead) => formatGeoSummary(lead.address?.district),
+      key: "location",
+      header: "Location",
+      cellClassName: "max-w-[14rem] text-muted",
+      cell: (lead) => formatLeadLocation(lead),
     },
     showPipelineValue && {
       key: "expectedValue",
@@ -158,5 +156,5 @@ export default function LeadTable({
     },
   ].filter(Boolean);
 
-  return <DataTable columns={columns} minWidth="1120px" rows={leads} />;
+  return <DataTable columns={columns} minWidth="1040px" rows={leads} />;
 }
