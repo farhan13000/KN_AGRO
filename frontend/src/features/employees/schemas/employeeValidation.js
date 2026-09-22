@@ -1,7 +1,6 @@
 import { EMPLOYMENT_TYPE } from "../constants";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const today = new Date();
 
 const hasValue = (value) => String(value || "").trim().length > 0;
 
@@ -40,17 +39,33 @@ const validateEmploymentType = (errors, values) => {
   }
 };
 
-const validateDate = (errors, values, field, label, required = false) => {
+/**
+ * A joining date, with no window around it.
+ *
+ * It used to refuse anything after today, which quietly broke the
+ * commonest case there is: an offer accepted now for someone who starts
+ * next month. Approving a hiring request has the same shape — the
+ * joining date is agreed before the person arrives, so it is almost
+ * always in the future at the moment it is typed in.
+ *
+ * A floor of 1950 went with it, and was equally arbitrary: entering a
+ * long-serving employee into the system for the first time is an
+ * ordinary thing, and no year the business might legitimately use
+ * belongs in a validator's opinion.
+ *
+ * So: past, today or future, as long as it is a real date. The backend
+ * never had a bound here either (employee.validation.js and
+ * hiring.validation.js both take a plain date), so this now agrees with
+ * it rather than being a stricter rule invented on one side.
+ */
+const validateJoiningDate = (errors, values, field, label, required = false) => {
   if (!hasValue(values[field])) {
     if (required) errors[field] = `${label} is required.`;
     return;
   }
 
-  const parsed = new Date(values[field]);
-  if (Number.isNaN(parsed.getTime())) {
+  if (Number.isNaN(new Date(values[field]).getTime())) {
     errors[field] = `Enter a valid ${label.toLowerCase()}.`;
-  } else if (parsed.getFullYear() < 1950 || parsed > today) {
-    errors[field] = `Enter a reasonable ${label.toLowerCase()}.`;
   }
 };
 
@@ -80,7 +95,7 @@ export const validateCreateEmployeeForm = (values = {}) => {
   validatePhone(errors, values);
   requireField(errors, values, "department", "Department is required.");
   requireField(errors, values, "designation", "Designation is required.");
-  validateDate(errors, values, "dateOfJoining", "Date of Joining", true);
+  validateJoiningDate(errors, values, "dateOfJoining", "Date of Joining", true);
   validateEmploymentType(errors, values);
   validateCoverage(errors, values);
 
@@ -94,7 +109,7 @@ export const validateUpdateEmployeeForm = (values = {}) => {
   validatePhone(errors, values);
   requireField(errors, values, "department", "Department is required.");
   requireField(errors, values, "designation", "Designation is required.");
-  validateDate(errors, values, "dateOfJoining", "Date of Joining");
+  validateJoiningDate(errors, values, "dateOfJoining", "Date of Joining");
   validateEmploymentType(errors, values);
 
   return result(errors);
@@ -110,7 +125,7 @@ export const validateSelfUpdateEmployeeForm = (values = {}) => {
 export const validateApprovalForm = (values = {}) => {
   const errors = {};
 
-  validateDate(errors, values, "dateOfJoining", "Date of Joining");
+  validateJoiningDate(errors, values, "dateOfJoining", "Date of Joining");
   return result(errors);
 };
 
