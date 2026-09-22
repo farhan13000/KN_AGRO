@@ -21,8 +21,20 @@ import { QUOTATION_STATUS } from "../constants/quotation.constants.js";
 // (quotation.service.js#reviseQuotation), and "do not hardcode
 // undocumented transitions" means following the actual contract, not the
 // prompt's generic example.
-export const getQuotationCapabilities = ({ hasPermission, quotation }) => {
+export const getQuotationCapabilities = ({ currentUserId, hasPermission, quotation }) => {
   const status = quotation?.status;
+
+  // Accepting or rejecting is not a decision anyone here makes — it is a
+  // report of what the CUSTOMER decided, and only the person who spoke
+  // to them can make it. The backend picks that person from the lead's
+  // own assignment (leadResponder.js) and names them on the record as
+  // `awaitingAnswerFrom`; this mirrors that choice rather than
+  // re-deriving it, so the two can never disagree about whose answer it
+  // is. An unassigned lead resolves to nobody, and there the backend
+  // deliberately falls open rather than stranding the quotation — so
+  // this does too.
+  const responderUserId = quotation?.awaitingAnswerFrom?.user?._id;
+  const isLeadResponder = !responderUserId || String(responderUserId) === String(currentUserId ?? "");
 
   return {
     canListQuotation: hasPermission(PERMISSIONS.QUOTATIONS_READ),
@@ -41,8 +53,15 @@ export const getQuotationCapabilities = ({ hasPermission, quotation }) => {
     // never enough — the document has to actually be waiting.
     canApproveQuotation:
       hasPermission(PERMISSIONS.QUOTATIONS_APPROVE) && status === QUOTATION_STATUS.PENDING_APPROVAL,
-    canAcceptQuotation: hasPermission(PERMISSIONS.QUOTATIONS_ACCEPT) && status === QUOTATION_STATUS.SENT,
-    canRejectQuotation: hasPermission(PERMISSIONS.QUOTATIONS_REJECT) && status === QUOTATION_STATUS.SENT,
+    canAcceptQuotation:
+      hasPermission(PERMISSIONS.QUOTATIONS_ACCEPT) && status === QUOTATION_STATUS.SENT && isLeadResponder,
+    canRejectQuotation:
+      hasPermission(PERMISSIONS.QUOTATIONS_REJECT) && status === QUOTATION_STATUS.SENT && isLeadResponder,
+    // Everyone else looking at a quotation that is out with the
+    // customer. There is nothing for them to press, and saying so beats
+    // an actions panel that silently has fewer buttons than they
+    // remember.
+    isAwaitingLeadAnswer: status === QUOTATION_STATUS.SENT && !isLeadResponder,
     canCancelQuotation:
       hasPermission(PERMISSIONS.QUOTATIONS_MANAGE) &&
       [QUOTATION_STATUS.DRAFT, QUOTATION_STATUS.PENDING_APPROVAL, QUOTATION_STATUS.SENT].includes(status),

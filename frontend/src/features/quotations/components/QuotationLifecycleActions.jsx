@@ -1,4 +1,4 @@
-import { CheckCircle2, GitPullRequest, PackagePlus, Pencil, RefreshCw, ShieldX, XCircle } from "lucide-react";
+import { CheckCircle2, GitPullRequest, Hourglass, PackagePlus, Pencil, RefreshCw, ShieldX, XCircle } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../../core/auth";
 import Button from "../../../shared/components/Button";
@@ -51,7 +51,7 @@ export default function QuotationLifecycleActions({
   onSuccess,
   quotation,
 }) {
-  const { hasPermission } = useAuth();
+  const { hasPermission, user } = useAuth();
   const [dialog, setDialog] = useState("");
   const [rejectReason, setRejectReason] = useState("");
   const [cancelReason, setCancelReason] = useState("");
@@ -68,7 +68,22 @@ export default function QuotationLifecycleActions({
     canRejectQuotation,
     canReviseQuotation,
     canSendQuotation,
-  } = getQuotationCapabilities({ hasPermission, quotation });
+    isAwaitingLeadAnswer,
+  } = getQuotationCapabilities({ currentUserId: user?._id, hasPermission, quotation });
+
+  const awaitingAnswerFrom = quotation.awaitingAnswerFrom?.user?.name || "";
+
+  // The bar itself, separate from the panels above it: a reader who is
+  // only being TOLD something (waiting for approval, waiting for the
+  // customer's answer) should not also be shown an empty "Actions" card.
+  const hasAnyAction =
+    canEditQuotation ||
+    canSendQuotation ||
+    canCreateOrderFromQuotation ||
+    canAcceptQuotation ||
+    canRejectQuotation ||
+    canCancelQuotation ||
+    canReviseQuotation;
 
   const isWaitingForApproval = quotation.status === QUOTATION_STATUS.PENDING_APPROVAL;
   // A refusal that has not been acted on yet: back in DRAFT, still
@@ -137,6 +152,7 @@ export default function QuotationLifecycleActions({
 
   if (
     !canApproveQuotation &&
+    !isAwaitingLeadAnswer &&
     !isWaitingForApproval &&
     !wasSentBack &&
     !canEditQuotation &&
@@ -189,6 +205,26 @@ export default function QuotationLifecycleActions({
         onDecide={handleDecision}
       />
 
+      {/* The quotation is with the customer and this reader is not the
+          person they will answer. Said plainly, because "the Accept
+          button is missing" is otherwise indistinguishable from a bug. */}
+      {isAwaitingLeadAnswer ? (
+        <div className="rounded-2xl border border-sky-200 bg-sky-50 p-5">
+          <p className="flex items-center gap-2 text-sm font-black text-sky-900">
+            <Hourglass className="h-4 w-4" />
+            {awaitingAnswerFrom
+              ? `Waiting for ${awaitingAnswerFrom} to record the customer's answer`
+              : "Waiting for the lead's employee to record the customer's answer"}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-sky-900">
+            This quotation is with {quotation.lead?.name || "the customer"}. Whether it was accepted or
+            refused is the customer&apos;s decision, so only the employee in touch with them can record it here
+            {awaitingAnswerFrom ? ` — ${awaitingAnswerFrom}` : ""}.
+          </p>
+        </div>
+      ) : null}
+
+      {hasAnyAction ? (
       <Card className="p-5">
         <h2 className="text-lg font-black text-ink">Actions</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -239,6 +275,7 @@ export default function QuotationLifecycleActions({
           ) : null}
         </div>
       </Card>
+      ) : null}
 
       <ConfirmDialog
         cancelLabel="Back"

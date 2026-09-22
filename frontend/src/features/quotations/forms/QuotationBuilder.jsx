@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Button from "../../../shared/components/Button";
 import Select from "../../../shared/forms/Select";
 import Textarea from "../../../shared/forms/Textarea";
@@ -6,6 +6,9 @@ import QuotationAmountSummary from "../components/QuotationAmountSummary";
 import QuotationItemEditableRow from "../components/QuotationItemEditableRow";
 import QuotationLeadSelector from "../components/QuotationLeadSelector";
 import QuotationProductSelector from "../components/QuotationProductSelector";
+// Narrow subpath, not the products feature barrel: this needs one hook,
+// not the whole Products UI graph in the Quotations bundle.
+import { useProductList } from "../../products/hooks";
 import { QUOTATION_DISCOUNT_TYPE, QUOTATION_DISCOUNT_TYPE_LABELS } from "../constants";
 import { calculateQuotationTotalsPreview } from "../utils";
 
@@ -50,6 +53,23 @@ const mapQuotationItemsToEditable = (items = []) =>
     rate: item.rate,
     taxRate: item.taxRate,
   }));
+
+/**
+ * A quotation line built from a product record, priced at the product's
+ * own current selling price and tax. One shape, whether the row was
+ * added by hand from the search box or filled in from what the lead
+ * asked for — a prefilled row is an ordinary editable row, never a
+ * locked or specially-marked one.
+ */
+const toEditableItem = (product, quantity) => ({
+  description: "",
+  discountType: null,
+  discountValue: "",
+  product,
+  quantity: quantity && Number(quantity) > 0 ? Number(quantity) : 1,
+  rate: product.sellingPrice ?? 0,
+  taxRate: product.taxRate ?? 0,
+});
 
 const isValidNumber = (value) => value !== "" && value !== null && value !== undefined && Number.isFinite(Number(value));
 
@@ -161,19 +181,77 @@ export default function QuotationBuilder({
   const [errors, setErrors] = useState({});
 
   const handleAddProduct = (product) => {
-    setItems((current) => [
-      ...current,
-      {
-        description: "",
-        discountType: null,
-        discountValue: "",
-        product,
-        quantity: 1,
-        rate: product.sellingPrice ?? 0,
-        taxRate: product.taxRate ?? 0,
-      },
-    ]);
+    setItems((current) => [...current, toEditableItem(product, 1)]);
   };
+
+  /**
+   * WHAT THE LEAD ALREADY ASKED FOR, FILLED IN.
+   *
+   * The enquiry already records the products and quantities the customer
+   * named (Lead.interestedProducts / productQuantities — captured by
+   * whoever generated the lead). Making the manager read that off the
+   * lead and retype it into the builder is not just slow, it is the step
+   * where a quotation quietly stops matching the enquiry.
+   *
+   * The products are re-fetched by id rather than priced from anything
+   * carried on the lead. A lead can be weeks old: prices move, tax rates
+   * change, and a product can be retired. `status: ACTIVE` means a
+   * withdrawn product simply does not come back and the row is not
+   * offered — so this can never quote something that is no longer sold.
+   *
+   * Filled ONCE per lead, and only into an empty item list. Everything
+   * after that is the manager's: they change quantities, drop rows, add
+   * products the customer mentioned later. Nothing here ever overwrites
+   * a row that is already on screen, and none of it applies in edit
+   * mode, where the saved quotation is the only truth.
+   */
+  const prefilledLeadRef = useRef(isEditMode ? "edit-mode" : null);
+  const [prefillSummary, setPrefillSummary] = useState(null);
+
+  const requestedProducts = useMemo(
+    () => (isEditMode ? [] : (lead?.interestedProducts ?? []).filter((product) => product?._id)),
+    [isEditMode, lead],
+  );
+  const shouldPrefill = Boolean(lead) && prefilledLeadRef.current !== lead?._id && requestedProducts.length > 0;
+
+  const requestedProductsState = useProductList(
+    {
+      ids: shouldPrefill ? requestedProducts.map((product) => product._id).join(",") : "",
+      limit: 50,
+      status: "ACTIVE",
+    },
+    { enabled: shouldPrefill },
+  );
+
+  const requestedProductsData = requestedProductsState.data?.products;
+
+  useEffect(() => {
+    if (!shouldPrefill || !requestedProductsData) return;
+
+    // This lead has now had its chance to fill the builder, whether or
+    // not anything was actually added — so a later render never tries
+    // again behind the manager's back.
+    prefilledLeadRef.current = lead._id;
+    if (items.length) return;
+
+    const quantityByProduct = new Map(
+      requestedProducts.map((product) => [String(product._id), product.quantity]),
+    );
+
+    setItems(
+      requestedProductsData.map((product) =>
+        toEditableItem(product, quantityByProduct.get(String(product._id))),
+      ),
+    );
+
+    setPrefillSummary({
+      filled: requestedProductsData.length,
+      // Asked for, but no longer an active product. Said out loud rather
+      // than silently dropped — a missing line is exactly the kind of
+      // thing nobody notices until the customer does.
+      unavailable: requestedProducts.length - requestedProductsData.length,
+    });
+  }, [items.length, lead, requestedProducts, requestedProductsData, shouldPrefill]);
 
   const handleItemChange = (index, nextItem) => {
     setItems((current) => current.map((item, itemIndex) => (itemIndex === index ? nextItem : item)));
@@ -241,7 +319,19 @@ export default function QuotationBuilder({
       <section>
         <h2 className="text-lg font-black text-ink">Lead</h2>
         <div className="mt-4">
-          <QuotationLeadSelector locked={isEditMode} onSelect={setLead} selectedLead={lead} />
+          <QuotationLeadSelector
+            locked={isEditMode}
+            onSelect={(nextLead) => {
+              // Changing the lead starts the items over. They were built
+              // from a different customer's enquiry, and silently
+              // carrying them across is how one buyer's quantities end
+              // up on another buyer's quotation.
+              setLead(nextLead);
+              setItems([]);
+              setPrefillSummary(null);
+            }}
+            selectedLead={lead}
+          />
           {errors.lead ? <p className="form-error mt-2">{errors.lead}</p> : null}
         </div>
       </section>
@@ -249,6 +339,20 @@ export default function QuotationBuilder({
       <section>
         <h2 className="text-lg font-black text-ink">Quotation Items</h2>
         <div className="mt-4 space-y-4">
+          {requestedProductsState.isLoading ? (
+            <p className="text-sm text-muted">Filling in what this lead asked for...</p>
+          ) : null}
+          {prefillSummary?.filled ? (
+            <p className="rounded-lg border border-forest/15 bg-mint/50 px-3 py-2 text-sm font-semibold text-forest">
+              Filled in {prefillSummary.filled} product{prefillSummary.filled === 1 ? "" : "s"} this lead asked
+              for, priced at today&apos;s rates. Change anything you need.
+              {prefillSummary.unavailable
+                ? ` ${prefillSummary.unavailable} product${
+                    prefillSummary.unavailable === 1 ? " they asked for is" : "s they asked for are"
+                  } no longer available and could not be added.`
+                : ""}
+            </p>
+          ) : null}
           <QuotationProductSelector
             excludeProductIds={items.map((item) => item.product._id)}
             onSelect={handleAddProduct}
