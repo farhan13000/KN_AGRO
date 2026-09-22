@@ -1,17 +1,17 @@
-import { Printer } from "lucide-react";
 import { useParams } from "react-router-dom";
-import Button from "../../../shared/components/Button";
+import DocumentPrintActions from "../../../shared/components/DocumentPrintActions";
 import EmptyState from "../../../shared/components/EmptyState";
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
 import { useQuotationPrintView } from "../hooks";
 import QuotationPrintView from "./QuotationPrintView";
 
-// Prompt 38 (PDF boundary): no PDF library is used here on purpose —
-// window.print() lets every browser's own "Save as PDF" destination cover
-// that need without adding a dependency. See
-// docs_about_the_phase_completion/phase5_frontend_progress.md for the
-// explicit decision record.
+// Print and Download both come from DocumentPrintActions, which every
+// printable document shares. The old "window.print() is enough, no PDF
+// dependency" decision recorded in
+// docs_about_the_phase_completion/phase5_frontend_progress.md was
+// reversed once these documents started being SENT rather than only
+// printed — see shared/utils/documentPdf.js for why.
 export default function QuotationPrintRouteView({ backTo }) {
   const { quotationId } = useParams();
   const printState = useQuotationPrintView(quotationId);
@@ -34,12 +34,7 @@ export default function QuotationPrintRouteView({ backTo }) {
 
   return (
     <div>
-      <div className="mb-4 flex justify-end print:hidden">
-        <Button onClick={() => window.print()} variant="secondary">
-          <Printer className="h-4 w-4" />
-          Print
-        </Button>
-      </div>
+      <DocumentPrintActions fileName={`Quotation ${quotation.quotationNumber}`} />
       <QuotationPrintView quotation={quotation} />
     </div>
   );

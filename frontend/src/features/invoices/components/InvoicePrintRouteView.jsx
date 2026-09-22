@@ -1,16 +1,17 @@
-import { Printer } from "lucide-react";
 import { useParams } from "react-router-dom";
-import Button from "../../../shared/components/Button";
+import DocumentPrintActions from "../../../shared/components/DocumentPrintActions";
 import EmptyState from "../../../shared/components/EmptyState";
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
 import { useInvoicePrintView } from "../hooks";
 import InvoicePrintView from "./InvoicePrintView";
 
-// Prompt 56 (PDF boundary): same decision already made for Quotations in
-// Phase 5 — window.print() lets every browser's own "Save as PDF"
-// destination cover that need without adding a PDF dependency. No new
-// decision to make here, just the same one applied consistently.
+// Print and Download both come from DocumentPrintActions, which every
+// printable document shares. The old "window.print() is enough, no PDF
+// dependency" decision recorded in
+// docs_about_the_phase_completion/phase5_frontend_progress.md was
+// reversed once these documents started being SENT rather than only
+// printed — see shared/utils/documentPdf.js for why.
 export default function InvoicePrintRouteView({ backTo }) {
   const { invoiceId } = useParams();
   const printState = useInvoicePrintView(invoiceId);
@@ -33,12 +34,7 @@ export default function InvoicePrintRouteView({ backTo }) {
 
   return (
     <div>
-      <div className="mb-4 flex justify-end print:hidden">
-        <Button onClick={() => window.print()} variant="secondary">
-          <Printer className="h-4 w-4" />
-          Print
-        </Button>
-      </div>
+      <DocumentPrintActions fileName={`Invoice ${invoice.invoiceNumber}`} />
       <InvoicePrintView invoice={invoice} />
     </div>
   );

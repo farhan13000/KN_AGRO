@@ -34,7 +34,7 @@ export default function DSRPrintView({ dsr }) {
   const totalOrdered = visits.reduce((sum, visit) => sum + (visit.orderAmount || 0), 0);
 
   return (
-    <div className="dsr-sheet relative mx-auto overflow-hidden bg-white p-6 text-[11px] leading-snug text-slate-900 shadow-sm print:p-0 print:shadow-none">
+    <div className="dsr-sheet relative mx-auto overflow-hidden bg-white p-6 text-[11px] leading-snug text-slate-900 shadow-sm print:p-0 print:shadow-none" data-print-sheet>
       <style>{`
         @page { size: A4 landscape; margin: 10mm; }
         @media print {

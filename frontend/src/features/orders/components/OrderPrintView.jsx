@@ -13,7 +13,7 @@ import OrderStatusBadge from "./OrderStatusBadge";
 // block.
 export default function OrderPrintView({ order }) {
   return (
-    <div className="relative mx-auto max-w-3xl bg-white p-4 text-ink sm:p-8 print:max-w-none print:p-0">
+    <div className="relative mx-auto max-w-3xl bg-white p-4 text-ink sm:p-8 print:max-w-none print:p-0" data-print-sheet>
       <PrintWatermark />
       <div className="relative">
       <div className="flex flex-wrap items-start justify-between gap-6 border-b-2 border-ink/80 pb-6">
