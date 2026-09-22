@@ -164,6 +164,17 @@ export const getLeadNextStep = ({ capabilities = {}, lead, work = {} }) => {
     };
   }
 
+  if ((status === LEAD_STATUS.CONTACTED || status === LEAD_STATUS.FOLLOW_UP) && lead?.nextFollowUpAt && canQualify) {
+    const followUpDate = new Date(lead.nextFollowUpAt);
+    const formatted = followUpDate.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true });
+    return {
+      headline: `Follow-up scheduled for ${formatted}`,
+      description: "A follow-up is already booked. Complete it when done, or mark this lead qualified if you are ready to quote.",
+      primary: canCompleteFollowUp ? action("complete-follow-up", "Complete the follow-up") : null,
+      secondary: [action("qualify", "Mark qualified")],
+    };
+  }
+
   if ((status === LEAD_STATUS.CONTACTED || status === LEAD_STATUS.FOLLOW_UP) && canQualify) {
     return {
       headline: "Decide what this lead is worth",
