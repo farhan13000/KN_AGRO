@@ -15,6 +15,7 @@ import {
 import { useSalaryProposalActions, useSalaryProposalList } from "../hooks";
 import SalaryProposalCard from "./SalaryProposalCard";
 import SalaryProposalDecisionDialog from "./SalaryProposalDecisionDialog";
+import { FilterPanel } from "../../../shared/components";
 
 /**
  * Everything across the whole pipeline, status-filterable (Prompt 8.2's
@@ -136,7 +137,7 @@ export default function SalaryProposalPipelineView({ description, portalLabel, s
         </p>
       ) : null}
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <label className="block max-w-xs">
           <span className="form-label">Status</span>
           <select
@@ -152,7 +153,7 @@ export default function SalaryProposalPipelineView({ description, portalLabel, s
             ))}
           </select>
         </label>
-      </section>
+      </FilterPanel>
 
       {state.isLoading ? <PageLoader message="Loading salary proposals..." /> : null}
       {state.isError ? <ErrorState message={state.errorMessage} title="Unable to load salary proposals" /> : null}

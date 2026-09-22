@@ -8,6 +8,7 @@ import { useMyAttendanceList } from "../hooks";
 import AttendanceTable from "./AttendanceTable";
 import AttendanceTodayWidget from "./AttendanceTodayWidget";
 import MyAttendanceCalendarSection from "./MyAttendanceCalendarSection";
+import { FilterPanel } from "../../../shared/components";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
@@ -46,7 +47,7 @@ export default function MyAttendanceListView({ description, portalLabel, showHea
 
       <MyAttendanceCalendarSection />
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 sm:grid-cols-3">
           <label>
             <span className="form-label">Status</span>
@@ -82,7 +83,7 @@ export default function MyAttendanceListView({ description, portalLabel, showHea
             />
           </label>
         </div>
-      </section>
+      </FilterPanel>
 
       {isLoading ? <PageLoader message="Loading attendance..." /> : null}
       {isError ? <ErrorState message={errorMessage} title="Unable to load attendance" /> : null}

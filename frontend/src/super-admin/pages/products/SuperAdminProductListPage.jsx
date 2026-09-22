@@ -1,3 +1,4 @@
+import { FilterPanel } from "../../../shared/components";
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Plus, Search } from "lucide-react";
@@ -130,7 +131,7 @@ export default function SuperAdminProductListPage({ showHeading = true }) {
         </div>
       ) : null}
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
           <label className="xl:col-span-2">
             <span className="form-label">Search</span>
@@ -209,7 +210,7 @@ export default function SuperAdminProductListPage({ showHeading = true }) {
             </select>
           </label>
         </div>
-      </section>
+      </FilterPanel>
 
       {productsState.isLoading ? <PageLoader message="Loading products..." /> : null}
       {productsState.isError ? <ErrorState message={productsState.errorMessage} title="Unable to load products" /> : null}

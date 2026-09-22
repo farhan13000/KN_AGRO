@@ -10,6 +10,7 @@ import { useAllAttendanceList } from "../hooks";
 import AttendanceCorrectionDialog from "./AttendanceCorrectionDialog";
 import AttendanceRecordDialog from "./AttendanceRecordDialog";
 import AttendanceTable from "./AttendanceTable";
+import { FilterPanel } from "../../../shared/components";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
@@ -44,7 +45,7 @@ export default function AllAttendanceListView({ description, portalLabel }) {
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
       </div>
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 sm:grid-cols-2">
           <label>
             <span className="form-label">From</span>
@@ -65,7 +66,7 @@ export default function AllAttendanceListView({ description, portalLabel }) {
             />
           </label>
         </div>
-      </section>
+      </FilterPanel>
 
       {isLoading ? <PageLoader message="Loading attendance..." /> : null}
       {isError ? <ErrorState message={errorMessage} title="Unable to load attendance" /> : null}

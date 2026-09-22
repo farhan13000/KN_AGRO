@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Target } from "lucide-react";
 import Card from "../../shared/components/Card";
+import { DataTable } from "../../shared/components";
 import { useAuth } from "../../core/auth";
 import { getApiErrorMessage } from "../../core/api";
 import { ROLE_LABELS } from "../../shared/constants";
@@ -69,37 +70,69 @@ export function SalesTargetProgressCard() {
 
 export function TargetProgressTable({ rows = [] }) {
   if (!rows.length) return <p className="text-sm text-muted">No sales team members yet.</p>;
+
+  const columns = [
+    {
+      key: "employee",
+      header: "Employee",
+      role: "title",
+      cellClassName: "font-semibold text-ink",
+      cell: (row) => row.employee.name || row.employee.employeeCode,
+    },
+    {
+      key: "role",
+      header: "Role",
+      cellClassName: "text-muted",
+      cell: (row) => ROLE_LABELS[row.role] || String(row.role || "").toUpperCase(),
+    },
+    {
+      key: "target",
+      header: "Target",
+      align: "right",
+      cellClassName: "tabular-nums",
+      cell: (row) => (row.target === null ? "—" : formatMoney(row.target)),
+    },
+    {
+      key: "achieved",
+      header: "Billed",
+      align: "right",
+      cellClassName: "font-bold tabular-nums",
+      cell: (row) => formatMoney(row.achieved),
+    },
+    {
+      key: "bills",
+      header: "Bills",
+      align: "right",
+      cellClassName: "tabular-nums",
+      cell: (row) => row.bills,
+    },
+    {
+      key: "progress",
+      header: "Progress",
+      headerClassName: "w-48",
+      // The bar needs width to mean anything, so on a card it takes the
+      // whole row rather than half of it.
+      cardClassName: "col-span-2",
+      cell: (row) => (
+        <div className="flex items-center gap-2">
+          <ProgressBar percent={row.percent} />
+          <span className="w-12 text-right text-xs font-bold tabular-nums text-ink">
+            {row.percent === null ? "—" : `${row.percent}%`}
+          </span>
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[640px] divide-y divide-forest/10 text-left text-sm" data-team-targets>
-        <thead className="text-xs font-black uppercase text-forest">
-          <tr>
-            <th className="px-3 py-2">Employee</th>
-            <th className="px-3 py-2">Role</th>
-            <th className="px-3 py-2 text-right">Target</th>
-            <th className="px-3 py-2 text-right">Billed</th>
-            <th className="px-3 py-2 text-right">Bills</th>
-            <th className="w-48 px-3 py-2">Progress</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-forest/10">
-          {rows.map((row) => (
-            <tr key={row.employee._id}>
-              <td className="px-3 py-2 font-semibold text-ink">{row.employee.name || row.employee.employeeCode}</td>
-              <td className="px-3 py-2 text-muted">{ROLE_LABELS[row.role] || String(row.role || "").toUpperCase()}</td>
-              <td className="px-3 py-2 text-right tabular-nums">{row.target === null ? "—" : formatMoney(row.target)}</td>
-              <td className="px-3 py-2 text-right font-bold tabular-nums">{formatMoney(row.achieved)}</td>
-              <td className="px-3 py-2 text-right tabular-nums">{row.bills}</td>
-              <td className="px-3 py-2">
-                <div className="flex items-center gap-2">
-                  <ProgressBar percent={row.percent} />
-                  <span className="w-12 text-right text-xs font-bold tabular-nums text-ink">{row.percent === null ? "—" : `${row.percent}%`}</span>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div data-team-targets>
+      <DataTable
+        columns={columns}
+        minWidth="640px"
+        rowKey={(row) => row.employee._id}
+        rows={rows}
+        theadClassName="text-xs font-black uppercase text-forest"
+      />
     </div>
   );
 }
@@ -168,47 +201,41 @@ export function SalesTargetsAdminView() {
       <Card className="p-5">
         <h2 className="text-lg font-black text-ink">Monthly target per role</h2>
         <p className="mt-1 text-sm text-muted">Everyone in a role follows the same target. Bills count toward the person who brought the lead.</p>
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[520px] text-left text-sm">
-            <tbody className="divide-y divide-forest/10">
-              {(targetsState.data?.targets || []).map((item) => (
-                <tr key={item.role}>
-                  <th className="py-2 pr-4 font-bold text-ink" scope="row">
-                    {ROLE_LABELS[item.role] || item.role.toUpperCase()}
-                  </th>
-                  <td className="py-2 pr-3">
-                    <label className="sr-only" htmlFor={`target-${item.role}`}>
-                      Monthly target for {item.role}
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <span className="text-muted">₹</span>
-                      <input
-                        className="form-field max-w-[200px]"
-                        id={`target-${item.role}`}
-                        inputMode="decimal"
-                        min="0"
-                        onChange={(event) => setDrafts((current) => ({ ...current, [item.role]: event.target.value }))}
-                        placeholder="Not set"
-                        step="1"
-                        type="number"
-                        value={drafts[item.role] ?? ""}
-                      />
-                    </div>
-                  </td>
-                  <td className="py-2 text-right">
-                    <button
-                      className="inline-flex min-h-10 items-center justify-center rounded-lg bg-forest px-4 py-2 text-sm font-bold text-white transition hover:bg-agriculture disabled:opacity-60"
-                      disabled={saving === item.role}
-                      onClick={() => save(item.role)}
-                      type="button"
-                    >
-                      {saving === item.role ? "Saving…" : "Save"}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* A form, not a data grid: on a phone each role stacks into its
+            own labelled block instead of scrolling sideways. */}
+        <div className="mt-4 divide-y divide-forest/10">
+          {(targetsState.data?.targets || []).map((item) => (
+            <div
+              className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+              key={item.role}
+            >
+              <label className="text-sm font-bold text-ink sm:w-40 sm:shrink-0" htmlFor={`target-${item.role}`}>
+                {ROLE_LABELS[item.role] || item.role.toUpperCase()}
+              </label>
+              <div className="flex flex-1 items-center gap-2">
+                <span className="text-muted">₹</span>
+                <input
+                  className="form-field w-full sm:max-w-[200px]"
+                  id={`target-${item.role}`}
+                  inputMode="decimal"
+                  min="0"
+                  onChange={(event) => setDrafts((current) => ({ ...current, [item.role]: event.target.value }))}
+                  placeholder="Not set"
+                  step="1"
+                  type="number"
+                  value={drafts[item.role] ?? ""}
+                />
+              </div>
+              <button
+                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-forest px-4 py-2 text-sm font-bold text-white transition hover:bg-agriculture disabled:opacity-60"
+                disabled={saving === item.role}
+                onClick={() => save(item.role)}
+                type="button"
+              >
+                {saving === item.role ? "Saving…" : "Save"}
+              </button>
+            </div>
+          ))}
         </div>
         {message ? <p className="mt-3 text-sm font-semibold text-green-700">{message}</p> : null}
         {error ? <p className="mt-3 text-sm font-semibold text-red-700">{error}</p> : null}

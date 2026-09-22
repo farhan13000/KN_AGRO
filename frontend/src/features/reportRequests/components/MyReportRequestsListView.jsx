@@ -9,6 +9,7 @@ import { REPORT_STATUS, REPORT_STATUS_LABELS } from "../constants";
 import { useMyReportRequestList, useReportRequestActions } from "../hooks";
 import ReportRequestCard from "./ReportRequestCard";
 import ReportSubmitDialog from "./ReportSubmitDialog";
+import { FilterPanel } from "../../../shared/components";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
@@ -89,7 +90,7 @@ export default function MyReportRequestsListView({ description, portalLabel, sho
         </div>
       ) : null}
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <label className="block max-w-xs">
           <span className="form-label">Status</span>
           <select
@@ -105,7 +106,7 @@ export default function MyReportRequestsListView({ description, portalLabel, sho
             ))}
           </select>
         </label>
-      </section>
+      </FilterPanel>
 
       {actionError ? (
         <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">

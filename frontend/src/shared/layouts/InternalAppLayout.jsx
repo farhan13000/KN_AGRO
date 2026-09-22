@@ -84,8 +84,11 @@ function ProfileMenu() {
       </button>
 
       {open ? (
+        // Capped to the screen on a phone for the same reason the
+        // notifications panel is: a fixed width anchored to a button can
+        // reach past the edge of a narrow screen.
         <div
-          className="absolute right-0 z-40 mt-2 w-72 rounded-2xl border border-forest/10 bg-white p-2 shadow-card"
+          className="absolute right-0 z-40 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl border border-forest/10 bg-white p-2 shadow-card"
           role="menu"
         >
           <div className="border-b border-forest/10 px-3 py-3">

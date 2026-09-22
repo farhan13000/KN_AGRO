@@ -101,6 +101,12 @@ export default function SearchableSelect({
           aria-invalid={Boolean(error)}
           autoComplete="off"
           className={`form-field pr-9 ${selectedAvatar && !isOpen ? "pl-11" : ""}`}
+          // The box shows a LABEL ("All states"), which is not the same
+          // thing as a value — an empty choice still reads as text. This
+          // carries the real value so anything inspecting the rendered
+          // fields, such as FilterPanel's "how many filters are on"
+          // count, can tell "nothing picked" from "something picked".
+          data-filter-value={value ?? ""}
           disabled={disabled}
           id={id}
           onChange={(event) => {

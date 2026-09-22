@@ -1,5 +1,6 @@
 import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
+import { DataTable, rowActionClass } from "../../../shared/components";
 import { formatBusinessDateTime } from "../../../shared/utils";
 import { LeadPriorityBadge, LeadSourceBadge, LeadStatusBadge } from "./LeadBadges";
 import { formatEmployeeSummary, formatGeoSummary, formatPipelineValue } from "../utils";
@@ -17,106 +18,145 @@ export default function LeadTable({
   // too, unless overridden.
   showLocation = showAssignments,
 }) {
-  return (
-    <div className="overflow-hidden rounded-lg border border-forest/10 bg-white shadow-sm">
-      <div className="overflow-x-auto">
-        <table className="min-w-[1120px] w-full divide-y divide-forest/10 text-left text-sm">
-          <thead className="bg-mint/70 text-xs font-black uppercase text-forest">
-            <tr>
-              <th className="px-4 py-3">Lead Code</th>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Company</th>
-              <th className="px-4 py-3">Phone</th>
-              {showSource ? <th className="px-4 py-3">Source</th> : null}
-              <th className="px-4 py-3">Priority</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Handled By</th>
-              {showAssignments ? <th className="px-4 py-3">Manager</th> : null}
-              {showAssignments ? <th className="px-4 py-3">Employee</th> : null}
-              {showLocation ? <th className="px-4 py-3">State</th> : null}
-              {showLocation ? <th className="px-4 py-3">District</th> : null}
-              {showPipelineValue ? <th className="px-4 py-3">Expected Value</th> : null}
-              <th className="px-4 py-3">Next Follow-Up</th>
-              <th className="px-4 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-forest/10">
-            {leads.map((lead) => (
-              <tr className="align-top transition hover:bg-mint/35" key={lead._id}>
-                <td className="px-4 py-3 font-black text-forest">{lead.leadCode || "Pending"}</td>
-                <td className="px-4 py-3 font-black text-ink">
-                  <span className="inline-flex items-center gap-2">
-                    {lead.pendingActionRequests > 0 ? (
-                      <span
-                        aria-label={`${lead.pendingActionRequests} pending request${lead.pendingActionRequests > 1 ? "s" : ""}`}
-                        className="relative flex h-2.5 w-2.5 shrink-0"
-                        data-lead-request-dot
-                        title="Your team is waiting on a request for this lead"
-                      >
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75 motion-reduce:hidden" />
-                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-600" />
-                      </span>
-                    ) : null}
-                    {lead.name || "Unnamed Lead"}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-muted">{lead.companyName || "Not Set"}</td>
-                <td className="px-4 py-3 text-muted">{lead.phone || "Not Set"}</td>
-                {showSource ? (
-                  <td className="px-4 py-3">
-                    <LeadSourceBadge source={lead.source} />
-                  </td>
-                ) : null}
-                <td className="px-4 py-3">
-                  <LeadPriorityBadge priority={lead.priority} />
-                </td>
-                <td className="px-4 py-3">
-                  <LeadStatusBadge status={lead.status} />
-                </td>
-                <td className="px-4 py-3 text-muted" data-lead-handled-by>
-                  {lead.handledBy ? (
-                    <span className="inline-flex flex-wrap items-center gap-1.5">
-                      <span className="font-semibold text-ink">{lead.handledBy.name}</span>
-                      {lead.handledBy.roleLabel ? (
-                        <span className="rounded bg-mint px-1.5 py-0.5 text-[10px] font-black text-forest">{lead.handledBy.roleLabel}</span>
-                      ) : null}
-                    </span>
-                  ) : (
-                    "—"
-                  )}
-                </td>
-                {showAssignments ? (
-                  <td className="px-4 py-3 text-muted">{formatEmployeeSummary(lead.assignedManager)}</td>
-                ) : null}
-                {showAssignments ? (
-                  <td className="px-4 py-3 text-muted">{formatEmployeeSummary(lead.assignedEmployee)}</td>
-                ) : null}
-                {showLocation ? (
-                  <td className="px-4 py-3 text-muted">{formatGeoSummary(lead.address?.state)}</td>
-                ) : null}
-                {showLocation ? (
-                  <td className="px-4 py-3 text-muted">{formatGeoSummary(lead.address?.district)}</td>
-                ) : null}
-                {showPipelineValue ? (
-                  <td className="px-4 py-3 font-bold text-ink">{formatPipelineValue(lead.expectedValue)}</td>
-                ) : null}
-                <td className="px-4 py-3 text-muted">{formatBusinessDateTime(lead.nextFollowUpAt)}</td>
-                <td className="px-4 py-3">
-                  <div className="flex justify-end">
-                    <Link
-                      aria-label={`View ${lead.name || "lead"}`}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white text-forest ring-1 ring-forest/15 transition hover:bg-mint"
-                      to={detailPath(lead)}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Link>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+  const columns = [
+    {
+      key: "leadCode",
+      header: "Lead Code",
+      cellClassName: "font-black text-forest",
+      cell: (lead) => lead.leadCode || "Pending",
+    },
+    {
+      key: "name",
+      header: "Name",
+      role: "title",
+      cellClassName: "font-black text-ink",
+      cell: (lead) => (
+        <span className="inline-flex items-center gap-2">
+          {lead.pendingActionRequests > 0 ? (
+            <span
+              aria-label={`${lead.pendingActionRequests} pending request${lead.pendingActionRequests > 1 ? "s" : ""}`}
+              className="relative flex h-2.5 w-2.5 shrink-0"
+              data-lead-request-dot
+              title="Your team is waiting on a request for this lead"
+            >
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75 motion-reduce:hidden" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-600" />
+            </span>
+          ) : null}
+          {lead.name || "Unnamed Lead"}
+        </span>
+      ),
+    },
+    {
+      key: "companyName",
+      header: "Company",
+      cellClassName: "text-muted",
+      cell: (lead) => lead.companyName || "Not Set",
+    },
+    {
+      key: "phone",
+      header: "Phone",
+      cellClassName: "text-muted",
+      // A phone number on a phone should place the call. It is the single
+      // most likely thing a field employee wants to do with this row.
+      cell: (lead) =>
+        lead.phone ? (
+          <a className="font-semibold text-forest md:font-normal md:text-muted" href={`tel:${lead.phone}`}>
+            {lead.phone}
+          </a>
+        ) : (
+          "Not Set"
+        ),
+    },
+    showSource && {
+      key: "source",
+      header: "Source",
+      cell: (lead) => <LeadSourceBadge source={lead.source} />,
+    },
+    {
+      key: "priority",
+      header: "Priority",
+      role: "badge",
+      cell: (lead) => <LeadPriorityBadge priority={lead.priority} />,
+    },
+    {
+      key: "status",
+      header: "Status",
+      role: "badge",
+      cell: (lead) => <LeadStatusBadge status={lead.status} />,
+    },
+    {
+      key: "handledBy",
+      header: "Handled By",
+      cellClassName: "text-muted",
+      cell: (lead) => (
+        <span data-lead-handled-by>
+          {lead.handledBy ? (
+            <span className="inline-flex flex-wrap items-center gap-1.5">
+              <span className="font-semibold text-ink">{lead.handledBy.name}</span>
+              {lead.handledBy.roleLabel ? (
+                <span className="rounded bg-mint px-1.5 py-0.5 text-[10px] font-black text-forest">
+                  {lead.handledBy.roleLabel}
+                </span>
+              ) : null}
+            </span>
+          ) : (
+            "—"
+          )}
+        </span>
+      ),
+    },
+    showAssignments && {
+      key: "assignedManager",
+      header: "Manager",
+      cellClassName: "text-muted",
+      cell: (lead) => formatEmployeeSummary(lead.assignedManager),
+    },
+    showAssignments && {
+      key: "assignedEmployee",
+      header: "Employee",
+      cellClassName: "text-muted",
+      cell: (lead) => formatEmployeeSummary(lead.assignedEmployee),
+    },
+    showLocation && {
+      key: "state",
+      header: "State",
+      cellClassName: "text-muted",
+      cell: (lead) => formatGeoSummary(lead.address?.state),
+    },
+    showLocation && {
+      key: "district",
+      header: "District",
+      cellClassName: "text-muted",
+      cell: (lead) => formatGeoSummary(lead.address?.district),
+    },
+    showPipelineValue && {
+      key: "expectedValue",
+      header: "Expected Value",
+      cellClassName: "font-bold text-ink",
+      cell: (lead) => formatPipelineValue(lead.expectedValue),
+    },
+    {
+      key: "nextFollowUpAt",
+      header: "Next Follow-Up",
+      cellClassName: "text-muted",
+      cell: (lead) => formatBusinessDateTime(lead.nextFollowUpAt),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      align: "right",
+      role: "actions",
+      cell: (lead) => (
+        <div className="flex justify-end">
+          <Link aria-label={`View ${lead.name || "lead"}`} className={rowActionClass} to={detailPath(lead)}>
+            <Eye className="h-4 w-4" />
+            <span className="md:sr-only">View</span>
+          </Link>
+        </div>
+      ),
+    },
+  ].filter(Boolean);
+
+  return <DataTable columns={columns} minWidth="1120px" rows={leads} />;
 }

@@ -11,7 +11,7 @@ import { formatQuotationAmount, formatQuotationItemDiscount } from "../utils";
 // a live Product lookup.
 export default function QuotationPrintView({ quotation }) {
   return (
-    <div className="relative mx-auto max-w-3xl bg-white p-8 text-ink print:max-w-none print:p-0">
+    <div className="relative mx-auto max-w-3xl bg-white p-4 text-ink sm:p-8 print:max-w-none print:p-0">
       <PrintWatermark />
       <div className="relative">
       <div className="flex flex-wrap items-start justify-between gap-6 border-b-2 border-ink/80 pb-6">
@@ -49,7 +49,7 @@ export default function QuotationPrintView({ quotation }) {
         </p>
       </div>
 
-      <table className="mt-6 w-full border-collapse text-sm">
+      <table className="doc-table mt-6 w-full border-collapse text-sm">
         <thead>
           <tr className="border-b-2 border-ink/80 text-left text-xs font-black uppercase">
             <th className="py-2 pr-2">Product</th>
@@ -64,18 +64,36 @@ export default function QuotationPrintView({ quotation }) {
         <tbody>
           {(quotation.items || []).map((item, index) => (
             <tr className="border-b border-forest/15 align-top" key={`${item.productCode}-${index}`}>
-              <td className="py-2 pr-2">
+              <td className="doc-cell-title py-2 pr-2">
                 <p className="font-bold">{item.productName || "Unnamed Product"}</p>
                 <p className="text-xs text-muted">{item.productCode}</p>
               </td>
-              <td className="py-2 pr-2 text-muted">{item.description || "-"}</td>
-              <td className="py-2 pr-2 text-right">
-                {item.quantity} {item.unit}
+              <td className="py-2 pr-2 text-muted">
+                <span className="doc-label">Description</span>
+                {item.description || "-"}
               </td>
-              <td className="py-2 pr-2 text-right">{formatQuotationAmount(item.rate)}</td>
-              <td className="py-2 pr-2 text-right">{formatQuotationItemDiscount(item)}</td>
-              <td className="py-2 pr-2 text-right">{item.taxRate ? `${item.taxRate}%` : "-"}</td>
-              <td className="py-2 text-right font-bold">{formatQuotationAmount(item.lineTotal)}</td>
+              <td className="py-2 pr-2 text-right">
+                <span className="doc-label">Qty</span>
+                <span>
+                  {item.quantity} {item.unit}
+                </span>
+              </td>
+              <td className="py-2 pr-2 text-right">
+                <span className="doc-label">Rate</span>
+                {formatQuotationAmount(item.rate)}
+              </td>
+              <td className="py-2 pr-2 text-right">
+                <span className="doc-label">Discount</span>
+                {formatQuotationItemDiscount(item)}
+              </td>
+              <td className="py-2 pr-2 text-right">
+                <span className="doc-label">Tax</span>
+                {item.taxRate ? `${item.taxRate}%` : "-"}
+              </td>
+              <td className="py-2 text-right font-bold">
+                <span className="doc-label">Total</span>
+                {formatQuotationAmount(item.lineTotal)}
+              </td>
             </tr>
           ))}
         </tbody>

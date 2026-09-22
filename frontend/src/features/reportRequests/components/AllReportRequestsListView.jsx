@@ -6,6 +6,7 @@ import Pagination from "../../../shared/components/Pagination";
 import { REPORT_STATUS, REPORT_STATUS_LABELS, REPORT_TYPE, REPORT_TYPE_LABELS } from "../constants";
 import { useAllReportRequestList } from "../hooks";
 import ReportRequestCard from "./ReportRequestCard";
+import { FilterPanel } from "../../../shared/components";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
@@ -40,7 +41,7 @@ export default function AllReportRequestsListView({ description, portalLabel }) 
         </p>
       </div>
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 sm:grid-cols-2">
           <label>
             <span className="form-label">Status</span>
@@ -73,7 +74,7 @@ export default function AllReportRequestsListView({ description, portalLabel }) 
             </select>
           </label>
         </div>
-      </section>
+      </FilterPanel>
 
       {isLoading ? <PageLoader message="Loading report requests..." /> : null}
       {isError ? <ErrorState message={errorMessage} title="Unable to load report requests" /> : null}

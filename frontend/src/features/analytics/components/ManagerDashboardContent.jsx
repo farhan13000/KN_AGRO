@@ -1,6 +1,7 @@
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
 import { formatMoney } from "../../../shared/utils";
+import { DataTable } from "../../../shared/components";
 import { useManagerDashboard } from "../hooks";
 import { KeyValueRow, Section, Stat, StatGrid } from "./DashboardPrimitives";
 
@@ -106,34 +107,46 @@ export default function ManagerDashboardContent() {
 
       {d.employeePerformance?.length ? (
         <Section title="Team Performance">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] divide-y divide-forest/10 text-left text-sm">
-              <thead className="text-xs font-black uppercase text-forest">
-                <tr>
-                  <th className="px-3 py-2">Employee</th>
-                  <th className="px-3 py-2">Assigned Leads</th>
-                  <th className="px-3 py-2">Converted</th>
-                  <th className="px-3 py-2">Orders</th>
-                  <th className="px-3 py-2">Booked Value</th>
-                  <th className="px-3 py-2">Present Days</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-forest/10">
-                {d.employeePerformance.map((row) => (
-                  <tr key={row.employee?._id}>
-                    <td className="px-3 py-2 font-semibold text-ink">
-                      {row.employee?.name || row.employee?.employeeCode || "Unknown"}
-                    </td>
-                    <td className="px-3 py-2 text-muted">{row.assignedLeads}</td>
-                    <td className="px-3 py-2 text-muted">{row.convertedLeads}</td>
-                    <td className="px-3 py-2 text-muted">{row.orders}</td>
-                    <td className="px-3 py-2 text-muted">{formatMoney(row.bookedOrderValue)}</td>
-                    <td className="px-3 py-2 text-muted">{row.attendanceSummary?.presentDays ?? 0}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            columns={[
+              {
+                key: "employee",
+                header: "Employee",
+                role: "title",
+                cellClassName: "font-semibold text-ink",
+                cell: (row) => row.employee?.name || row.employee?.employeeCode || "Unknown",
+              },
+              {
+                key: "assignedLeads",
+                header: "Assigned Leads",
+                cellClassName: "text-muted",
+                cell: (row) => row.assignedLeads,
+              },
+              {
+                key: "convertedLeads",
+                header: "Converted",
+                cellClassName: "text-muted",
+                cell: (row) => row.convertedLeads,
+              },
+              { key: "orders", header: "Orders", cellClassName: "text-muted", cell: (row) => row.orders },
+              {
+                key: "bookedOrderValue",
+                header: "Booked Value",
+                cellClassName: "text-muted",
+                cell: (row) => formatMoney(row.bookedOrderValue),
+              },
+              {
+                key: "presentDays",
+                header: "Present Days",
+                cellClassName: "text-muted",
+                cell: (row) => row.attendanceSummary?.presentDays ?? 0,
+              },
+            ]}
+            minWidth="720px"
+            rowKey={(row) => row.employee?._id}
+            rows={d.employeePerformance}
+            theadClassName="text-xs font-black uppercase text-forest"
+          />
         </Section>
       ) : null}
     </div>

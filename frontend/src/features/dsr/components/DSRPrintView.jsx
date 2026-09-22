@@ -58,7 +58,7 @@ export default function DSRPrintView({ dsr }) {
           <p className="mt-3 text-[15px] font-bold text-[#e0452b]">Daily Sales Report</p>
         </header>
 
-        <table className="mt-3 w-[62%] border-collapse text-[12px]">
+        <table className="mt-3 w-full border-collapse text-[12px] md:w-[62%]">
           <tbody>
             <tr>
               <td className={`${cell} w-40 font-semibold`}>Name of Employee</td>
@@ -71,7 +71,7 @@ export default function DSRPrintView({ dsr }) {
           </tbody>
         </table>
 
-        <table className="mt-4 w-full border-collapse" data-dsr-print-table>
+        <table className="doc-table mt-4 w-full border-collapse" data-dsr-print-table>
           <thead>
             <tr>
               <th className={`${head} w-[8%]`}>Date</th>
@@ -98,29 +98,46 @@ export default function DSRPrintView({ dsr }) {
           <tbody>
             {visits.map((visit, index) => (
               <tr key={`${visit.retailerName}-${index}`}>
-                <td className={`${cell} whitespace-nowrap`}>{index === 0 ? day : ""}</td>
-                <td className={cell}>{visit.route}</td>
+                <td className={`${cell} whitespace-nowrap`}>
+                  <span className="doc-label">Date</span>
+                  {index === 0 ? day : ""}
+                </td>
                 <td className={cell}>
+                  <span className="doc-label">Visit route</span>
+                  {visit.route}
+                </td>
+                <td className={`${cell} doc-cell-title`}>
                   <span className="block font-semibold">{visit.retailerName}</span>
                   {visit.retailerPhone ? <span className="block">Mob: {visit.retailerPhone}</span> : null}
                   {visit.retailerPlace ? <span className="block text-slate-600">{visit.retailerPlace}</span> : null}
                 </td>
-                <td className={`${cell} text-right`}>{visit.amountReceived ? formatMoney(visit.amountReceived) : ""}</td>
+                <td className={`${cell} text-right`}>
+                  <span className="doc-label">Amount received</span>
+                  {visit.amountReceived ? formatMoney(visit.amountReceived) : ""}
+                </td>
                 <td className={cell}>
+                  <span className="doc-label">Order received</span>
+                  <span className="block">
                   {visit.orderAmount ? <span className="block text-right font-semibold">{formatMoney(visit.orderAmount)}</span> : null}
                   {visit.orderNumbers?.length ? (
                     <span className="block text-[10px] text-slate-600">{visit.orderNumbers.join(", ")}</span>
                   ) : null}
+                  </span>
                 </td>
                 <td className={cell}>
+                  <span className="doc-label">Materials ordered</span>
+                  <span className="block">
                   {(visit.products ?? []).map((line, lineIndex) => (
                     <span className="block" key={`${line.productName}-${lineIndex}`}>
                       {line.productName}
                       {typeof line.quantity === "number" ? ` – ${line.quantity}${line.unit ? ` ${line.unit}` : ""}` : ""}
                     </span>
                   ))}
+                  </span>
                 </td>
                 <td className={`${cell} whitespace-nowrap text-center`}>
+                  <span className="doc-label">Meter reading</span>
+                  <span className="block">
                   {typeof visit.meterFrom === "number" || typeof visit.meterTo === "number"
                     ? `${reading(visit.meterFrom)} – ${reading(visit.meterTo)}`
                     : ""}
@@ -129,11 +146,15 @@ export default function DSRPrintView({ dsr }) {
                       {Math.round((visit.meterTo - visit.meterFrom) * 10) / 10} km
                     </span>
                   ) : null}
+                  </span>
                 </td>
               </tr>
             ))}
+            {/* Ruled empty lines so the printed sheet fills the page. On
+                a phone there is no page to fill, and an empty card says
+                nothing, so they are left off the screen only. */}
             {Array.from({ length: blankRows }, (_, index) => (
-              <tr className="h-6" key={`blank-${index}`}>
+              <tr className="doc-blank-row h-6" key={`blank-${index}`}>
                 {Array.from({ length: 7 }, (__, column) => (
                   <td className={cell} key={column}>
                     {visits.length === 0 && index === 0 && column === 0 ? day : ""}
@@ -142,13 +163,22 @@ export default function DSRPrintView({ dsr }) {
               </tr>
             ))}
             <tr className="font-semibold">
-              <td className={cell} colSpan={3}>
+              <td className={`${cell} doc-cell-title`} colSpan={3}>
                 Total
               </td>
-              <td className={`${cell} text-right`}>{formatMoney(totalReceived)}</td>
-              <td className={`${cell} text-right`}>{formatMoney(totalOrdered)}</td>
-              <td className={cell} />
-              <td className={`${cell} text-center`}>{typeof dsr.distanceKm === "number" ? `${dsr.distanceKm} km` : ""}</td>
+              <td className={`${cell} text-right`}>
+                <span className="doc-label">Amount received</span>
+                {formatMoney(totalReceived)}
+              </td>
+              <td className={`${cell} text-right`}>
+                <span className="doc-label">Order received</span>
+                {formatMoney(totalOrdered)}
+              </td>
+              <td className={`${cell} doc-blank-row`} />
+              <td className={`${cell} text-center`}>
+                <span className="doc-label">Distance</span>
+                {typeof dsr.distanceKm === "number" ? `${dsr.distanceKm} km` : ""}
+              </td>
             </tr>
           </tbody>
         </table>

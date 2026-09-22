@@ -7,6 +7,7 @@ import Pagination from "../../../shared/components/Pagination";
 import { useDebouncedValue } from "../../../shared/hooks";
 import { useCategoryList } from "../../../features/categories";
 import { InventoryThresholdTable, useOutOfStockInventory } from "../../../features/inventory";
+import { FilterPanel } from "../../../shared/components";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
@@ -53,7 +54,7 @@ export default function SuperAdminOutOfStockPage({ showHeading = true }) {
         </div>
       ) : null}
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
           <label className="xl:col-span-2">
             <span className="form-label">Search</span>
@@ -98,7 +99,7 @@ export default function SuperAdminOutOfStockPage({ showHeading = true }) {
             </select>
           </label>
         </div>
-      </section>
+      </FilterPanel>
 
       {outOfStockState.isLoading ? <PageLoader message="Loading out-of-stock inventory..." /> : null}
       {outOfStockState.isError ? (

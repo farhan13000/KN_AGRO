@@ -10,6 +10,7 @@ import { useTeamReportRequestList } from "../hooks";
 import ReportDecisionDialog from "./ReportDecisionDialog";
 import ReportRequestCard from "./ReportRequestCard";
 import ReportRequestCreateDialog from "./ReportRequestCreateDialog";
+import { FilterPanel } from "../../../shared/components";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
@@ -80,7 +81,7 @@ export default function TeamReportRequestsListView({ description, portalLabel, s
         </button>
       </div>
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <label className="block max-w-xs">
           <span className="form-label">Status</span>
           <select
@@ -96,7 +97,7 @@ export default function TeamReportRequestsListView({ description, portalLabel, s
             ))}
           </select>
         </label>
-      </section>
+      </FilterPanel>
 
       {isLoading ? <PageLoader message="Loading report requests..." /> : null}
       {isError ? <ErrorState message={errorMessage} title="Unable to load report requests" /> : null}

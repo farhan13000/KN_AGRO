@@ -52,8 +52,15 @@ export default function NotificationBell() {
       </button>
 
       {open ? (
+        // The panel used to hang off the bell, and the bell is not at the
+        // right edge of the header — the Profile menu is. Anchored to the
+        // button, a 358px panel on a 390px screen started 48px to the
+        // LEFT of the screen, so the first column of every notification
+        // was cut off. On a phone it now spans the screen with a margin
+        // either side; from `sm` up, where it comfortably fits, it goes
+        // back to hanging off the bell.
         <div
-          className="absolute right-0 z-40 mt-2 w-96 max-w-[calc(100vw-2rem)] rounded-2xl border border-forest/10 bg-white p-2 shadow-card"
+          className="fixed inset-x-4 top-20 z-40 rounded-2xl border border-forest/10 bg-white p-2 shadow-card sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-96"
           role="menu"
         >
           <div className="flex items-center justify-between gap-2 border-b border-forest/10 px-3 py-3">

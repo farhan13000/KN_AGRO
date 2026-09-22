@@ -11,6 +11,7 @@ import { ORDER_STATUS_LABELS, ORDER_STATUSES } from "../constants";
 import { useOrderList } from "../hooks";
 import { LocationFilterFields } from "../../geo";
 import OrderTable from "./OrderTable";
+import { FilterPanel } from "../../../shared/components";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
@@ -92,7 +93,7 @@ export default function OrderListView({
         ) : null}
       </div>
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <label className="xl:col-span-2">
             <span className="form-label">Search</span>
@@ -142,7 +143,7 @@ export default function OrderListView({
             <LocationFilterFields compact onChange={handleLocationFilterChange} showPost={false} value={locationFilter} />
           </div>
         ) : null}
-      </section>
+      </FilterPanel>
 
       {ordersState.isLoading ? <PageLoader message="Loading orders..." /> : null}
       {ordersState.isError ? (

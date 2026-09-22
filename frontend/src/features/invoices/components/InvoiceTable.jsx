@@ -1,5 +1,6 @@
 import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
+import { DataTable, rowActionClass } from "../../../shared/components";
 import { formatBusinessDateTime, getBusinessDaysOverdue } from "../../../shared/utils";
 import { INVOICE_PAYMENT_STATUS } from "../constants";
 import { formatInvoiceAmount } from "../utils";
@@ -16,65 +17,97 @@ const overdueHint = (invoice) => {
 };
 
 export default function InvoiceTable({ detailPath, invoices = [] }) {
-  return (
-    <div className="overflow-hidden rounded-lg border border-forest/10 bg-white shadow-sm">
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[1180px] divide-y divide-forest/10 text-left text-sm">
-          <thead className="bg-mint/70 text-xs font-black uppercase text-forest">
-            <tr>
-              <th className="px-4 py-3">Invoice Number</th>
-              <th className="px-4 py-3">Customer</th>
-              <th className="px-4 py-3">Order</th>
-              <th className="px-4 py-3">Invoice Status</th>
-              <th className="px-4 py-3">Payment Status</th>
-              <th className="px-4 py-3 text-right">Grand Total</th>
-              <th className="px-4 py-3 text-right">Paid Amount</th>
-              <th className="px-4 py-3 text-right">Due Amount</th>
-              <th className="px-4 py-3">Invoice Date</th>
-              <th className="px-4 py-3">Due Date</th>
-              <th className="px-4 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-forest/10">
-            {invoices.map((invoice) => (
-              <tr className="align-top transition hover:bg-mint/35" key={invoice._id}>
-                <td className="px-4 py-3 font-black text-forest">{invoice.invoiceNumber}</td>
-                <td className="px-4 py-3 text-ink">{invoice.customer?.name || "Not Set"}</td>
-                <td className="px-4 py-3 text-muted">{invoice.order?.orderNumber || "Not Set"}</td>
-                <td className="px-4 py-3">
-                  <InvoiceStatusBadge status={invoice.status} />
-                </td>
-                <td className="px-4 py-3">
-                  <InvoicePaymentStatusBadge status={invoice.paymentStatus} />
-                  {overdueHint(invoice) ? (
-                    <p className="mt-1 text-xs font-semibold text-orange-800">{overdueHint(invoice)}</p>
-                  ) : null}
-                </td>
-                <td className="px-4 py-3 text-right font-bold text-ink">
-                  {formatInvoiceAmount(invoice.grandTotal)}
-                </td>
-                <td className="px-4 py-3 text-right text-ink">{formatInvoiceAmount(invoice.paidAmount)}</td>
-                <td className="px-4 py-3 text-right font-semibold text-ink">
-                  {formatInvoiceAmount(invoice.dueAmount)}
-                </td>
-                <td className="px-4 py-3 text-muted">{formatBusinessDateTime(invoice.invoiceDate)}</td>
-                <td className="px-4 py-3 text-muted">{formatBusinessDateTime(invoice.dueDate)}</td>
-                <td className="px-4 py-3">
-                  <div className="flex justify-end">
-                    <Link
-                      aria-label={`View ${invoice.invoiceNumber}`}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white text-forest ring-1 ring-forest/15 transition hover:bg-mint"
-                      to={detailPath(invoice)}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Link>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+  const columns = [
+    {
+      key: "invoiceNumber",
+      header: "Invoice Number",
+      role: "title",
+      cellClassName: "font-black text-forest",
+      cell: (invoice) => invoice.invoiceNumber,
+    },
+    {
+      key: "customer",
+      header: "Customer",
+      cellClassName: "text-ink",
+      cell: (invoice) => invoice.customer?.name || "Not Set",
+    },
+    {
+      key: "order",
+      header: "Order",
+      cellClassName: "text-muted",
+      cell: (invoice) => invoice.order?.orderNumber || "Not Set",
+    },
+    {
+      key: "status",
+      header: "Invoice Status",
+      role: "badge",
+      cell: (invoice) => <InvoiceStatusBadge status={invoice.status} />,
+    },
+    {
+      key: "paymentStatus",
+      header: "Payment Status",
+      role: "badge",
+      cell: (invoice) => (
+        <>
+          <InvoicePaymentStatusBadge status={invoice.paymentStatus} />
+          {overdueHint(invoice) ? (
+            <p className="mt-1 text-xs font-semibold text-orange-800">{overdueHint(invoice)}</p>
+          ) : null}
+        </>
+      ),
+    },
+    {
+      key: "grandTotal",
+      header: "Grand Total",
+      align: "right",
+      cellClassName: "font-bold text-ink",
+      cell: (invoice) => formatInvoiceAmount(invoice.grandTotal),
+    },
+    {
+      key: "paidAmount",
+      header: "Paid Amount",
+      align: "right",
+      cellClassName: "text-ink",
+      cell: (invoice) => formatInvoiceAmount(invoice.paidAmount),
+    },
+    {
+      key: "dueAmount",
+      header: "Due Amount",
+      align: "right",
+      cellClassName: "font-semibold text-ink",
+      cell: (invoice) => formatInvoiceAmount(invoice.dueAmount),
+    },
+    {
+      key: "invoiceDate",
+      header: "Invoice Date",
+      cellClassName: "text-muted",
+      cell: (invoice) => formatBusinessDateTime(invoice.invoiceDate),
+    },
+    {
+      key: "dueDate",
+      header: "Due Date",
+      cellClassName: "text-muted",
+      cell: (invoice) => formatBusinessDateTime(invoice.dueDate),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      align: "right",
+      role: "actions",
+      cell: (invoice) => (
+        <div className="flex justify-end">
+          <Link
+            aria-label={`View ${invoice.invoiceNumber}`}
+            className={rowActionClass}
+            to={detailPath(invoice)}
+          >
+            <Eye className="h-4 w-4" />
+            <span className="md:sr-only">View</span>
+          </Link>
+        </div>
+      ),
+    },
+  ];
+
+  return <DataTable columns={columns} minWidth="1180px" rows={invoices} />;
 }

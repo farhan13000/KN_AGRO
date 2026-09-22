@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { DataTable } from "../../../shared/components";
 import { ROUTES } from "../../../shared/constants";
 import { getProductUnitLabel } from "../../products/utils";
 import { INVENTORY_TRANSACTION_TYPE_LABELS } from "../constants";
@@ -18,70 +19,110 @@ const getReference = (transaction) => {
 };
 
 export default function InventoryTransactionTable({ transactions = [] }) {
-  return (
-    <div className="overflow-hidden rounded-lg border border-forest/10 bg-white shadow-sm">
-      <div className="overflow-x-auto">
-        <table className="min-w-[1240px] w-full divide-y divide-forest/10 text-left text-sm">
-          <caption className="sr-only">
-            Read-only inventory transaction ledger. Historical transactions can be viewed, filtered, searched, and paginated but not edited or deleted.
-          </caption>
-          <thead className="bg-mint/70 text-xs font-black uppercase text-forest">
-            <tr>
-              <th className="px-4 py-3">Transaction Code</th>
-              <th className="px-4 py-3">Product</th>
-              <th className="px-4 py-3">Type</th>
-              <th className="px-4 py-3">Quantity</th>
-              <th className="px-4 py-3">Previous Stock</th>
-              <th className="px-4 py-3">New Stock</th>
-              <th className="px-4 py-3">Previous Reserved</th>
-              <th className="px-4 py-3">New Reserved</th>
-              <th className="px-4 py-3">Reference</th>
-              <th className="px-4 py-3">Reason</th>
-              <th className="px-4 py-3">Remarks</th>
-              <th className="px-4 py-3">Performed By</th>
-              <th className="px-4 py-3">Date</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-forest/10">
-            {transactions.map((transaction) => {
-              const product = transaction.product || {};
-              const unit = getProductUnitLabel(product.unit);
+  const columns = [
+    {
+      key: "transactionCode",
+      header: "Transaction Code",
+      cellClassName: "font-black text-forest",
+      cell: (transaction) => transaction.transactionCode || "Not Set",
+    },
+    {
+      key: "product",
+      header: "Product",
+      role: "title",
+      cell: (transaction) => {
+        const product = transaction.product || {};
+        return (
+          <>
+            {product._id ? (
+              <Link
+                className="font-black text-ink transition hover:text-forest"
+                to={`${ROUTES.SUPER_ADMIN.INVENTORY}/${product._id}`}
+              >
+                {product.name || product.productCode || "Product"}
+              </Link>
+            ) : (
+              <span className="font-black text-ink">Not Set</span>
+            )}
+            <p className="mt-1 text-xs font-semibold text-muted">{product.productCode || ""}</p>
+          </>
+        );
+      },
+    },
+    {
+      key: "type",
+      header: "Type",
+      cellClassName: "text-muted",
+      cell: (transaction) => getTransactionLabel(transaction.type),
+    },
+    {
+      key: "quantity",
+      header: "Quantity",
+      cellClassName: "font-bold text-ink",
+      cell: (transaction) => `${transaction.quantity ?? 0} ${getProductUnitLabel(transaction.product?.unit)}`,
+    },
+    {
+      key: "previousStock",
+      header: "Previous Stock",
+      cellClassName: "text-muted",
+      cell: (transaction) => transaction.previousStock ?? 0,
+    },
+    {
+      key: "newStock",
+      header: "New Stock",
+      cellClassName: "text-muted",
+      cell: (transaction) => transaction.newStock ?? 0,
+    },
+    {
+      key: "previousReservedStock",
+      header: "Previous Reserved",
+      cellClassName: "text-muted",
+      cell: (transaction) => transaction.previousReservedStock ?? 0,
+    },
+    {
+      key: "newReservedStock",
+      header: "New Reserved",
+      cellClassName: "text-muted",
+      cell: (transaction) => transaction.newReservedStock ?? 0,
+    },
+    {
+      key: "reference",
+      header: "Reference",
+      cellClassName: "text-muted",
+      cell: getReference,
+    },
+    {
+      key: "reason",
+      header: "Reason",
+      cellClassName: "text-muted",
+      cell: (transaction) => transaction.reason || "Not Set",
+    },
+    {
+      key: "remarks",
+      header: "Remarks",
+      cellClassName: "text-muted",
+      cell: (transaction) => transaction.remarks || "Not Set",
+    },
+    {
+      key: "performedBy",
+      header: "Performed By",
+      cellClassName: "text-muted",
+      cell: (transaction) => transaction.performedBy?.name || "System",
+    },
+    {
+      key: "createdAt",
+      header: "Date",
+      cellClassName: "text-muted",
+      cell: (transaction) => formatDateTime(transaction.createdAt),
+    },
+  ];
 
-              return (
-                <tr className="align-top transition hover:bg-mint/35" key={transaction._id}>
-                  <td className="px-4 py-3 font-black text-forest">{transaction.transactionCode || "Not Set"}</td>
-                  <td className="px-4 py-3">
-                    {product._id ? (
-                      <Link
-                        className="font-black text-ink transition hover:text-forest"
-                        to={`${ROUTES.SUPER_ADMIN.INVENTORY}/${product._id}`}
-                      >
-                        {product.name || product.productCode || "Product"}
-                      </Link>
-                    ) : (
-                      <span className="font-black text-ink">Not Set</span>
-                    )}
-                    <p className="mt-1 text-xs font-semibold text-muted">{product.productCode || ""}</p>
-                  </td>
-                  <td className="px-4 py-3 text-muted">{getTransactionLabel(transaction.type)}</td>
-                  <td className="px-4 py-3 font-bold text-ink">
-                    {transaction.quantity ?? 0} {unit}
-                  </td>
-                  <td className="px-4 py-3 text-muted">{transaction.previousStock ?? 0}</td>
-                  <td className="px-4 py-3 text-muted">{transaction.newStock ?? 0}</td>
-                  <td className="px-4 py-3 text-muted">{transaction.previousReservedStock ?? 0}</td>
-                  <td className="px-4 py-3 text-muted">{transaction.newReservedStock ?? 0}</td>
-                  <td className="px-4 py-3 text-muted">{getReference(transaction)}</td>
-                  <td className="px-4 py-3 text-muted">{transaction.reason || "Not Set"}</td>
-                  <td className="px-4 py-3 text-muted">{transaction.remarks || "Not Set"}</td>
-                  <td className="px-4 py-3 text-muted">{transaction.performedBy?.name || "System"}</td>
-                  <td className="px-4 py-3 text-muted">{formatDateTime(transaction.createdAt)}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
+  return (
+    <DataTable
+      caption="Read-only inventory transaction ledger. Historical transactions can be viewed, filtered, searched, and paginated but not edited or deleted."
+      columns={columns}
+      minWidth="1240px"
+      rows={transactions}
+    />
   );
 }

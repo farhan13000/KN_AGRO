@@ -8,6 +8,7 @@ import { useProductList } from "../../../features/products";
 import {
   LeadForm,
   initialLeadFormValues,
+  pipelineValueFromProducts,
   pickCreateLeadPayload,
   useLeadActions,
   validateLeadForm,
@@ -22,6 +23,11 @@ export default function SuperAdminLeadCreatePage() {
   const productOptions = (productsState.data?.products || []).map((product) => ({
     label: [product.productCode, product.name].filter(Boolean).join(" - "),
     value: product._id,
+    // What the pipeline value is worked out from: the catalogue price the
+    // Super Admin / Office Admin set, and the product's own tax rate.
+    price: product.sellingPrice,
+    taxRate: product.taxRate,
+    unit: product.unit,
   }));
   const leadActions = useLeadActions({
     onSuccess: (payload) => {
@@ -35,9 +41,40 @@ export default function SuperAdminLeadCreatePage() {
     setErrors((current) => ({ ...current, [event.target.name]: "" }));
   };
 
+  // Picking products, or changing a quantity, re-states the pipeline
+  // value from the catalogue and overwrites whatever was there: the
+  // products and their quantities are what the figure MEANS, so a stale
+  // number from an earlier selection would be wrong. It stays editable
+  // afterwards — see pipelineValueFromProducts.
   const handleProductChange = (event) => {
     const selected = Array.from(event.target.selectedOptions).map((option) => option.value);
-    setValues((current) => ({ ...current, interestedProducts: selected }));
+    setValues((current) => {
+      // Drop quantities for products no longer selected, so a figure can
+      // never include something the lead is not interested in.
+      const quantities = Object.fromEntries(
+        Object.entries(current.productQuantities || {}).filter(([id]) => selected.includes(id)),
+      );
+      return {
+        ...current,
+        interestedProducts: selected,
+        productQuantities: quantities,
+        expectedValue: pipelineValueFromProducts(selected, productOptions, quantities),
+      };
+    });
+    setErrors((current) => ({ ...current, expectedValue: "" }));
+  };
+
+  const handleQuantityChange = (productId, quantity) => {
+    setValues((current) => {
+      const quantities = { ...(current.productQuantities || {}) };
+      if (String(quantity).trim() === "") delete quantities[String(productId)];
+      else quantities[String(productId)] = quantity;
+      return {
+        ...current,
+        productQuantities: quantities,
+        expectedValue: pipelineValueFromProducts(current.interestedProducts, productOptions, quantities),
+      };
+    });
   };
 
   const handleSubmit = async (event) => {
@@ -74,6 +111,7 @@ export default function SuperAdminLeadCreatePage() {
           isSubmitting={leadActions.createLead.isLoading}
           onChange={handleChange}
           onProductChange={handleProductChange}
+          onQuantityChange={handleQuantityChange}
           onSubmit={handleSubmit}
           productOptions={productOptions}
           submitLabel="Create Lead"

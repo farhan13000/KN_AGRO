@@ -1,5 +1,6 @@
 import { Download } from "lucide-react";
 import { Link } from "react-router-dom";
+import { DataTable } from "../../../shared/components";
 import { formatBusinessDateTime, formatMoney } from "../../../shared/utils";
 import DSRStatusBadge from "./DSRStatusBadge";
 
@@ -11,61 +12,106 @@ const formatDate = (value) => {
 
 const reading = (value) => (typeof value === "number" ? value : "—");
 
-/** The paper-form rows of a DSR, as a table. */
+/**
+ * The paper-form rows of a DSR. A table on a desktop screen, where the
+ * columns line up across visits; one card per visit on a phone, where
+ * seven columns would mean dragging sideways to read a single call.
+ */
 function VisitsTable({ visits }) {
+  const columns = [
+    {
+      key: "index",
+      header: "#",
+      hideOnCard: true,
+      cellClassName: "text-muted",
+      cell: ({ index }) => index + 1,
+    },
+    {
+      key: "route",
+      header: "Visit route",
+      cellClassName: "text-ink",
+      cell: ({ visit }) => visit.route || "—",
+    },
+    {
+      key: "retailer",
+      header: "Retailer details",
+      role: "title",
+      cell: ({ visit }) => (
+        <>
+          <span className="block font-bold text-ink">{visit.retailerName}</span>
+          {visit.retailerPhone ? (
+            <a className="block font-semibold text-forest md:font-normal md:text-muted" href={`tel:${visit.retailerPhone}`}>
+              {visit.retailerPhone}
+            </a>
+          ) : null}
+          {visit.retailerPlace ? <span className="block text-muted">{visit.retailerPlace}</span> : null}
+        </>
+      ),
+    },
+    {
+      key: "meter",
+      header: "Meter (km)",
+      cellClassName: "whitespace-nowrap text-ink",
+      cell: ({ visit }) => (
+        <>
+          {reading(visit.meterFrom)} → {reading(visit.meterTo)}
+          {typeof visit.meterFrom === "number" && typeof visit.meterTo === "number" ? (
+            <span className="block font-bold">
+              {Math.round((visit.meterTo - visit.meterFrom) * 10) / 10} km
+            </span>
+          ) : null}
+        </>
+      ),
+    },
+    {
+      key: "amountReceived",
+      header: "Amount received",
+      cellClassName: "whitespace-nowrap font-bold text-ink",
+      cell: ({ visit }) => (visit.amountReceived ? formatMoney(visit.amountReceived) : "—"),
+    },
+    {
+      key: "order",
+      header: "Order received",
+      cellClassName: "text-ink",
+      cell: ({ visit }) => (
+        <>
+          {visit.orderAmount ? <span className="block font-bold">{formatMoney(visit.orderAmount)}</span> : "—"}
+          {visit.orderNumbers?.length ? (
+            <span className="block text-muted">{visit.orderNumbers.join(", ")}</span>
+          ) : null}
+        </>
+      ),
+    },
+    {
+      key: "products",
+      header: "Materials order details",
+      cellClassName: "text-ink",
+      cardClassName: "col-span-2",
+      cell: ({ visit }) =>
+        visit.products?.length
+          ? visit.products.map((line, lineIndex) => (
+              <span className="block" key={`${line.productName}-${lineIndex}`}>
+                {line.productName}
+                {typeof line.quantity === "number"
+                  ? ` × ${line.quantity}${line.unit ? ` ${line.unit}` : ""}`
+                  : ""}
+              </span>
+            ))
+          : "—",
+    },
+  ];
+
+  const rows = visits.map((visit, index) => ({ index, visit }));
+
   return (
-    <div className="mt-3 overflow-x-auto rounded-lg border border-forest/10">
-      <table className="w-full min-w-[900px] divide-y divide-forest/10 text-left text-xs">
-        <thead className="bg-mint/30 font-black uppercase text-forest">
-          <tr>
-            <th className="px-3 py-2">#</th>
-            <th className="px-3 py-2">Visit route</th>
-            <th className="px-3 py-2">Retailer details</th>
-            <th className="px-3 py-2">Meter (km)</th>
-            <th className="px-3 py-2">Amount received</th>
-            <th className="px-3 py-2">Order received</th>
-            <th className="px-3 py-2">Materials order details</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-forest/10 align-top">
-          {visits.map((visit, index) => (
-            <tr key={`${visit.retailerName}-${index}`}>
-              <td className="px-3 py-2 text-muted">{index + 1}</td>
-              <td className="px-3 py-2 text-ink">{visit.route || "—"}</td>
-              <td className="px-3 py-2">
-                <span className="block font-bold text-ink">{visit.retailerName}</span>
-                {visit.retailerPhone ? <span className="block text-muted">{visit.retailerPhone}</span> : null}
-                {visit.retailerPlace ? <span className="block text-muted">{visit.retailerPlace}</span> : null}
-              </td>
-              <td className="whitespace-nowrap px-3 py-2 text-ink">
-                {reading(visit.meterFrom)} → {reading(visit.meterTo)}
-                {typeof visit.meterFrom === "number" && typeof visit.meterTo === "number" ? (
-                  <span className="block font-bold">{Math.round((visit.meterTo - visit.meterFrom) * 10) / 10} km</span>
-                ) : null}
-              </td>
-              <td className="whitespace-nowrap px-3 py-2 font-bold text-ink">
-                {visit.amountReceived ? formatMoney(visit.amountReceived) : "—"}
-              </td>
-              <td className="px-3 py-2 text-ink">
-                {visit.orderAmount ? <span className="block font-bold">{formatMoney(visit.orderAmount)}</span> : "—"}
-                {visit.orderNumbers?.length ? (
-                  <span className="block text-muted">{visit.orderNumbers.join(", ")}</span>
-                ) : null}
-              </td>
-              <td className="px-3 py-2 text-ink">
-                {visit.products?.length
-                  ? visit.products.map((line, lineIndex) => (
-                      <span className="block" key={`${line.productName}-${lineIndex}`}>
-                        {line.productName}
-                        {typeof line.quantity === "number" ? ` × ${line.quantity}${line.unit ? ` ${line.unit}` : ""}` : ""}
-                      </span>
-                    ))
-                  : "—"}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="mt-3">
+      <DataTable
+        columns={columns}
+        minWidth="900px"
+        rowKey={({ index, visit }) => `${visit.retailerName}-${index}`}
+        rows={rows}
+        theadClassName="bg-mint/30 text-xs font-black uppercase text-forest"
+      />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { useDebouncedValue } from "../../../shared/hooks";
 import { PAYMENT_METHOD_LABELS, PAYMENT_METHODS } from "../constants";
 import { usePaymentList } from "../hooks";
 import PaymentTable from "./PaymentTable";
+import { FilterPanel } from "../../../shared/components";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
@@ -59,7 +60,7 @@ export default function PaymentListView({
         </div>
       ) : null}
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <label className="xl:col-span-2">
             <span className="form-label">Search</span>
@@ -96,7 +97,7 @@ export default function PaymentListView({
             </select>
           </label>
         </div>
-      </section>
+      </FilterPanel>
 
       {paymentsState.isLoading ? <PageLoader message="Loading payments..." /> : null}
       {paymentsState.isError ? (

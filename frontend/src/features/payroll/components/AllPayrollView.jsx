@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { useAuth } from "../../../core/auth";
 import { getApiErrorMessage } from "../../../core/api";
+import { DataTable, FilterPanel } from "../../../shared/components";
 import EmptyState from "../../../shared/components/EmptyState";
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
@@ -53,6 +54,87 @@ export default function AllPayrollView() {
     }
   };
 
+  const columns = [
+    {
+      key: "payrollNumber",
+      header: "Payroll No.",
+      cellClassName: "font-mono text-xs text-muted",
+      cell: (payroll) => payroll.payrollNumber,
+    },
+    {
+      key: "employee",
+      header: "Employee",
+      role: "title",
+      cell: (payroll) => (
+        <>
+          <span className="block font-black text-ink">{payroll.employee?.user?.name || "—"}</span>
+          <span className="block text-xs text-muted">{payroll.employee?.employeeCode}</span>
+        </>
+      ),
+    },
+    {
+      key: "period",
+      header: "Period",
+      cellClassName: "text-muted",
+      cell: (payroll) => formatPeriod(payroll.month, payroll.year),
+    },
+    {
+      key: "grossSalary",
+      header: "Gross",
+      align: "right",
+      cellClassName: "tabular-nums text-muted",
+      cell: (payroll) => formatMoney(payroll.grossSalary),
+    },
+    {
+      key: "totalDeductions",
+      header: "Deductions",
+      align: "right",
+      cellClassName: "tabular-nums text-muted",
+      cell: (payroll) => formatMoney(payroll.totalDeductions),
+    },
+    {
+      key: "netSalary",
+      header: "Net",
+      align: "right",
+      cellClassName: "font-black tabular-nums text-forest",
+      cell: (payroll) => formatMoney(payroll.netSalary),
+    },
+    {
+      key: "status",
+      header: "Status",
+      role: "badge",
+      cell: (payroll) => <PayrollStatusBadge status={payroll.status} />,
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      align: "right",
+      role: "actions",
+      cell: (payroll) => (
+        <div className="flex justify-end gap-2">
+          {payroll.status === PAYROLL_STATUS.DRAFT && canGenerate ? (
+            <button
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-forest ring-1 ring-forest/15 transition hover:bg-mint md:min-h-9"
+              onClick={() => run(actions.processPayroll.mutate, "Payroll processed.", payroll._id)}
+              type="button"
+            >
+              Process
+            </button>
+          ) : null}
+          {payroll.status === PAYROLL_STATUS.PROCESSED && canMarkPaid ? (
+            <button
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-forest px-3 py-1.5 text-xs font-bold text-white shadow-sm transition hover:bg-agriculture md:min-h-9"
+              onClick={() => run(actions.markPayrollPaid.mutate, "Payroll marked paid.", payroll._id)}
+              type="button"
+            >
+              Mark Paid
+            </button>
+          ) : null}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -87,7 +169,7 @@ export default function AllPayrollView() {
         </p>
       ) : null}
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 md:grid-cols-3">
           <label>
             <span className="form-label">Status</span>
@@ -125,7 +207,7 @@ export default function AllPayrollView() {
             />
           </label>
         </div>
-      </section>
+      </FilterPanel>
 
       {state.isLoading ? <PageLoader message="Loading payroll records..." /> : null}
       {state.isError ? <ErrorState message={state.errorMessage} title="Unable to load payroll" /> : null}
@@ -135,76 +217,7 @@ export default function AllPayrollView() {
 
       {state.payrolls.length ? (
         <>
-          <div className="overflow-hidden rounded-lg border border-forest/10 bg-white shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="min-w-[900px] w-full divide-y divide-forest/10 text-left text-sm">
-                <thead className="bg-mint/70 text-xs font-black uppercase text-forest">
-                  <tr>
-                    <th className="px-4 py-3">Payroll No.</th>
-                    <th className="px-4 py-3">Employee</th>
-                    <th className="px-4 py-3">Period</th>
-                    <th className="px-4 py-3 text-right">Gross</th>
-                    <th className="px-4 py-3 text-right">Deductions</th>
-                    <th className="px-4 py-3 text-right">Net</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-forest/10">
-                  {state.payrolls.map((payroll) => (
-                    <tr className="align-top transition hover:bg-mint/35" key={payroll._id}>
-                      <td className="px-4 py-3 font-mono text-xs text-muted">{payroll.payrollNumber}</td>
-                      <td className="px-4 py-3">
-                        <span className="block font-black text-ink">
-                          {payroll.employee?.user?.name || "—"}
-                        </span>
-                        <span className="block text-xs text-muted">{payroll.employee?.employeeCode}</span>
-                      </td>
-                      <td className="px-4 py-3 text-muted">{formatPeriod(payroll.month, payroll.year)}</td>
-                      <td className="px-4 py-3 text-right tabular-nums text-muted">
-                        {formatMoney(payroll.grossSalary)}
-                      </td>
-                      <td className="px-4 py-3 text-right tabular-nums text-muted">
-                        {formatMoney(payroll.totalDeductions)}
-                      </td>
-                      <td className="px-4 py-3 text-right font-black tabular-nums text-forest">
-                        {formatMoney(payroll.netSalary)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <PayrollStatusBadge status={payroll.status} />
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex justify-end gap-2">
-                          {payroll.status === PAYROLL_STATUS.DRAFT && canGenerate ? (
-                            <button
-                              className="inline-flex min-h-9 items-center justify-center rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-forest ring-1 ring-forest/15 transition hover:bg-mint"
-                              onClick={() =>
-                                run(actions.processPayroll.mutate, "Payroll processed.", payroll._id)
-                              }
-                              type="button"
-                            >
-                              Process
-                            </button>
-                          ) : null}
-                          {payroll.status === PAYROLL_STATUS.PROCESSED && canMarkPaid ? (
-                            <button
-                              className="inline-flex min-h-9 items-center justify-center rounded-lg bg-forest px-3 py-1.5 text-xs font-bold text-white shadow-sm transition hover:bg-agriculture"
-                              onClick={() =>
-                                run(actions.markPayrollPaid.mutate, "Payroll marked paid.", payroll._id)
-                              }
-                              type="button"
-                            >
-                              Mark Paid
-                            </button>
-                          ) : null}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <DataTable columns={columns} minWidth="900px" rows={state.payrolls} />
 
           <Pagination
             ariaLabel="Payroll pagination"

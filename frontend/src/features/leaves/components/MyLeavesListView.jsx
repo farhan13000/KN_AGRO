@@ -10,6 +10,7 @@ import { useMyLeaveList } from "../hooks";
 import LeaveCancelDialog from "./LeaveCancelDialog";
 import LeaveCard from "./LeaveCard";
 import LeaveRequestDialog from "./LeaveRequestDialog";
+import { FilterPanel } from "../../../shared/components";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
@@ -53,7 +54,7 @@ export default function MyLeavesListView({ description, portalLabel, showHeading
         </button>
       </div>
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <label className="block max-w-xs">
           <span className="form-label">Status</span>
           <select
@@ -69,7 +70,7 @@ export default function MyLeavesListView({ description, portalLabel, showHeading
             ))}
           </select>
         </label>
-      </section>
+      </FilterPanel>
 
       {isLoading ? <PageLoader message="Loading leaves..." /> : null}
       {isError ? <ErrorState message={errorMessage} title="Unable to load leaves" /> : null}

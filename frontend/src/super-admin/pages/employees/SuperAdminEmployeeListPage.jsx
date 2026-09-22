@@ -17,6 +17,7 @@ import {
   useEmployeeSummary,
 } from "../../../features/employees";
 import { LocationFilterFields } from "../../../features/geo";
+import { FilterPanel } from "../../../shared/components";
 
 /**
  * Adding a person takes one of two forms, and which one you get is
@@ -92,7 +93,7 @@ export default function SuperAdminEmployeeListPage() {
         </div>
       </div>
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
           <label className="xl:col-span-2">
             <span className="form-label">Search</span>
@@ -163,7 +164,7 @@ export default function SuperAdminEmployeeListPage() {
           <p className="form-label">Location — where this employee covers</p>
           <LocationFilterFields compact onChange={handleLocationFilterChange} value={locationFilter} />
         </div>
-      </section>
+      </FilterPanel>
 
       {!summaryState.isLoading && !summaryState.isError ? (
         <EmployeeSummaryCards summary={summaryState.data} />

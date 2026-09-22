@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { CornerDownRight, Eye } from "lucide-react";
+import { DataTable, rowActionClass } from "../../../shared/components";
 import { formatEmploymentType, getEmployeeDisplayName } from "../utils";
 import EmployeeRoleBadge from "./EmployeeRoleBadge";
 import EmployeeStatusBadge from "./EmployeeStatusBadge";
@@ -51,70 +52,89 @@ const formatDate = (value) => {
 export default function TeamHierarchyTable({ detailPathFor, employees = [] }) {
   const rows = buildForest(employees);
 
+  const columns = [
+    {
+      key: "name",
+      header: "Name",
+      role: "title",
+      cell: ({ depth, employee }) => (
+        <span
+          className="flex items-center gap-2 font-bold text-ink"
+          // Indentation is the tree. Inline because the depth is data,
+          // not one of a fixed set of Tailwind classes.
+          style={{ paddingLeft: `${depth * 22}px` }}
+        >
+          {depth ? <CornerDownRight className="h-4 w-4 shrink-0 text-muted" /> : null}
+          {getEmployeeDisplayName(employee)}
+        </span>
+      ),
+    },
+    {
+      key: "role",
+      header: "Role",
+      role: "badge",
+      cell: ({ employee }) => <EmployeeRoleBadge employee={employee} />,
+    },
+    {
+      key: "manager",
+      header: "Reports To",
+      cellClassName: "text-muted",
+      // The manager's real name, including for your own direct reports —
+      // naming you back is less useful than naming the person, and this
+      // column has to stay correct for a row whose manager is outside the
+      // current filter.
+      cell: ({ employee }) => (employee.manager ? getEmployeeDisplayName(employee.manager) : "Not Set"),
+    },
+    {
+      key: "employeeCode",
+      header: "Employee Code",
+      cellClassName: "font-black text-forest",
+      cell: ({ employee }) => employee.employeeCode || "Not Assigned",
+    },
+    {
+      key: "employmentType",
+      header: "Employment Type",
+      cellClassName: "text-muted",
+      cell: ({ employee }) => formatEmploymentType(employee.employmentType),
+    },
+    {
+      key: "status",
+      header: "Status",
+      role: "badge",
+      cell: ({ employee }) => <EmployeeStatusBadge status={employee.employeeStatus} />,
+    },
+    {
+      key: "dateOfJoining",
+      header: "Joining Date",
+      cellClassName: "text-muted",
+      cell: ({ employee }) => formatDate(employee.dateOfJoining),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      align: "right",
+      role: "actions",
+      cell: ({ employee }) => (
+        <div className="flex justify-end">
+          <Link
+            aria-label={`View ${getEmployeeDisplayName(employee)}`}
+            className={rowActionClass}
+            to={detailPathFor(employee)}
+          >
+            <Eye className="h-4 w-4" />
+            <span className="md:sr-only">View</span>
+          </Link>
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <div className="overflow-hidden rounded-lg border border-forest/10 bg-white shadow-sm">
-      <div className="overflow-x-auto">
-        <table className="min-w-[860px] w-full divide-y divide-forest/10 text-left text-sm">
-          <thead className="bg-mint/70 text-xs font-black uppercase text-forest">
-            <tr>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Role</th>
-              <th className="px-4 py-3">Reports To</th>
-              <th className="px-4 py-3">Employee Code</th>
-              <th className="px-4 py-3">Employment Type</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Joining Date</th>
-              <th className="px-4 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-forest/10">
-            {rows.map(({ depth, employee }) => (
-              <tr className="align-middle transition hover:bg-mint/35" key={employee._id}>
-                <td className="px-4 py-3">
-                  <span
-                    className="flex items-center gap-2 font-bold text-ink"
-                    // Indentation is the tree. Inline because the depth is
-                    // data, not one of a fixed set of Tailwind classes.
-                    style={{ paddingLeft: `${depth * 22}px` }}
-                  >
-                    {depth ? <CornerDownRight className="h-4 w-4 shrink-0 text-muted" /> : null}
-                    {getEmployeeDisplayName(employee)}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <EmployeeRoleBadge employee={employee} />
-                </td>
-                <td className="px-4 py-3 text-muted">
-                  {/* The manager's real name, including for your own direct
-                      reports — naming you back is less useful than naming
-                      the person, and this column has to stay correct for a
-                      row whose manager is outside the current filter. */}
-                  {employee.manager ? getEmployeeDisplayName(employee.manager) : "Not Set"}
-                </td>
-                <td className="px-4 py-3 font-black text-forest">
-                  {employee.employeeCode || "Not Assigned"}
-                </td>
-                <td className="px-4 py-3 text-muted">{formatEmploymentType(employee.employmentType)}</td>
-                <td className="px-4 py-3">
-                  <EmployeeStatusBadge status={employee.employeeStatus} />
-                </td>
-                <td className="px-4 py-3 text-muted">{formatDate(employee.dateOfJoining)}</td>
-                <td className="px-4 py-3">
-                  <div className="flex justify-end">
-                    <Link
-                      aria-label={`View ${getEmployeeDisplayName(employee)}`}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white text-forest ring-1 ring-forest/15 transition hover:bg-mint"
-                      to={detailPathFor(employee)}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Link>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <DataTable
+      columns={columns}
+      minWidth="860px"
+      rowKey={({ employee }) => employee._id}
+      rows={rows}
+    />
   );
 }

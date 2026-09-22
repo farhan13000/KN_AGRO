@@ -1,3 +1,4 @@
+import { DataTable } from "../../../shared/components";
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
 import { formatBusinessDateTime, formatMoney } from "../../../shared/utils";
@@ -109,30 +110,35 @@ export default function AdminDashboardContent() {
 
       {d.employees?.managerPerformance?.length ? (
         <Section title="Manager Performance (Top 10 by Team Size)">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] divide-y divide-forest/10 text-left text-sm">
-              <thead className="text-xs font-black uppercase text-forest">
-                <tr>
-                  <th className="px-3 py-2">Manager</th>
-                  <th className="px-3 py-2">Team Size</th>
-                  <th className="px-3 py-2">Assigned Leads</th>
-                  <th className="px-3 py-2">Orders</th>
-                  <th className="px-3 py-2">Booked Value</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-forest/10">
-                {d.employees.managerPerformance.map((row) => (
-                  <tr key={row.manager?._id}>
-                    <td className="px-3 py-2 font-semibold text-ink">{row.manager?.name || row.manager?.employeeCode}</td>
-                    <td className="px-3 py-2 text-muted">{row.teamSize}</td>
-                    <td className="px-3 py-2 text-muted">{row.assignedLeads}</td>
-                    <td className="px-3 py-2 text-muted">{row.orders}</td>
-                    <td className="px-3 py-2 text-muted">{formatMoney(row.bookedOrderValue)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            columns={[
+              {
+                key: "manager",
+                header: "Manager",
+                role: "title",
+                cellClassName: "font-semibold text-ink",
+                cell: (row) => row.manager?.name || row.manager?.employeeCode,
+              },
+              { key: "teamSize", header: "Team Size", cellClassName: "text-muted", cell: (row) => row.teamSize },
+              {
+                key: "assignedLeads",
+                header: "Assigned Leads",
+                cellClassName: "text-muted",
+                cell: (row) => row.assignedLeads,
+              },
+              { key: "orders", header: "Orders", cellClassName: "text-muted", cell: (row) => row.orders },
+              {
+                key: "bookedOrderValue",
+                header: "Booked Value",
+                cellClassName: "text-muted",
+                cell: (row) => formatMoney(row.bookedOrderValue),
+              },
+            ]}
+            minWidth="720px"
+            rowKey={(row) => row.manager?._id}
+            rows={d.employees.managerPerformance}
+            theadClassName="text-xs font-black uppercase text-forest"
+          />
         </Section>
       ) : null}
 

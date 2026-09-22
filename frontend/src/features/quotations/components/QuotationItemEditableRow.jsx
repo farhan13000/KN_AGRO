@@ -18,7 +18,7 @@ export default function QuotationItemEditableRow({ item, onChange, onRemove }) {
 
   return (
     <tr className="align-top">
-      <td className="min-w-[180px] px-3 py-3">
+      <td className="px-3 py-3 md:min-w-[180px]">
         <p className="font-black text-forest">{item.product?.productCode || "Not Set"}</p>
         <p className="text-sm font-semibold text-ink">{item.product?.name || "Unnamed Product"}</p>
         <p className="text-xs text-muted">{getProductUnitLabel(item.product?.unit)}</p>
@@ -31,7 +31,8 @@ export default function QuotationItemEditableRow({ item, onChange, onRemove }) {
           value={item.description || ""}
         />
       </td>
-      <td className="w-40 px-3 py-3">
+      <td className="px-3 py-3 md:w-40">
+        <span className="item-grid-label">Quantity</span>
         <input
           aria-label={`Quantity for ${productLabel}`}
           className="form-field"
@@ -42,7 +43,8 @@ export default function QuotationItemEditableRow({ item, onChange, onRemove }) {
           value={item.quantity}
         />
       </td>
-      <td className="w-36 px-3 py-3">
+      <td className="px-3 py-3 md:w-36">
+        <span className="item-grid-label">Rate</span>
         <input
           aria-label={`Rate for ${productLabel}`}
           className="form-field"
@@ -53,7 +55,8 @@ export default function QuotationItemEditableRow({ item, onChange, onRemove }) {
           value={item.rate}
         />
       </td>
-      <td className="w-56 px-3 py-3">
+      <td className="px-3 py-3 md:w-56">
+        <span className="item-grid-label">Discount</span>
         <div className="flex gap-2">
           <select
             aria-label={`Discount type for ${productLabel}`}
@@ -82,7 +85,8 @@ export default function QuotationItemEditableRow({ item, onChange, onRemove }) {
           ) : null}
         </div>
       </td>
-      <td className="w-28 px-3 py-3">
+      <td className="px-3 py-3 md:w-28">
+        <span className="item-grid-label">Tax %</span>
         <input
           aria-label={`Tax rate for ${productLabel}`}
           className="form-field"
@@ -94,7 +98,8 @@ export default function QuotationItemEditableRow({ item, onChange, onRemove }) {
           value={item.taxRate}
         />
       </td>
-      <td className="px-3 py-3 text-right">
+      <td className="px-3 py-3 md:text-right">
+        <span className="item-grid-label">Line total</span>
         <p className="font-semibold text-ink">{formatQuotationAmount(preview.lineSubtotal)}</p>
         <p className="text-xs text-muted">
           Tax {formatQuotationAmount(preview.taxAmount)}
@@ -102,14 +107,15 @@ export default function QuotationItemEditableRow({ item, onChange, onRemove }) {
         </p>
         <p className="font-black text-forest">{formatQuotationAmount(preview.lineTotal)}</p>
       </td>
-      <td className="w-12 px-3 py-3 text-right">
+      <td className="px-3 py-3 md:w-12 md:text-right">
         <button
           aria-label={`Remove ${item.product?.name || "item"}`}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-red-700 ring-1 ring-red-200 transition hover:bg-red-50"
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg text-red-700 ring-1 ring-red-200 transition hover:bg-red-50 md:h-9 md:min-h-0 md:w-9"
           onClick={onRemove}
           type="button"
         >
           <Trash2 className="h-4 w-4" />
+          <span className="text-sm font-bold md:sr-only">Remove</span>
         </button>
       </td>
     </tr>

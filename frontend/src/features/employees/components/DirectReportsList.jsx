@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { DataTable } from "../../../shared/components";
 import { ROUTES } from "../../../shared/constants";
 import EmptyState from "../../../shared/components/EmptyState";
 import ErrorState from "../../../shared/components/ErrorState";
@@ -25,47 +26,53 @@ export default function DirectReportsList({ employeeId }) {
     return <EmptyState description="This employee has no direct reports." title="No direct reports" />;
   }
 
-  return (
-    <div className="overflow-hidden rounded-lg border border-forest/10 bg-white shadow-sm">
-      <div className="overflow-x-auto">
-        <table className="min-w-[620px] w-full divide-y divide-forest/10 text-left text-sm">
-          <thead className="bg-mint/70 text-xs font-black uppercase text-forest">
-            <tr>
-              <th className="px-4 py-3">Employee Code</th>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Role</th>
-              <th className="px-4 py-3">Designation</th>
-              <th className="px-4 py-3">Department</th>
-              <th className="px-4 py-3">Employee Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-forest/10">
-            {reports.map((report) => (
-              <tr className="transition hover:bg-mint/35" key={report._id}>
-                <td className="px-4 py-3">
-                  <Link className="font-black text-forest" to={`${ROUTES.SUPER_ADMIN.EMPLOYEES}/${report._id}`}>
-                    {report.employeeCode || "Not Assigned"}
-                  </Link>
-                </td>
-                <td className="px-4 py-3 font-bold text-ink">
-                  <span className="flex items-center gap-2">
-                    <Avatar name={getEmployeeDisplayName(report)} src={report.photo?.url || ""} />
-                    <span className="min-w-0 truncate">{getEmployeeDisplayName(report)}</span>
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <EmployeeRoleBadge employee={report} />
-                </td>
-                <td className="px-4 py-3 text-muted">{report.designation || "Not Set"}</td>
-                <td className="px-4 py-3 text-muted">{report.department || "Not Set"}</td>
-                <td className="px-4 py-3">
-                  <EmployeeStatusBadge status={report.employeeStatus} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+  const columns = [
+    {
+      key: "employeeCode",
+      header: "Employee Code",
+      cell: (report) => (
+        <Link className="font-black text-forest" to={`${ROUTES.SUPER_ADMIN.EMPLOYEES}/${report._id}`}>
+          {report.employeeCode || "Not Assigned"}
+        </Link>
+      ),
+    },
+    {
+      key: "name",
+      header: "Name",
+      role: "title",
+      cellClassName: "font-bold text-ink",
+      cell: (report) => (
+        <span className="flex items-center gap-2">
+          <Avatar name={getEmployeeDisplayName(report)} src={report.photo?.url || ""} />
+          <span className="min-w-0 truncate">{getEmployeeDisplayName(report)}</span>
+        </span>
+      ),
+    },
+    {
+      key: "role",
+      header: "Role",
+      role: "badge",
+      cell: (report) => <EmployeeRoleBadge employee={report} />,
+    },
+    {
+      key: "designation",
+      header: "Designation",
+      cellClassName: "text-muted",
+      cell: (report) => report.designation || "Not Set",
+    },
+    {
+      key: "department",
+      header: "Department",
+      cellClassName: "text-muted",
+      cell: (report) => report.department || "Not Set",
+    },
+    {
+      key: "employeeStatus",
+      header: "Employee Status",
+      role: "badge",
+      cell: (report) => <EmployeeStatusBadge status={report.employeeStatus} />,
+    },
+  ];
+
+  return <DataTable columns={columns} minWidth="620px" rows={reports} />;
 }

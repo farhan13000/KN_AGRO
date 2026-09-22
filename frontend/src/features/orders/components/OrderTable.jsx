@@ -1,5 +1,6 @@
 import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
+import { DataTable, rowActionClass } from "../../../shared/components";
 import { formatBusinessDateTime } from "../../../shared/utils";
 import { ORDER_STATUS } from "../constants";
 import { formatGeoSummary, formatOrderAmount } from "../utils";
@@ -18,54 +19,78 @@ const dispatchStateLabel = (order) => {
 };
 
 export default function OrderTable({ detailPath, orders = [] }) {
-  return (
-    <div className="overflow-hidden rounded-lg border border-forest/10 bg-white shadow-sm">
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[1060px] divide-y divide-forest/10 text-left text-sm">
-          <thead className="bg-mint/70 text-xs font-black uppercase text-forest">
-            <tr>
-              <th className="px-4 py-3">Order Number</th>
-              <th className="px-4 py-3">Customer</th>
-              <th className="px-4 py-3">Quotation</th>
-              <th className="px-4 py-3">State</th>
-              <th className="px-4 py-3">District</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3 text-right">Order Value</th>
-              <th className="px-4 py-3">Created At</th>
-              <th className="px-4 py-3">Dispatch State</th>
-              <th className="px-4 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-forest/10">
-            {orders.map((order) => (
-              <tr className="align-top transition hover:bg-mint/35" key={order._id}>
-                <td className="px-4 py-3 font-black text-forest">{order.orderNumber}</td>
-                <td className="px-4 py-3 text-ink">{order.customer?.name || "Not Set"}</td>
-                <td className="px-4 py-3 text-muted">{order.quotation?.quotationNumber || "Not Set"}</td>
-                <td className="px-4 py-3 text-muted">{formatGeoSummary(order.state)}</td>
-                <td className="px-4 py-3 text-muted">{formatGeoSummary(order.district)}</td>
-                <td className="px-4 py-3">
-                  <OrderStatusBadge status={order.orderStatus} />
-                </td>
-                <td className="px-4 py-3 text-right font-bold text-ink">{formatOrderAmount(order.grandTotal)}</td>
-                <td className="px-4 py-3 text-muted">{formatBusinessDateTime(order.createdAt)}</td>
-                <td className="px-4 py-3 text-muted">{dispatchStateLabel(order)}</td>
-                <td className="px-4 py-3">
-                  <div className="flex justify-end">
-                    <Link
-                      aria-label={`View ${order.orderNumber}`}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white text-forest ring-1 ring-forest/15 transition hover:bg-mint"
-                      to={detailPath(order)}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Link>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+  const columns = [
+    {
+      key: "orderNumber",
+      header: "Order Number",
+      role: "title",
+      cellClassName: "font-black text-forest",
+      cell: (order) => order.orderNumber,
+    },
+    {
+      key: "customer",
+      header: "Customer",
+      cellClassName: "text-ink",
+      cell: (order) => order.customer?.name || "Not Set",
+    },
+    {
+      key: "quotation",
+      header: "Quotation",
+      cellClassName: "text-muted",
+      cell: (order) => order.quotation?.quotationNumber || "Not Set",
+    },
+    {
+      key: "state",
+      header: "State",
+      cellClassName: "text-muted",
+      cell: (order) => formatGeoSummary(order.state),
+    },
+    {
+      key: "district",
+      header: "District",
+      cellClassName: "text-muted",
+      cell: (order) => formatGeoSummary(order.district),
+    },
+    {
+      key: "status",
+      header: "Status",
+      role: "badge",
+      cell: (order) => <OrderStatusBadge status={order.orderStatus} />,
+    },
+    {
+      key: "grandTotal",
+      header: "Order Value",
+      align: "right",
+      cellClassName: "font-bold text-ink",
+      cell: (order) => formatOrderAmount(order.grandTotal),
+    },
+    {
+      key: "createdAt",
+      header: "Created At",
+      cellClassName: "text-muted",
+      cell: (order) => formatBusinessDateTime(order.createdAt),
+    },
+    {
+      key: "dispatchState",
+      header: "Dispatch State",
+      cellClassName: "text-muted",
+      cell: dispatchStateLabel,
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      align: "right",
+      role: "actions",
+      cell: (order) => (
+        <div className="flex justify-end">
+          <Link aria-label={`View ${order.orderNumber}`} className={rowActionClass} to={detailPath(order)}>
+            <Eye className="h-4 w-4" />
+            <span className="md:sr-only">View</span>
+          </Link>
+        </div>
+      ),
+    },
+  ];
+
+  return <DataTable columns={columns} minWidth="1060px" rows={orders} />;
 }

@@ -77,8 +77,14 @@ export default function DSRPrintRouteView({ backTo }) {
           </Button>
         </div>
       </div>
-      <div className="overflow-x-auto">
-        <div className="min-w-[1000px] print:min-w-0">
+      {/* The sheet is held at its A4-landscape width from `md` up, where
+          the ruled grid is the point of it. On a phone that 1,000px floor
+          was what pushed half the columns past the edge, so below `md`
+          the sheet takes the screen width and its rows stack instead —
+          see `.doc-table` in index.css. Printing is unaffected either
+          way. */}
+      <div className="md:overflow-x-auto">
+        <div className="md:min-w-[1000px] print:min-w-0">
           <DSRPrintView dsr={dsr} />
         </div>
       </div>

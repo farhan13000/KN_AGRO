@@ -1,3 +1,4 @@
+import { FilterPanel } from "../../../shared/components";
 import { useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
 import Card from "../../../shared/components/Card";
@@ -82,7 +83,7 @@ export default function SuperAdminInventoryOverviewPage({ showHeading = true }) 
         </div>
       ) : null}
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
           <label className="xl:col-span-2">
             <span className="form-label">Search</span>
@@ -164,7 +165,7 @@ export default function SuperAdminInventoryOverviewPage({ showHeading = true }) 
             </select>
           </label>
         </div>
-      </section>
+      </FilterPanel>
 
       {inventoryState.isLoading ? <PageLoader message="Loading inventory..." /> : null}
       {inventoryState.isError ? <ErrorState message={inventoryState.errorMessage} title="Unable to load inventory" /> : null}

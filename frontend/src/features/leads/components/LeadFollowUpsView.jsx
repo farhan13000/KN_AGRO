@@ -7,6 +7,7 @@ import Pagination from "../../../shared/components/Pagination";
 import { useDebouncedValue } from "../../../shared/hooks";
 import { useFollowUps } from "../hooks";
 import LeadTable from "./LeadTable";
+import { FilterPanel } from "../../../shared/components";
 
 const followUpKinds = [
   { label: "Today", value: "today" },
@@ -65,7 +66,7 @@ export default function LeadFollowUpsView({
         </div>
       ) : null}
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
           <label>
             <span className="form-label">Follow-Up Window</span>
@@ -116,7 +117,7 @@ export default function LeadFollowUpsView({
             </>
           ) : null}
         </div>
-      </section>
+      </FilterPanel>
 
       {followUpsState.isLoading ? <PageLoader message="Loading follow-ups..." /> : null}
       {followUpsState.isError ? (

@@ -255,8 +255,10 @@ export default function QuotationBuilder({
           />
           {errors.items ? <p className="form-error">{errors.items}</p> : null}
           {items.length ? (
-            <div className="overflow-x-auto rounded-lg border border-forest/10 bg-white">
-              <table className="w-full min-w-[880px] divide-y divide-forest/10 text-left text-sm">
+            // Real table on a desktop screen; one card per item on a
+            // phone — see `.item-grid` in index.css.
+            <div className="md:overflow-x-auto md:rounded-lg md:border md:border-forest/10 md:bg-white">
+              <table className="item-grid w-full text-left text-sm md:min-w-[880px] md:divide-y md:divide-forest/10">
                 <thead className="bg-mint/70 text-xs font-black uppercase text-forest">
                   <tr>
                     <th className="px-3 py-3">Product</th>

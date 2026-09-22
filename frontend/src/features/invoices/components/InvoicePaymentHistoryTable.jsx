@@ -1,3 +1,4 @@
+import { DataTable } from "../../../shared/components";
 import { formatBusinessDateTime } from "../../../shared/utils";
 // Narrow subpath imports (not the payments feature's root barrel) — this
 // only needs the formatter/component, not the whole Payments UI/hooks
@@ -34,40 +35,58 @@ export default function InvoicePaymentHistoryTable({ paymentHistoryState }) {
     return <p className="text-sm text-muted">No payments recorded against this invoice yet.</p>;
   }
 
+  const columns = [
+    {
+      key: "paymentNumber",
+      header: "Payment Number",
+      role: "title",
+      cellClassName: "font-black text-forest",
+      cell: (payment) => payment.paymentNumber,
+    },
+    {
+      key: "method",
+      header: "Method",
+      cell: (payment) => <PaymentMethodFormatter method={payment.method} />,
+    },
+    {
+      key: "amount",
+      header: "Amount",
+      align: "right",
+      cellClassName: "font-semibold text-ink",
+      cell: (payment) => formatPaymentAmount(payment.amount),
+    },
+    {
+      key: "paymentDate",
+      header: "Payment Date",
+      cellClassName: "text-muted",
+      cell: (payment) => formatBusinessDateTime(payment.paymentDate),
+    },
+    {
+      key: "reference",
+      header: "Reference",
+      cellClassName: "text-muted",
+      cell: (payment) => payment.transactionReference || "-",
+    },
+    {
+      key: "status",
+      header: "Status",
+      role: "badge",
+      cell: (payment) => <span className="text-xs font-bold text-muted">{payment.status || "-"}</span>,
+    },
+    {
+      key: "createdAt",
+      header: "Created At",
+      cellClassName: "text-muted",
+      cell: (payment) => formatBusinessDateTime(payment.createdAt),
+    },
+  ];
+
   return (
-    <div className="overflow-hidden rounded-lg border border-forest/10">
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] divide-y divide-forest/10 text-left text-sm">
-          <thead className="bg-mint/40 text-xs font-black uppercase text-muted">
-            <tr>
-              <th className="px-4 py-2">Payment Number</th>
-              <th className="px-4 py-2">Method</th>
-              <th className="px-4 py-2 text-right">Amount</th>
-              <th className="px-4 py-2">Payment Date</th>
-              <th className="px-4 py-2">Reference</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Created At</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-forest/10">
-            {payments.map((payment) => (
-              <tr key={payment._id}>
-                <td className="px-4 py-2 font-black text-forest">{payment.paymentNumber}</td>
-                <td className="px-4 py-2">
-                  <PaymentMethodFormatter method={payment.method} />
-                </td>
-                <td className="px-4 py-2 text-right font-semibold text-ink">
-                  {formatPaymentAmount(payment.amount)}
-                </td>
-                <td className="px-4 py-2 text-muted">{formatBusinessDateTime(payment.paymentDate)}</td>
-                <td className="px-4 py-2 text-muted">{payment.transactionReference || "-"}</td>
-                <td className="px-4 py-2 text-muted">{payment.status || "-"}</td>
-                <td className="px-4 py-2 text-muted">{formatBusinessDateTime(payment.createdAt)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <DataTable
+      columns={columns}
+      minWidth="640px"
+      rows={payments}
+      theadClassName="bg-mint/40 text-xs font-black uppercase text-muted"
+    />
   );
 }

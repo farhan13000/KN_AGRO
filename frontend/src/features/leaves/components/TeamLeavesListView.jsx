@@ -8,6 +8,7 @@ import { LEAVE_STATUS, LEAVE_STATUS_LABELS } from "../constants";
 import { useTeamLeaveList } from "../hooks";
 import LeaveCard from "./LeaveCard";
 import LeaveDecisionDialog from "./LeaveDecisionDialog";
+import { FilterPanel } from "../../../shared/components";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
@@ -45,7 +46,7 @@ export default function TeamLeavesListView({ description, portalLabel, showHeadi
         </div>
       ) : null}
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <label className="block max-w-xs">
           <span className="form-label">Status</span>
           <select
@@ -61,7 +62,7 @@ export default function TeamLeavesListView({ description, portalLabel, showHeadi
             ))}
           </select>
         </label>
-      </section>
+      </FilterPanel>
 
       {isLoading ? <PageLoader message="Loading team leaves..." /> : null}
       {isError ? <ErrorState message={errorMessage} title="Unable to load team leaves" /> : null}

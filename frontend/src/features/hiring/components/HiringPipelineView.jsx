@@ -17,6 +17,7 @@ import { useHiringActions, useHiringRequestList } from "../hooks";
 import HiringCompleteDialog from "./HiringCompleteDialog";
 import HiringRequestDetailsDialog from "./HiringRequestDetailsDialog";
 import HiringStatusBadge from "./HiringStatusBadge";
+import { FilterPanel } from "../../../shared/components";
 
 /** The proposed area, short enough to sit on one line of the card. */
 const coverageSummary = (coverage) => {
@@ -140,7 +141,7 @@ export default function HiringPipelineView({ createHref, description, portalLabe
         </p>
       ) : null}
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <label className="block max-w-xs">
           <span className="form-label">Status</span>
           <select
@@ -156,7 +157,7 @@ export default function HiringPipelineView({ createHref, description, portalLabe
             ))}
           </select>
         </label>
-      </section>
+      </FilterPanel>
 
       {state.isLoading ? <PageLoader message="Loading hiring requests..." /> : null}
       {state.isError ? <ErrorState message={state.errorMessage} title="Unable to load hiring requests" /> : null}

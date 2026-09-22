@@ -73,6 +73,113 @@ select:focus-visible {
 }
 
 @layer components {
+  /**
+   * A PRINTED DOCUMENT shown on a screen — an invoice, a quotation, an
+   * order copy, a DSR. The sheet is laid out for A4, so its item table
+   * has seven narrow columns that fit a page and not a phone: on a 393px
+   * screen the Discount, Tax and Total columns ran off the right edge
+   * with no way to reach them.
+   *
+   * Below `md` the item rows therefore become one block per item, each
+   * line labelled. Everything here is inside `@media screen`, so the
+   * paper output is byte-for-byte what it always was — this changes what
+   * you READ on the phone, never what comes out of the printer or the
+   * "Save as PDF" destination.
+   */
+  .doc-label {
+    display: none;
+  }
+
+  @media screen and (max-width: 767px) {
+    .doc-table,
+    .doc-table tbody,
+    .doc-table tr,
+    .doc-table td {
+      display: block;
+      width: 100%;
+    }
+
+    .doc-table thead {
+      display: none;
+    }
+
+    .doc-table tr {
+      @apply border-b border-forest/15 py-3;
+    }
+
+    .doc-table td {
+      @apply flex items-baseline justify-between gap-4 px-0 py-0.5;
+      text-align: right;
+    }
+
+    /* The product cell is the item's heading, not one of its fields. */
+    .doc-table td.doc-cell-title {
+      @apply block pb-1;
+      text-align: left;
+    }
+
+    .doc-label {
+      @apply inline text-[11px] font-black uppercase tracking-wide text-soft;
+      text-align: left;
+    }
+
+    /* Ruled filler lines exist to fill an A4 page; there is no page to
+       fill on a phone, and an empty card says nothing. Written against
+       `.doc-table` so it outweighs the `display: block` the reflow above
+       gives every row and cell. */
+    .doc-table tr.doc-blank-row,
+    .doc-table td.doc-blank-row {
+      display: none;
+    }
+
+    /* A ruled sheet's cell borders read as a grid on paper and as noise
+       once the cells are stacked. */
+    .doc-table td {
+      border: 0;
+    }
+  }
+
+  /**
+   * An EDITABLE item grid — the rows of a quotation or an order while it
+   * is being built. It stays a real table on a desktop screen, where the
+   * columns line the inputs up, and reflows into one card per item below
+   * `md`, where six columns of number boxes would otherwise be a
+   * sideways scroll with the Remove button always off the edge.
+   *
+   * The column headings disappear with the table layout, so each cell
+   * carries its own `.item-grid-label` that is visible only while the
+   * cards are showing.
+   */
+  .item-grid-label {
+    @apply mb-1 block text-[11px] font-black uppercase tracking-wide text-soft md:hidden;
+  }
+
+  @media (max-width: 767px) {
+    .item-grid,
+    .item-grid tbody,
+    .item-grid tr,
+    .item-grid td {
+      display: block;
+      width: 100%;
+    }
+
+    .item-grid thead {
+      display: none;
+    }
+
+    .item-grid tr {
+      @apply mb-3 rounded-xl border border-forest/10 bg-white p-4 shadow-sm;
+    }
+
+    .item-grid tr:last-child {
+      @apply mb-0;
+    }
+
+    .item-grid td {
+      @apply px-0 py-1.5 text-left;
+    }
+  }
+
   .site-container {
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }

@@ -63,7 +63,16 @@ function ProductInterestSection({ lead }) {
         <ul className="mt-4 grid gap-3 sm:grid-cols-2">
           {products.map((product) => (
             <li className="rounded-lg border border-forest/10 bg-mint/50 px-4 py-3" key={product._id || product}>
-              <p className="text-sm font-black text-ink">{product.name || product}</p>
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-sm font-black text-ink">{product.name || product}</p>
+                {/* Only shown when a quantity was actually given — a lead
+                    may record what was asked about without how much. */}
+                {product.quantity ? (
+                  <span className="shrink-0 rounded-md bg-white px-2 py-0.5 text-xs font-black tabular-nums text-forest ring-1 ring-forest/15">
+                    {product.quantity}
+                  </span>
+                ) : null}
+              </div>
               {product.productCode || product.slug ? (
                 <p className="mt-1 text-xs font-semibold text-muted">
                   {[product.productCode, product.slug].filter(Boolean).join(" | ")}

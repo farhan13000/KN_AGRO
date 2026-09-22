@@ -10,6 +10,7 @@ import { AUDIT_ACTIONS, titleCaseAuditValue } from "../constants";
 import { useAuditLogList } from "../hooks";
 import AuditLogDetailModal from "./AuditLogDetailModal";
 import AuditLogTable from "./AuditLogTable";
+import { FilterPanel } from "../../../shared/components";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
@@ -54,7 +55,7 @@ export default function AuditLogListView({ description, portalLabel }) {
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
       </div>
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <label className="xl:col-span-2">
             <span className="form-label">Search description</span>
@@ -131,7 +132,7 @@ export default function AuditLogListView({ description, portalLabel }) {
             />
           </label>
         </div>
-      </section>
+      </FilterPanel>
 
       {isLoading ? <PageLoader message="Loading audit log..." /> : null}
       {isError ? <ErrorState message={errorMessage} title="Unable to load the audit log" /> : null}

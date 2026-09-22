@@ -8,6 +8,7 @@ import { useDebouncedValue } from "../../../shared/hooks";
 import { INVOICE_PAYMENT_STATUS_LABELS, INVOICE_PAYMENT_STATUSES, INVOICE_STATUS_LABELS, INVOICE_STATUSES } from "../constants";
 import { useInvoiceList } from "../hooks";
 import InvoiceTable from "./InvoiceTable";
+import { FilterPanel } from "../../../shared/components";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
@@ -64,7 +65,7 @@ export default function InvoiceListView({
         </div>
       ) : null}
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
           <label className="xl:col-span-2">
             <span className="form-label">Search</span>
@@ -118,7 +119,7 @@ export default function InvoiceListView({
             </select>
           </label>
         </div>
-      </section>
+      </FilterPanel>
 
       {invoicesState.isLoading ? <PageLoader message="Loading invoices..." /> : null}
       {invoicesState.isError ? (

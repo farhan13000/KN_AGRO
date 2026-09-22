@@ -121,8 +121,10 @@ export default function OrderBuilder({
         {errors.items ? <p className="mt-3 text-sm font-semibold text-red-700">{errors.items}</p> : null}
 
         {items.length ? (
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[46rem] text-sm">
+          // Real table on a desktop screen; one card per item on a
+          // phone — see `.item-grid` in index.css.
+          <div className="mt-4 md:overflow-x-auto">
+            <table className="item-grid w-full text-sm md:min-w-[46rem]">
               <thead>
                 <tr className="border-b border-forest/10 text-left text-xs font-black uppercase tracking-wide text-muted">
                   <th className="py-2 pr-3">Product</th>
@@ -142,7 +144,8 @@ export default function OrderBuilder({
                         {[item.product.productCode, item.product.unit].filter(Boolean).join(" | ")}
                       </p>
                     </td>
-                    <td className="py-2.5 pr-3">
+                    <td className="py-2.5 md:pr-3">
+                      <span className="item-grid-label">Qty</span>
                       <input
                         aria-label={`Quantity for ${item.product.name}`}
                         className="form-field"
@@ -154,7 +157,8 @@ export default function OrderBuilder({
                         value={item.quantity}
                       />
                     </td>
-                    <td className="py-2.5 pr-3">
+                    <td className="py-2.5 md:pr-3">
+                      <span className="item-grid-label">Rate</span>
                       <input
                         aria-label={`Rate for ${item.product.name}`}
                         className="form-field"
@@ -166,7 +170,8 @@ export default function OrderBuilder({
                         value={item.rate}
                       />
                     </td>
-                    <td className="py-2.5 pr-3">
+                    <td className="py-2.5 md:pr-3">
+                      <span className="item-grid-label">Tax %</span>
                       <input
                         aria-label={`Tax rate for ${item.product.name}`}
                         className="form-field"
@@ -179,17 +184,19 @@ export default function OrderBuilder({
                         value={item.taxRate}
                       />
                     </td>
-                    <td className="py-2.5 pr-3 text-right font-semibold tabular-nums text-ink">
+                    <td className="py-2.5 font-semibold tabular-nums text-ink md:pr-3 md:text-right">
+                      <span className="item-grid-label">Line total</span>
                       {formatMoney(itemsPreview[index].lineTotal)}
                     </td>
                     <td className="py-2.5">
                       <button
                         aria-label={`Remove ${item.product.name}`}
-                        className="rounded-lg p-2 text-red-700 transition hover:bg-red-50"
+                        className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg p-2 text-red-700 ring-1 ring-red-200 transition hover:bg-red-50 md:min-h-0 md:w-auto md:ring-0"
                         onClick={() => removeItem(index)}
                         type="button"
                       >
                         <Trash2 className="h-4 w-4" />
+                        <span className="text-sm font-bold md:sr-only">Remove</span>
                       </button>
                     </td>
                   </tr>

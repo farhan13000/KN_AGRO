@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { DataTable, FilterPanel } from "../../../shared/components";
 import EmptyState from "../../../shared/components/EmptyState";
 import ErrorState from "../../../shared/components/ErrorState";
 import PageLoader from "../../../shared/components/PageLoader";
@@ -46,6 +47,31 @@ export default function TeamAttendanceListView({ description, portalLabel, showH
     setSearchParams(next);
   };
 
+  const summaryColumns = [
+    {
+      key: "employee",
+      header: "Employee",
+      role: "title",
+      cellClassName: "font-semibold text-ink",
+      cell: (row) => row.employee?.user?.name || row.employee?.employeeCode,
+    },
+    { key: "presentDays", header: "Present", cellClassName: "text-muted", cell: (row) => row.presentDays },
+    { key: "halfDays", header: "Half Days", cellClassName: "text-muted", cell: (row) => row.halfDays },
+    { key: "leaveDays", header: "Leave", cellClassName: "text-muted", cell: (row) => row.leaveDays },
+    {
+      key: "recordedAbsences",
+      header: "Recorded Absences",
+      cellClassName: "text-muted",
+      cell: (row) => row.recordedAbsences,
+    },
+    {
+      key: "attendancePercentage",
+      header: "Attendance %",
+      cellClassName: "text-muted",
+      cell: (row) => (row.attendancePercentage === null ? "—" : `${row.attendancePercentage}%`),
+    },
+  ];
+
   return (
     <div className="space-y-6">
       {showHeading ? (
@@ -56,7 +82,7 @@ export default function TeamAttendanceListView({ description, portalLabel, showH
         </div>
       ) : null}
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="flex flex-wrap items-end justify-between gap-3">
           <h2 className="text-lg font-black text-ink">Monthly Summary</h2>
           <div className="flex gap-3">
@@ -90,38 +116,17 @@ export default function TeamAttendanceListView({ description, portalLabel, showH
 
         {summaryState.isLoading ? <p className="mt-4 text-sm font-semibold text-muted">Loading summary...</p> : null}
         {!summaryState.isLoading && summaryRows.length ? (
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[640px] divide-y divide-forest/10 text-left text-sm">
-              <thead className="text-xs font-black uppercase text-forest">
-                <tr>
-                  <th className="px-3 py-2">Employee</th>
-                  <th className="px-3 py-2">Present</th>
-                  <th className="px-3 py-2">Half Days</th>
-                  <th className="px-3 py-2">Leave</th>
-                  <th className="px-3 py-2">Recorded Absences</th>
-                  <th className="px-3 py-2">Attendance %</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-forest/10">
-                {summaryRows.map((row) => (
-                  <tr key={row.employee?._id}>
-                    <td className="px-3 py-2 font-semibold text-ink">
-                      {row.employee?.user?.name || row.employee?.employeeCode}
-                    </td>
-                    <td className="px-3 py-2 text-muted">{row.presentDays}</td>
-                    <td className="px-3 py-2 text-muted">{row.halfDays}</td>
-                    <td className="px-3 py-2 text-muted">{row.leaveDays}</td>
-                    <td className="px-3 py-2 text-muted">{row.recordedAbsences}</td>
-                    <td className="px-3 py-2 text-muted">
-                      {row.attendancePercentage === null ? "—" : `${row.attendancePercentage}%`}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="mt-4">
+            <DataTable
+              columns={summaryColumns}
+              minWidth="640px"
+              rowKey={(row) => row.employee?._id}
+              rows={summaryRows}
+              theadClassName="text-xs font-black uppercase text-forest"
+            />
           </div>
         ) : null}
-      </section>
+      </FilterPanel>
 
       <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
         <div className="grid gap-3 sm:grid-cols-2">

@@ -17,6 +17,7 @@ export const initialLeadFormValues = {
   location: "",
   source: "MANUAL",
   interestedProducts: [],
+  productQuantities: {},
   message: "",
   priority: "MEDIUM",
   expectedValue: "",
@@ -57,6 +58,7 @@ export default function LeadForm({
   isSubmitting = false,
   onChange,
   onProductChange,
+  onQuantityChange,
   onSubmit,
   productOptions = [],
   submitLabel = "Save Lead",
@@ -134,17 +136,26 @@ export default function LeadForm({
             options={priorityOptions}
             value={values.priority}
           />
-          <TextInput
-            error={errors.expectedValue}
-            id="lead-expected-value"
-            label="Expected / Pipeline Value"
-            min="0"
-            name="expectedValue"
-            onChange={onChange}
-            step="0.01"
-            type="number"
-            value={values.expectedValue}
-          />
+          <div>
+            <TextInput
+              error={errors.expectedValue}
+              id="lead-expected-value"
+              label="Expected / Pipeline Value"
+              min="0"
+              name="expectedValue"
+              onChange={onChange}
+              step="0.01"
+              type="number"
+              value={values.expectedValue}
+            />
+            <span className="mt-1 block text-xs font-semibold text-muted">
+              {values.interestedProducts?.length
+                ? `Worked out from ${values.interestedProducts.length} selected product${
+                    values.interestedProducts.length > 1 ? "s" : ""
+                  } at catalogue price, including tax. Change it if you need to.`
+                : "Pick the interested products below and this fills in from the catalogue price, with tax."}
+            </span>
+          </div>
           <label className="sm:col-span-2">
             <span className="form-label">Interested Products</span>
             <select
@@ -165,6 +176,39 @@ export default function LeadForm({
               Use Ctrl or Shift to select multiple products.
             </span>
           </label>
+
+          {/* Quantity is optional throughout: a lead often records only
+              WHAT was asked about, and how much is settled on the
+              quotation. A blank box counts as one unit for the estimate
+              and is not sent as a quantity the customer never gave. */}
+          {values.interestedProducts?.length ? (
+            <div className="sm:col-span-2">
+              <span className="form-label">Quantity per product (optional)</span>
+              <div className="mt-2 space-y-2 rounded-lg border border-forest/10 bg-white p-3">
+                {values.interestedProducts.map((productId) => {
+                  const option = productOptions.find((item) => String(item.value) === String(productId));
+                  return (
+                    <div className="flex flex-wrap items-center gap-3" key={productId}>
+                      <span className="min-w-0 flex-1 truncate text-sm font-semibold text-ink">
+                        {option?.label || productId}
+                      </span>
+                      <input
+                        aria-label={`Quantity for ${option?.label || productId}`}
+                        className="form-field w-32"
+                        min="0"
+                        name={`quantity-${productId}`}
+                        onChange={(event) => onQuantityChange?.(productId, event.target.value)}
+                        placeholder={option?.unit || "Qty"}
+                        step="any"
+                        type="number"
+                        value={values.productQuantities?.[String(productId)] ?? ""}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
           <div className="sm:col-span-2">
             <Textarea
               error={errors.message}

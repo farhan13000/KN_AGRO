@@ -1,3 +1,4 @@
+import { FilterPanel } from "../../../shared/components";
 import { useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
 import EmptyState from "../../../shared/components/EmptyState";
@@ -64,7 +65,7 @@ export default function SuperAdminInventoryTransactionsPage({ showHeading = true
         </div>
       ) : null}
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-7">
           <label className="xl:col-span-2">
             <span className="form-label">Search</span>
@@ -129,7 +130,7 @@ export default function SuperAdminInventoryTransactionsPage({ showHeading = true
             </select>
           </label>
         </div>
-      </section>
+      </FilterPanel>
 
       {transactionState.isLoading ? <PageLoader message="Loading transactions..." /> : null}
       {transactionState.isError ? (

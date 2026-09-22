@@ -9,6 +9,7 @@ import { useEmployeeListQuery, useMyTeam } from "../hooks";
 import { useDebouncedValue } from "../../../shared/hooks";
 import { isMissingEmployeeProfileError } from "../utils/employeeErrors";
 import TeamHierarchyTable from "./TeamHierarchyTable";
+import { FilterPanel } from "../../../shared/components";
 
 /**
  * The people who report to you, in any portal.
@@ -64,7 +65,7 @@ export default function MyTeamListView({
         </div>
       ) : null}
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <label className="xl:col-span-2">
             <span className="form-label">Search</span>
@@ -113,7 +114,7 @@ export default function MyTeamListView({
             </select>
           </label>
         </div>
-      </section>
+      </FilterPanel>
 
       {teamState.isLoading ? <PageLoader message="Loading your team..." /> : null}
       {showError ? <ErrorState message={teamState.errorMessage} title="Unable to load team" /> : null}

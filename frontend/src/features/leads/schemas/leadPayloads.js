@@ -31,6 +31,24 @@ const numberOrUndefined = (value) => {
   return Number.isFinite(amount) ? amount : undefined;
 };
 
+/**
+ * `[{ productId, quantity }]` for the API, built from the form's
+ * `{ [productId]: quantity }` map. Only products still selected and
+ * carrying a real number survive — a blank box means "not stated", which
+ * is a legitimate answer and must not be sent as a 1 nobody asked for.
+ */
+const productQuantitiesOf = (values) => {
+  const selected = normalizeProductIds(values.interestedProducts);
+  if (!selected?.length) return undefined;
+
+  const quantities = values.productQuantities || {};
+  const rows = selected
+    .map((id) => ({ productId: String(id), quantity: Number(quantities[String(id)]) }))
+    .filter((row) => Number.isFinite(row.quantity) && row.quantity > 0);
+
+  return rows.length ? rows : undefined;
+};
+
 export const pickPublicEnquiryPayload = (values) =>
   cleanPayload({
     name: trimOrUndefined(values.name),
@@ -51,6 +69,7 @@ export const pickCreateLeadPayload = (values) =>
     location: trimOrUndefined(values.location),
     source: LEAD_SOURCES.includes(values.source) ? values.source : undefined,
     interestedProducts: normalizeProductIds(values.interestedProducts),
+    productQuantities: productQuantitiesOf(values),
     message: trimOrUndefined(values.message),
     priority: LEAD_PRIORITIES.includes(values.priority) ? values.priority : undefined,
     expectedValue: numberOrUndefined(values.expectedValue),
@@ -90,6 +109,7 @@ export const pickUpdateLeadPayload = (values) => {
   put("message", trimOrText(values.message));
   put("source", LEAD_SOURCES.includes(values.source) ? values.source : undefined);
   put("interestedProducts", normalizeProductIds(values.interestedProducts));
+  put("productQuantities", productQuantitiesOf(values));
   // Emptying the pipeline-value box means "no expected value yet", which
   // this field stores as zero — it has no separate "unset".
   put("expectedValue", isBlank(values.expectedValue) ? 0 : numberOrUndefined(values.expectedValue));

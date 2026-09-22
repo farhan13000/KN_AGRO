@@ -8,6 +8,7 @@ import EmployeeApprovalDialog from "./EmployeeApprovalDialog";
 import EmployeeRejectionDialog from "./EmployeeRejectionDialog";
 import PendingApplicationsTable from "./PendingApplicationsTable";
 import { useDebouncedValue, useEmployeeListQuery, usePendingEmployees } from "../hooks";
+import { FilterPanel } from "../../../shared/components";
 
 /**
  * Employee registrations awaiting a decision.
@@ -65,7 +66,7 @@ export default function PendingApplicationsView({ showHeading = true }) {
         </p>
       ) : null}
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 md:grid-cols-3">
           <label>
             <span className="form-label">Search</span>
@@ -103,7 +104,7 @@ export default function PendingApplicationsView({ showHeading = true }) {
             </select>
           </label>
         </div>
-      </section>
+      </FilterPanel>
 
       {pendingState.isLoading ? <PageLoader message="Loading pending approvals..." /> : null}
       {pendingState.isError ? (

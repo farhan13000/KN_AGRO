@@ -10,6 +10,7 @@ import { CUSTOMER_STATUSES, CUSTOMER_STATUS_LABELS, CUSTOMER_TYPES, CUSTOMER_TYP
 import { useCustomerList } from "../hooks";
 import { getCustomerCapabilities } from "../utils";
 import CustomerTable from "./CustomerTable";
+import { FilterPanel } from "../../../shared/components";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
@@ -79,7 +80,7 @@ export default function CustomerListView({
         ) : null}
       </div>
 
-      <section className="rounded-lg border border-forest/10 bg-white p-4 shadow-sm">
+      <FilterPanel>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
           <label className="xl:col-span-2">
             <span className="form-label">Search</span>
@@ -127,7 +128,7 @@ export default function CustomerListView({
             </select>
           </label>
         </div>
-      </section>
+      </FilterPanel>
 
       {customersState.isLoading ? <PageLoader message="Loading customers..." /> : null}
       {customersState.isError ? (
