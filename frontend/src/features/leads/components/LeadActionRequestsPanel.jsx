@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { BellRing, Check, X } from "lucide-react";
 import Card from "../../../shared/components/Card";
 import Modal from "../../../shared/components/Modal";
@@ -6,15 +6,41 @@ import Textarea from "../../../shared/forms/Textarea";
 import { useAuth } from "../../../core/auth";
 import { getApiErrorMessage } from "../../../core/api";
 import { PERMISSIONS } from "../../../shared/constants";
-import { useAsyncMutation, useAsyncResource } from "../../../shared/hooks";
+import { useAsyncMutation } from "../../../shared/hooks";
 import { formatBusinessDateTime } from "../../../shared/utils";
+import { useLeadActionRequests } from "../hooks";
 import { leadActionRequestApi } from "../services/leadActionRequestApi";
 
+/**
+ * Each request, and the thing that has to exist before asking for it
+ * makes any sense.
+ *
+ * Without these gates the panel offered all four on every lead, so a
+ * field officer could ask their manager to raise a bill against a lead
+ * nobody had phoned - a request the manager can only answer by going
+ * back and asking what it means. A request nobody can act on is not a
+ * smaller version of a real one; it is noise in the manager's queue.
+ *
+ * "Create quotation" is missing from this list on purpose: at QUALIFIED
+ * it IS the lead's next step, so it lives on the next-step panel with
+ * the sentence that explains it, not in a row of four look-alikes.
+ */
 const REQUEST_TYPES = [
-  { value: "CREATE_QUOTATION", label: "Create quotation" },
-  { value: "CONFIRM_ORDER", label: "Confirm order" },
-  { value: "CREATE_INVOICE", label: "Create bill" },
-  { value: "RECORD_PAYMENT", label: "Record payment" },
+  {
+    value: "CONFIRM_ORDER",
+    label: "Confirm order",
+    isReady: (work) => Boolean(work.orderAwaitingConfirm),
+  },
+  {
+    value: "CREATE_INVOICE",
+    label: "Create bill",
+    isReady: (work) => Boolean(work.billableOrder),
+  },
+  {
+    value: "RECORD_PAYMENT",
+    label: "Record payment",
+    isReady: (work) => Boolean(work.unpaidOrder),
+  },
 ];
 
 const VIA_LABELS = {
@@ -36,18 +62,20 @@ const secondaryButton =
  * order, making the bill, recording the payment) closes it by itself, or
  * they can mark it done.
  */
-export default function LeadActionRequestsPanel({ lead }) {
+export default function LeadActionRequestsPanel({ lead, work = {} }) {
   const { hasPermission, user } = useAuth();
   // ASM/RM/GM and SA/OA can do these tasks themselves; SO/FO ask for them.
   const canAct = hasPermission(PERMISSIONS.ORDERS_CONFIRM);
   const myUserId = user?._id || user?.id;
 
-  const request = useCallback(() => leadActionRequestApi.list({ leadId: lead._id }), [lead._id]);
-  const state = useAsyncResource(["lead-action-requests", lead._id], request, { enabled: Boolean(lead?._id) });
-  const requests = state.data?.requests || [];
-  const pending = requests.filter((item) => item.status === "PENDING");
+  // The shared hook, not a second fetch of the same rows - the
+  // next-step panel reads this same list to know whether a quotation has
+  // already been asked for.
+  const state = useLeadActionRequests(lead._id);
+  const { pending, requests } = state;
   const history = requests.filter((item) => item.status !== "PENDING").slice(0, 5);
-  const pendingTypes = new Set(pending.map((item) => item.type));
+  const pendingTypes = new Set(state.pendingTypes);
+  const offerable = REQUEST_TYPES.filter((type) => type.isReady(work));
 
   const [asking, setAsking] = useState(null);
   const [note, setNote] = useState("");
@@ -90,9 +118,15 @@ export default function LeadActionRequestsPanel({ lead }) {
         </h2>
       </div>
 
-      {!canAct ? (
+      {!canAct && !offerable.length && !work.isLoading ? (
+        <p className="mt-3 text-sm leading-6 text-muted">
+          Nothing to ask for yet. Requests appear here once there is an order or a bill to act on.
+        </p>
+      ) : null}
+
+      {!canAct && offerable.length ? (
         <div className="mt-3 flex flex-wrap gap-2">
-          {REQUEST_TYPES.map((type) => (
+          {offerable.map((type) => (
             <button
               className={secondaryButton}
               disabled={pendingTypes.has(type.value)}

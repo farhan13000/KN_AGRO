@@ -5,7 +5,8 @@ export {
   LeadFollowUpSummary,
   PipelineValueDisplay,
 } from "./LeadSummaries";
-export { default as LeadActionsPanel } from "./LeadActionsPanel";
+export { default as LeadNextStepPanel } from "./LeadNextStepPanel";
+export { default as LeadPipelineStrip } from "./LeadPipelineStrip";
 export { default as LeadDetailView } from "./LeadDetailView";
 export { default as LeadDetailRouteView } from "./LeadDetailRouteView";
 export { default as LeadListView } from "./LeadListView";

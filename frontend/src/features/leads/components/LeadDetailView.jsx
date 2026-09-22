@@ -3,10 +3,11 @@ import Card from "../../../shared/components/Card";
 import { getProductUnitLabel } from "../../products/utils";
 import { LeadActivityTimeline } from "../../lead-activities";
 import { QuotationsForLeadSection } from "../../quotations";
-import LeadActionsPanel from "./LeadActionsPanel";
 import LeadActionRequestsPanel from "./LeadActionRequestsPanel";
+import LeadNextStepPanel from "./LeadNextStepPanel";
 import LeadHandlerBanner from "./LeadHandlerBanner";
 import { LeadPriorityBadge, LeadSourceBadge, LeadStatusBadge } from "./LeadBadges";
+import { useLeadWorkState } from "../hooks";
 import {
   LeadAssignmentSummary,
   LeadContactSummary,
@@ -111,42 +112,69 @@ function ActivitySection({ recentActivities = [], timelineState }) {
 export default function LeadDetailView({
   lead,
   onMutationSuccess,
+  orderDetailPathFor,
   quotationCreatePath = "",
   quotationDetailPathFor,
   recentActivities = [],
   roleLabel = "CRM",
   timelineState,
 }) {
+  // Fetched once, here, and handed to both panels: what already exists
+  // against this lead decides what its next step is AND which requests
+  // are worth offering, and the two must not disagree.
+  const work = useLeadWorkState(lead?._id);
+
   return (
-    <div className="space-y-6">
+    // `pb-28` below `md` clears the action bar, which is pinned to the
+    // bottom of the screen there (see LeadNextStepPanel).
+    <div className="space-y-6 max-md:pb-28">
       <div>
         <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{roleLabel}</p>
         <h1 className="mt-2 text-3xl font-black text-ink">{lead.name || "Lead Detail"}</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Current lead state is shown here. Historical changes stay in the activity timeline.
+        <p className="mt-2 text-sm font-semibold text-muted">
+          {[lead.leadCode, lead.companyName].filter(Boolean).join(" · ") || "Lead code pending"}
         </p>
       </div>
-      <LeadOverviewSection lead={lead} />
+
+      {/* What to do next comes first. Everything below it is the
+          evidence someone needs in order to do it — contact details and
+          what the customer actually asked for, before any of the record
+          keeping. */}
+      <LeadNextStepPanel
+        lead={lead}
+        onSuccess={onMutationSuccess}
+        orderDetailPathFor={orderDetailPathFor}
+        quotationCreatePath={quotationCreatePath}
+        quotationDetailPathFor={quotationDetailPathFor}
+        work={work}
+      />
       <LeadHandlerBanner lead={lead} onChanged={onMutationSuccess} />
-      <LeadActionRequestsPanel lead={lead} />
-      <LeadActionsPanel lead={lead} onSuccess={onMutationSuccess} quotationCreatePath={quotationCreatePath} />
+
       <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
         <div className="space-y-6">
           <LeadContactSummary lead={lead} />
           <ProductInterestSection lead={lead} />
-          <LeadAssignmentSummary lead={lead} />
         </div>
         <div className="space-y-6">
           <PipelineValueDisplay value={lead.expectedValue} />
           <LeadFollowUpSummary lead={lead} />
         </div>
       </div>
+
+      <LeadActionRequestsPanel lead={lead} work={work} />
+
       {quotationDetailPathFor ? (
         <QuotationsForLeadSection
           detailPath={(quotation) => quotationDetailPathFor(quotation._id)}
           leadId={lead._id}
         />
       ) : null}
+
+      {/* The record-keeping half: who owns it, where it came from, and
+          everything that has happened. Real, and rarely the reason
+          someone opened the page. */}
+      <LeadAssignmentSummary lead={lead} />
+      <LeadOverviewSection lead={lead} />
       <ActivitySection recentActivities={recentActivities} timelineState={timelineState} />
     </div>
   );

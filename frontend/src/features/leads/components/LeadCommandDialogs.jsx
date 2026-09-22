@@ -9,11 +9,13 @@ import { BACKEND_ROLES, MANAGER_TIER_ROLES, normalizeRoleName } from "../../../s
 import { useAuth } from "../../../core/auth";
 import { EMPLOYEE_STATUS, useEmployeeList, useMyTeam, employeeSelectOption } from "../../employees";
 import { useProductList } from "../../products";
+// Narrow subpath, not the products barrel - this needs one formatter.
+import { getProductUnitLabel } from "../../products/utils";
 import { LEAD_STATUS, LEAD_STATUSES, LEAD_STATUS_LABELS } from "../constants";
 import { useLeadActions } from "../hooks";
 import {
   formatEmployeeSummary,
-  formatPipelineValue,
+  pipelineValueFromProducts,
   getCrmErrorDetails,
   getCrmErrorMessage,
   shouldRefetchAfterCrmError,
@@ -67,135 +69,25 @@ const useLeadDialogActions = ({ onClose, onSuccess }) =>
     },
   });
 
-export function ProductInterestDialog({ isOpen, lead, onClose, onSuccess }) {
-  const [selectedProducts, setSelectedProducts] = useState([]);
-  // How much of each, keyed by product id. Asked for here for the same
-  // reason as on the lead form: a manager's quotation is built from this
-  // list and cannot add to it, so a product with no quantity is quoted
-  // as one unit of itself.
-  const [quantities, setQuantities] = useState({});
-  const productsState = useProductList({ limit: 100, status: "ACTIVE", sortBy: "name", sortOrder: "asc" }, { enabled: isOpen });
-  const actions = useLeadDialogActions({ onClose, onSuccess });
-
-  useEffect(() => {
-    if (isOpen) {
-      const existing = lead?.interestedProducts || [];
-      setSelectedProducts(existing.map((product) => product._id || product).filter(Boolean));
-      setQuantities(
-        Object.fromEntries(
-          existing
-            .filter((product) => product?._id && product.quantity)
-            .map((product) => [String(product._id), String(product.quantity)]),
-        ),
-      );
-    }
-  }, [isOpen, lead]);
-
-  const productById = useMemo(
-    () => new Map((productsState.data?.products || []).map((product) => [String(product._id), product])),
-    [productsState.data],
-  );
-
-  const missingQuantity = selectedProducts.filter((productId) => {
-    const quantity = Number(quantities[String(productId)]);
-    return !Number.isFinite(quantity) || quantity <= 0;
-  }).length;
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (missingQuantity) return;
-    await actions.updateInterestedProducts
-      .mutate(lead._id, selectedProducts, quantities)
-      .catch(ignoreHandledError);
-  };
-
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Update interested products">
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <label>
-          <span className="form-label">Products</span>
-          <select
-            className="form-field min-h-44"
-            multiple
-            onChange={(event) =>
-              setSelectedProducts(Array.from(event.target.selectedOptions).map((option) => option.value))
-            }
-            value={selectedProducts}
-          >
-            {(productsState.data?.products || []).map((product) => (
-              <option key={product._id} value={product._id}>
-                {[product.productCode, product.name].filter(Boolean).join(" - ")}
-              </option>
-            ))}
-          </select>
-          <span className="mt-1 block text-xs font-semibold text-muted">
-            Use Ctrl or Shift to select multiple products.
-          </span>
-        </label>
-
-        {selectedProducts.length ? (
-          <div>
-            <span className="form-label">
-              Quantity per product <span className="text-red-700">*</span>
-            </span>
-            <div className="mt-2 space-y-2 rounded-lg border border-forest/10 bg-white p-3">
-              {selectedProducts.map((productId) => {
-                const product = productById.get(String(productId));
-                const label = product
-                  ? [product.productCode, product.name].filter(Boolean).join(" - ")
-                  : String(productId);
-                return (
-                  <div className="flex flex-wrap items-center gap-3" key={productId}>
-                    <span className="min-w-0 flex-1 truncate text-sm font-semibold text-ink">{label}</span>
-                    <input
-                      aria-label={`Quantity for ${label}`}
-                      className="form-field w-32"
-                      min="0"
-                      onChange={(event) =>
-                        setQuantities((current) => ({ ...current, [String(productId)]: event.target.value }))
-                      }
-                      placeholder={product?.unit || "Qty"}
-                      required
-                      step="any"
-                      type="number"
-                      value={quantities[String(productId)] ?? ""}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-            {missingQuantity ? (
-              <p className="form-error mt-2">
-                {missingQuantity === selectedProducts.length
-                  ? "Enter how much of each product they want."
-                  : `${missingQuantity} of the ${selectedProducts.length} products still has no quantity.`}
-              </p>
-            ) : null}
-          </div>
-        ) : null}
-
-        {productsState.isError ? (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800" role="alert">
-            {productsState.errorMessage}
-          </p>
-        ) : null}
-        <CrmActionError error={actions.updateInterestedProducts.error} fallback="Unable to update interested products." />
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-          <Button onClick={onClose} variant="secondary">
-            Cancel
-          </Button>
-          <Button
-            disabled={actions.updateInterestedProducts.isLoading || Boolean(missingQuantity)}
-            type="submit"
-          >
-            {actions.updateInterestedProducts.isLoading ? "Saving..." : "Update Products"}
-          </Button>
-        </div>
-      </form>
-    </Modal>
-  );
-}
-
+/**
+ * Everything about a lead that is a plain edit, in ONE dialog.
+ *
+ * It used to be four: Edit Details, Products, Priority and Expected
+ * Value, each its own button on the actions grid and each its own trip.
+ * Three of them are the same act - correcting what was written down -
+ * and splitting them meant a field officer who got the quantity and the
+ * phone number wrong had to open two dialogs and save twice.
+ *
+ * Priority stays out, on purpose: the backend gives it its own endpoint
+ * so that changing it writes its own PRIORITY_CHANGED activity, and
+ * folding it in here would mean two requests behind one Save, where the
+ * second can fail after the first has already gone through.
+ *
+ * The quantity rule is the same one the create form and the API enforce
+ * - every product named needs a number against it, because the
+ * manager's quotation is built from exactly this list and they cannot
+ * add to it.
+ */
 export function LeadEditDialog({ isOpen, lead, onClose, onSuccess }) {
   const [values, setValues] = useState({
     name: "",
@@ -204,34 +96,97 @@ export function LeadEditDialog({ isOpen, lead, onClose, onSuccess }) {
     email: "",
     location: "",
     message: "",
+    expectedValue: "",
+    interestedProducts: [],
+    productQuantities: {},
   });
   const actions = useLeadDialogActions({ onClose, onSuccess });
+  const productsState = useProductList(
+    { limit: 100, status: "ACTIVE", sortBy: "name", sortOrder: "asc" },
+    { enabled: isOpen }
+  );
+
+  const productOptions = useMemo(
+    () =>
+      (productsState.data?.products || []).map((product) => ({
+        label: [product.productCode, product.name].filter(Boolean).join(" - "),
+        value: product._id,
+        price: product.sellingPrice,
+        taxRate: product.taxRate,
+        unit: product.unit,
+      })),
+    [productsState.data]
+  );
 
   useEffect(() => {
-    if (isOpen) {
-      setValues({
-        name: lead?.name || "",
-        companyName: lead?.companyName || "",
-        phone: lead?.phone || "",
-        email: lead?.email || "",
-        location: lead?.location || "",
-        message: lead?.message || "",
-      });
-    }
+    if (!isOpen) return;
+    const existing = lead?.interestedProducts || [];
+    setValues({
+      name: lead?.name || "",
+      companyName: lead?.companyName || "",
+      phone: lead?.phone || "",
+      email: lead?.email || "",
+      location: lead?.location || "",
+      message: lead?.message || "",
+      expectedValue: lead?.expectedValue ? String(lead.expectedValue) : "",
+      interestedProducts: existing.map((product) => product._id || product).filter(Boolean),
+      productQuantities: Object.fromEntries(
+        existing
+          .filter((product) => product?._id && product.quantity)
+          .map((product) => [String(product._id), String(product.quantity)])
+      ),
+    });
   }, [isOpen, lead]);
 
   const updateField = (event) => {
     setValues((current) => ({ ...current, [event.target.name]: event.target.value }));
   };
 
+  // Same behaviour as the create form: picking products or changing a
+  // quantity re-states the pipeline value from the catalogue, and it
+  // stays editable afterwards.
+  const handleProductChange = (event) => {
+    const selected = Array.from(event.target.selectedOptions).map((option) => option.value);
+    setValues((current) => {
+      const quantities = Object.fromEntries(
+        Object.entries(current.productQuantities || {}).filter(([id]) => selected.includes(id))
+      );
+      return {
+        ...current,
+        interestedProducts: selected,
+        productQuantities: quantities,
+        expectedValue: pipelineValueFromProducts(selected, productOptions, quantities),
+      };
+    });
+  };
+
+  const handleQuantityChange = (productId, quantity) => {
+    setValues((current) => {
+      const quantities = { ...(current.productQuantities || {}) };
+      if (String(quantity).trim() === "") delete quantities[String(productId)];
+      else quantities[String(productId)] = quantity;
+      return {
+        ...current,
+        productQuantities: quantities,
+        expectedValue: pipelineValueFromProducts(current.interestedProducts, productOptions, quantities),
+      };
+    });
+  };
+
+  const missingQuantity = (values.interestedProducts || []).filter((productId) => {
+    const quantity = Number(values.productQuantities?.[String(productId)]);
+    return !Number.isFinite(quantity) || quantity <= 0;
+  }).length;
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (missingQuantity) return;
     await actions.updateLead.mutate(lead._id, values).catch(ignoreHandledError);
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Edit lead details">
-      <form className="space-y-4" onSubmit={handleSubmit}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Edit lead">
+      <form className="space-y-5" onSubmit={handleSubmit}>
         <div className="grid gap-4 sm:grid-cols-2">
           <TextInput
             id="lead-edit-name"
@@ -264,28 +219,102 @@ export function LeadEditDialog({ isOpen, lead, onClose, onSuccess }) {
             onChange={updateField}
             value={values.location}
           />
-          <div className="sm:col-span-2">
-            <Textarea
-              id="lead-edit-message"
-              label="Message"
-              maxLength={2000}
-              name="message"
-              onChange={updateField}
-              value={values.message}
-            />
-          </div>
+          <TextInput
+            id="lead-edit-expected-value"
+            label="Expected / Pipeline Value"
+            min="0"
+            name="expectedValue"
+            onChange={updateField}
+            step="0.01"
+            type="number"
+            value={values.expectedValue}
+          />
         </div>
-        <p className="rounded-lg border border-forest/10 bg-white px-3 py-2 text-sm font-semibold text-muted">
-          This form changes the lead's basic details only. Status, priority, assignment, expected value and
-          products each have their own button.
-        </p>
-        <CrmActionError error={actions.updateLead.error} fallback="Unable to update lead details." />
+
+        <label>
+          <span className="form-label">Interested Products</span>
+          <select
+            className="form-field min-h-32"
+            id="lead-edit-products"
+            multiple
+            onChange={handleProductChange}
+            value={values.interestedProducts}
+          >
+            {productOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <span className="mt-1 block text-xs font-semibold text-muted">
+            Use Ctrl or Shift to select multiple products.
+          </span>
+        </label>
+
+        {values.interestedProducts?.length ? (
+          <div>
+            <span className="form-label">
+              Quantity per product <span className="text-red-700">*</span>
+            </span>
+            <div className="mt-2 space-y-2 rounded-lg border border-forest/10 bg-white p-3">
+              {values.interestedProducts.map((productId) => {
+                const option = productOptions.find((item) => String(item.value) === String(productId));
+                const label = option?.label || String(productId);
+                return (
+                  <div className="flex flex-wrap items-center gap-3" key={productId}>
+                    <span className="min-w-0 flex-1 truncate text-sm font-semibold text-ink">{label}</span>
+                    <input
+                      aria-label={`Quantity for ${label}`}
+                      className="form-field w-28"
+                      min="0"
+                      onChange={(event) => handleQuantityChange(productId, event.target.value)}
+                      placeholder="Qty"
+                      required
+                      step="any"
+                      type="number"
+                      value={values.productQuantities?.[String(productId)] ?? ""}
+                    />
+                    <span className="w-16 shrink-0 text-sm font-bold text-muted">
+                      {getProductUnitLabel(option?.unit)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+            {missingQuantity ? (
+              <p className="form-error mt-2">
+                {missingQuantity === values.interestedProducts.length
+                  ? "Enter how much of each product they want."
+                  : `${missingQuantity} of the ${values.interestedProducts.length} products still has no quantity.`}
+              </p>
+            ) : null}
+            <span className="mt-1 block text-xs font-semibold text-muted">
+              The quotation is built from this &mdash; whoever prices it later cannot add products you did not list.
+            </span>
+          </div>
+        ) : null}
+
+        <Textarea
+          id="lead-edit-message"
+          label="Message"
+          maxLength={2000}
+          name="message"
+          onChange={updateField}
+          value={values.message}
+        />
+
+        {productsState.isError ? (
+          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800" role="alert">
+            {productsState.errorMessage}
+          </p>
+        ) : null}
+        <CrmActionError error={actions.updateLead.error} fallback="Unable to update this lead." />
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-          <Button onClick={onClose} variant="secondary">
+          <Button onClick={onClose} type="button" variant="secondary">
             Cancel
           </Button>
-          <Button disabled={actions.updateLead.isLoading} type="submit">
-            {actions.updateLead.isLoading ? "Saving..." : "Save Details"}
+          <Button disabled={actions.updateLead.isLoading || Boolean(missingQuantity)} type="submit">
+            {actions.updateLead.isLoading ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </form>
@@ -496,51 +525,6 @@ export function PriorityChangeDialog({ isOpen, lead, onClose, onSuccess }) {
           </Button>
           <Button disabled={!priority || actions.changePriority.isLoading} type="submit">
             {actions.changePriority.isLoading ? "Saving..." : "Update Priority"}
-          </Button>
-        </div>
-      </form>
-    </Modal>
-  );
-}
-
-export function ExpectedValueDialog({ isOpen, lead, onClose, onSuccess }) {
-  const [expectedValue, setExpectedValue] = useState("");
-  const actions = useLeadDialogActions({ onClose, onSuccess });
-
-  useEffect(() => {
-    if (isOpen) setExpectedValue(String(lead?.expectedValue ?? ""));
-  }, [isOpen, lead]);
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    await actions.updateExpectedValue.mutate(lead._id, expectedValue).catch(ignoreHandledError);
-  };
-
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Update expected value">
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="rounded-lg bg-mint/60 p-4 text-sm font-semibold text-forest">
-          Current expected value: {formatPipelineValue(lead?.expectedValue)}
-        </div>
-        <TextInput
-          id="lead-expected-value-change"
-          label="Expected / Pipeline Value"
-          min="0"
-          onChange={(event) => setExpectedValue(event.target.value)}
-          step="0.01"
-          type="number"
-          value={expectedValue}
-        />
-        <p className="rounded-lg border border-forest/10 bg-white px-3 py-2 text-sm font-semibold text-muted">
-          This is pipeline value, not revenue, cash collected, invoice value, or order value.
-        </p>
-        <CrmActionError error={actions.updateExpectedValue.error} fallback="Unable to update expected value." />
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-          <Button onClick={onClose} variant="secondary">
-            Cancel
-          </Button>
-          <Button disabled={actions.updateExpectedValue.isLoading} type="submit">
-            {actions.updateExpectedValue.isLoading ? "Saving..." : "Update Value"}
           </Button>
         </div>
       </form>

@@ -8,6 +8,7 @@ import LeadDetailView from "./LeadDetailView";
 
 export default function LeadDetailRouteView({
   backTo,
+  orderDetailPathFor,
   quotationCreatePath = "",
   quotationDetailPathFor,
   roleLabel = "CRM",
@@ -42,6 +43,7 @@ export default function LeadDetailRouteView({
     <LeadDetailView
       lead={lead}
       onMutationSuccess={refetchLeadAndTimeline}
+      orderDetailPathFor={orderDetailPathFor}
       quotationCreatePath={quotationCreatePath}
       quotationDetailPathFor={quotationDetailPathFor}
       recentActivities={recentActivities}

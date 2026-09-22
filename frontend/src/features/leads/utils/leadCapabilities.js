@@ -4,6 +4,9 @@ import { LEAD_STATUS } from "../constants/lead.constants.js";
 
 const terminalStatuses = [LEAD_STATUS.CONVERTED, LEAD_STATUS.LOST, LEAD_STATUS.CLOSED];
 
+// Before anyone has decided the lead is worth quoting.
+const EARLY_STATUSES = [LEAD_STATUS.NEW, LEAD_STATUS.CONTACTED, LEAD_STATUS.FOLLOW_UP];
+
 export const getLeadCapabilities = ({ hasPermission, lead, role }) => {
   const canUpdateLead = hasPermission(PERMISSIONS.LEADS_UPDATE);
   const canAssign = hasPermission(PERMISSIONS.LEADS_ASSIGN);
@@ -38,13 +41,27 @@ export const getLeadCapabilities = ({ hasPermission, lead, role }) => {
     canUpdateExpectedValue: canUpdateLead,
     canUpdateProductInterest: canUpdateLead,
     canScheduleFollowUp,
-    canCompleteFollowUp: canScheduleFollowUp,
+    // Only when there is actually one to complete. The permission alone
+    // put a "Complete Follow-Up" button on every lead, including ones
+    // whose own panel said "Next follow-up: Not Set" three inches away.
+    canCompleteFollowUp: canScheduleFollowUp && Boolean(lead?.nextFollowUpAt),
     canAddActivity: hasPermission(PERMISSIONS.LEADS_ACTIVITIES_CREATE),
+    // "Nobody has spoken to them yet" is the one state where advancing
+    // the lead needs no judgement and no form — so it gets a single
+    // press of its own rather than sending someone into the generic
+    // stage picker to find the one row that applies.
+    canLogFirstContact: canChangeStatus && lead?.status === LEAD_STATUS.NEW,
     canMarkLost:
       canChangeStatus &&
       ![LEAD_STATUS.CONVERTED, LEAD_STATUS.LOST, LEAD_STATUS.CLOSED].includes(lead?.status),
     canCloseLead: canChangeStatus && [LEAD_STATUS.CONVERTED, LEAD_STATUS.LOST].includes(lead?.status),
-    canQualify: canChangeStatus && !terminalStatuses.includes(lead?.status) && lead?.status !== LEAD_STATUS.QUALIFIED,
+    // Qualifying is a step forward out of the early conversation, so it
+    // is offered only while the lead is still in it. Past QUALIFIED it
+    // was a button that moved the lead BACKWARDS — a quotation had gone
+    // out and the panel still invited someone to re-qualify. Correcting
+    // a wrongly advanced lead is still possible, through "Change stage",
+    // which is where going backwards belongs.
+    canQualify: canChangeStatus && EARLY_STATUSES.includes(lead?.status),
     // Backend only accepts creating a quotation against a QUALIFIED lead
     // (see PHASE5_FRONTEND_API_CONTRACT.md) and re-validates this itself —
     // this only decides whether the button is worth showing. It does not
@@ -52,5 +69,11 @@ export const getLeadCapabilities = ({ hasPermission, lead, role }) => {
     // no endpoint for that is wired into this feature yet; the backend's
     // 409 on a duplicate active quotation is the real guard.
     canCreateQuotation: hasPermission(PERMISSIONS.QUOTATIONS_CREATE) && lead?.status === LEAD_STATUS.QUALIFIED,
+    // The other half of the same moment: whoever CANNOT price a
+    // quotation asks the manager who can. Keyed on the same permission
+    // as above so the two can never both be true, or both be false, for
+    // a qualified lead.
+    canRequestQuotation:
+      !hasPermission(PERMISSIONS.QUOTATIONS_CREATE) && lead?.status === LEAD_STATUS.QUALIFIED,
   };
 };
