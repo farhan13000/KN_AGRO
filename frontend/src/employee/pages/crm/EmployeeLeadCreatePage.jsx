@@ -9,7 +9,6 @@ import {
   LeadForm,
   initialLeadFormValues,
   pipelineValueFromProducts,
-  pickCreateLeadPayload,
   useLeadActions,
   validateLeadForm,
 } from "../../../features/leads";
@@ -36,9 +35,14 @@ export default function EmployeeLeadCreatePage() {
     },
   });
 
+  // Clearing the banner on ANY edit, not only on the next submit. The
+  // banner reports what the server said about the LAST attempt; leaving
+  // it up while the person fixes exactly what it complained about reads
+  // as "I fixed it and it still says no", which is what it did say.
   const handleChange = (event) => {
     setValues((current) => ({ ...current, [event.target.name]: event.target.value }));
     setErrors((current) => ({ ...current, [event.target.name]: "" }));
+    setFormError("");
   };
 
   // Picking products, or changing a quantity, re-states the pipeline
@@ -61,10 +65,13 @@ export default function EmployeeLeadCreatePage() {
         expectedValue: pipelineValueFromProducts(selected, productOptions, quantities),
       };
     });
-    setErrors((current) => ({ ...current, expectedValue: "" }));
+    setErrors((current) => ({ ...current, expectedValue: "", productQuantities: "" }));
+    setFormError("");
   };
 
   const handleQuantityChange = (productId, quantity) => {
+    setErrors((current) => ({ ...current, productQuantities: "" }));
+    setFormError("");
     setValues((current) => {
       const quantities = { ...(current.productQuantities || {}) };
       if (String(quantity).trim() === "") delete quantities[String(productId)];
@@ -85,7 +92,12 @@ export default function EmployeeLeadCreatePage() {
     if (!validation.isValid) return;
 
     try {
-      await leadActions.createLead.mutate(pickCreateLeadPayload(values));
+      // Raw form values, NOT a pre-built payload: leadApi.createLead
+      // builds it. Doing it here as well ran the builder twice, and the
+      // second pass was handed its own output — which quietly dropped
+      // every product quantity, because they leave here as an array and
+      // the builder expects the form's map.
+      await leadActions.createLead.mutate(values);
     } catch (error) {
       setFormError(getApiErrorMessage(error));
     }

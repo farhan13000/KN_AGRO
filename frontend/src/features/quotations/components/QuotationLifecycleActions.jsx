@@ -69,6 +69,7 @@ export default function QuotationLifecycleActions({
     canReviseQuotation,
     canSendQuotation,
     isAwaitingLeadAnswer,
+    isAwaitingManagerOrder,
   } = getQuotationCapabilities({ currentUserId: user?._id, hasPermission, quotation });
 
   const awaitingAnswerFrom = quotation.awaitingAnswerFrom?.user?.name || "";
@@ -153,6 +154,7 @@ export default function QuotationLifecycleActions({
   if (
     !canApproveQuotation &&
     !isAwaitingLeadAnswer &&
+    !isAwaitingManagerOrder &&
     !isWaitingForApproval &&
     !wasSentBack &&
     !canEditQuotation &&
@@ -220,6 +222,22 @@ export default function QuotationLifecycleActions({
             This quotation is with {quotation.lead?.name || "the customer"}. Whether it was accepted or
             refused is the customer&apos;s decision, so only the employee in touch with them can record it here
             {awaitingAnswerFrom ? ` — ${awaitingAnswerFrom}` : ""}.
+          </p>
+        </div>
+      ) : null}
+
+      {/* They recorded the customer's yes and that is where their part
+          ends — the order is the manager's to raise. */}
+      {isAwaitingManagerOrder ? (
+        <div className="rounded-2xl border border-forest/20 bg-mint/60 p-5">
+          <p className="flex items-center gap-2 text-sm font-black text-forest">
+            <CheckCircle2 className="h-4 w-4" />
+            Accepted — your manager raises the order
+          </p>
+          <p className="mt-2 text-sm leading-6 text-forest">
+            {quotation.lead?.name ? `${quotation.lead.name} has` : "The customer has"} accepted this quotation.
+            Turning it into an order commits stock and pricing, so that step belongs to a manager. Nothing else
+            is needed from you.
           </p>
         </div>
       ) : null}

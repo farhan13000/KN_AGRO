@@ -86,6 +86,11 @@ export const PERMISSIONS = Object.freeze({
   ORDERS_READ: "orders.read",
   ORDERS_ANALYTICS_READ: "orders.analytics.read",
   ORDERS_CREATE: "orders.create",
+  // Turning an ACCEPTED quotation into an order. Held by the manager
+  // tier only — a field officer records the customer's answer, a manager
+  // commits the company to it. Mirrors the backend permission of the
+  // same name.
+  ORDERS_CREATE_FROM_QUOTATION: "orders.createFromQuotation",
   ORDERS_CONFIRM: "orders.confirm",
   // ORDERS_FULFILL gates all four fulfillment actions: Processing (Prompt
   // 30, Batch 3), Ready/Dispatch/Deliver (Prompts 31/32/34, this batch).

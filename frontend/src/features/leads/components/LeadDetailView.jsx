@@ -1,4 +1,6 @@
 import Card from "../../../shared/components/Card";
+// Narrow subpath, not the products barrel — this needs one formatter.
+import { getProductUnitLabel } from "../../products/utils";
 import { LeadActivityTimeline } from "../../lead-activities";
 import { QuotationsForLeadSection } from "../../quotations";
 import LeadActionsPanel from "./LeadActionsPanel";
@@ -68,8 +70,9 @@ function ProductInterestSection({ lead }) {
                 {/* Only shown when a quantity was actually given — a lead
                     may record what was asked about without how much. */}
                 {product.quantity ? (
-                  <span className="shrink-0 rounded-md bg-white px-2 py-0.5 text-xs font-black tabular-nums text-forest ring-1 ring-forest/15">
-                    {product.quantity}
+                  <span className="shrink-0 rounded-md bg-white px-2 py-0.5 text-xs font-black text-forest ring-1 ring-forest/15">
+                    <span className="tabular-nums">{product.quantity}</span>
+                    {product.unit ? ` ${getProductUnitLabel(product.unit)}` : ""}
                   </span>
                 ) : null}
               </div>

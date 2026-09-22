@@ -1,4 +1,6 @@
 import Button from "../../../shared/components/Button";
+// Narrow subpath, not the products barrel — this needs one formatter.
+import { getProductUnitLabel } from "../../products/utils";
 import Select from "../../../shared/forms/Select";
 import TextInput from "../../../shared/forms/TextInput";
 import Textarea from "../../../shared/forms/Textarea";
@@ -39,6 +41,26 @@ export const validateLeadForm = (values) => {
   if (values.expectedValue && (!hasAtMostTwoDecimals(values.expectedValue) || Number(values.expectedValue) < 0)) {
     errors.expectedValue = "Expected value must be 0 or greater with at most 2 decimal places.";
   }
+
+  // The quotation is built from these quantities — see the matching rule
+  // in lead.validation.js. A product with no quantity would be quoted as
+  // one unit, and nobody would find out until the customer read the
+  // total, so it is asked for here instead of guessed later.
+  const selectedProducts = values.interestedProducts || [];
+  if (selectedProducts.length) {
+    const quantities = values.productQuantities || {};
+    const missing = selectedProducts.filter((productId) => {
+      const quantity = Number(quantities[String(productId)]);
+      return !Number.isFinite(quantity) || quantity <= 0;
+    });
+    if (missing.length) {
+      errors.productQuantities =
+        missing.length === selectedProducts.length
+          ? "Enter how much of each product they want."
+          : `${missing.length} of the ${selectedProducts.length} products still has no quantity.`;
+    }
+  }
+
   return { errors, isValid: Object.keys(errors).length === 0 };
 };
 
@@ -177,13 +199,17 @@ export default function LeadForm({
             </span>
           </label>
 
-          {/* Quantity is optional throughout: a lead often records only
-              WHAT was asked about, and how much is settled on the
-              quotation. A blank box counts as one unit for the estimate
-              and is not sent as a quantity the customer never gave. */}
+          {/* Required, not optional. The quotation a manager later sends
+              is built from exactly these products and these quantities —
+              they no longer pick the line-up themselves — so a blank box
+              here becomes a quantity of one on a document that goes to
+              the customer. The person who spoke to them is the only one
+              who can fill it in honestly. */}
           {values.interestedProducts?.length ? (
             <div className="sm:col-span-2">
-              <span className="form-label">Quantity per product (optional)</span>
+              <span className="form-label">
+                Quantity per product <span className="text-red-700">*</span>
+              </span>
               <div className="mt-2 space-y-2 rounded-lg border border-forest/10 bg-white p-3">
                 {values.interestedProducts.map((productId) => {
                   const option = productOptions.find((item) => String(item.value) === String(productId));
@@ -194,19 +220,31 @@ export default function LeadForm({
                       </span>
                       <input
                         aria-label={`Quantity for ${option?.label || productId}`}
-                        className="form-field w-32"
+                        className="form-field w-28"
                         min="0"
                         name={`quantity-${productId}`}
                         onChange={(event) => onQuantityChange?.(productId, event.target.value)}
-                        placeholder={option?.unit || "Qty"}
+                        placeholder="Qty"
+                        required
                         step="any"
                         type="number"
                         value={values.productQuantities?.[String(productId)] ?? ""}
                       />
+                      {/* Beside the box, not inside it as a placeholder:
+                          a placeholder disappears the moment a number is
+                          typed, which is exactly when the unit matters.
+                          12 bags and 12 packets are different orders. */}
+                      <span className="w-16 shrink-0 text-sm font-bold text-muted">
+                        {getProductUnitLabel(option?.unit)}
+                      </span>
                     </div>
                   );
                 })}
               </div>
+              {errors.productQuantities ? <p className="form-error mt-2">{errors.productQuantities}</p> : null}
+              <span className="mt-1 block text-xs font-semibold text-muted">
+                The quotation is built from this — whoever prices it later cannot add products you did not list.
+              </span>
             </div>
           ) : null}
           <div className="sm:col-span-2">

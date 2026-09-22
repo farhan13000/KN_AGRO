@@ -69,18 +69,44 @@ const useLeadDialogActions = ({ onClose, onSuccess }) =>
 
 export function ProductInterestDialog({ isOpen, lead, onClose, onSuccess }) {
   const [selectedProducts, setSelectedProducts] = useState([]);
+  // How much of each, keyed by product id. Asked for here for the same
+  // reason as on the lead form: a manager's quotation is built from this
+  // list and cannot add to it, so a product with no quantity is quoted
+  // as one unit of itself.
+  const [quantities, setQuantities] = useState({});
   const productsState = useProductList({ limit: 100, status: "ACTIVE", sortBy: "name", sortOrder: "asc" }, { enabled: isOpen });
   const actions = useLeadDialogActions({ onClose, onSuccess });
 
   useEffect(() => {
     if (isOpen) {
-      setSelectedProducts((lead?.interestedProducts || []).map((product) => product._id || product).filter(Boolean));
+      const existing = lead?.interestedProducts || [];
+      setSelectedProducts(existing.map((product) => product._id || product).filter(Boolean));
+      setQuantities(
+        Object.fromEntries(
+          existing
+            .filter((product) => product?._id && product.quantity)
+            .map((product) => [String(product._id), String(product.quantity)]),
+        ),
+      );
     }
   }, [isOpen, lead]);
 
+  const productById = useMemo(
+    () => new Map((productsState.data?.products || []).map((product) => [String(product._id), product])),
+    [productsState.data],
+  );
+
+  const missingQuantity = selectedProducts.filter((productId) => {
+    const quantity = Number(quantities[String(productId)]);
+    return !Number.isFinite(quantity) || quantity <= 0;
+  }).length;
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    await actions.updateInterestedProducts.mutate(lead._id, selectedProducts).catch(ignoreHandledError);
+    if (missingQuantity) return;
+    await actions.updateInterestedProducts
+      .mutate(lead._id, selectedProducts, quantities)
+      .catch(ignoreHandledError);
   };
 
   return (
@@ -106,6 +132,48 @@ export function ProductInterestDialog({ isOpen, lead, onClose, onSuccess }) {
             Use Ctrl or Shift to select multiple products.
           </span>
         </label>
+
+        {selectedProducts.length ? (
+          <div>
+            <span className="form-label">
+              Quantity per product <span className="text-red-700">*</span>
+            </span>
+            <div className="mt-2 space-y-2 rounded-lg border border-forest/10 bg-white p-3">
+              {selectedProducts.map((productId) => {
+                const product = productById.get(String(productId));
+                const label = product
+                  ? [product.productCode, product.name].filter(Boolean).join(" - ")
+                  : String(productId);
+                return (
+                  <div className="flex flex-wrap items-center gap-3" key={productId}>
+                    <span className="min-w-0 flex-1 truncate text-sm font-semibold text-ink">{label}</span>
+                    <input
+                      aria-label={`Quantity for ${label}`}
+                      className="form-field w-32"
+                      min="0"
+                      onChange={(event) =>
+                        setQuantities((current) => ({ ...current, [String(productId)]: event.target.value }))
+                      }
+                      placeholder={product?.unit || "Qty"}
+                      required
+                      step="any"
+                      type="number"
+                      value={quantities[String(productId)] ?? ""}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+            {missingQuantity ? (
+              <p className="form-error mt-2">
+                {missingQuantity === selectedProducts.length
+                  ? "Enter how much of each product they want."
+                  : `${missingQuantity} of the ${selectedProducts.length} products still has no quantity.`}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+
         {productsState.isError ? (
           <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800" role="alert">
             {productsState.errorMessage}
@@ -116,7 +184,10 @@ export function ProductInterestDialog({ isOpen, lead, onClose, onSuccess }) {
           <Button onClick={onClose} variant="secondary">
             Cancel
           </Button>
-          <Button disabled={actions.updateInterestedProducts.isLoading} type="submit">
+          <Button
+            disabled={actions.updateInterestedProducts.isLoading || Boolean(missingQuantity)}
+            type="submit"
+          >
             {actions.updateInterestedProducts.isLoading ? "Saving..." : "Update Products"}
           </Button>
         </div>

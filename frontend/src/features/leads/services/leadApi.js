@@ -80,8 +80,12 @@ export const leadApi = {
     return leadApi.updateLead(leadId, { expectedValue });
   },
 
-  async updateInterestedProducts(leadId, interestedProducts) {
-    return leadApi.updateLead(leadId, { interestedProducts });
+  // `productQuantities` is the form's `{ productId: quantity }` map, not
+  // the API's array — pickUpdateLeadPayload converts it. Sent together
+  // with the products on purpose: the two are one fact, and the backend
+  // now refuses a product list that leaves any of them unquantified.
+  async updateInterestedProducts(leadId, interestedProducts, productQuantities) {
+    return leadApi.updateLead(leadId, { interestedProducts, productQuantities });
   },
 
   async scheduleFollowUp(leadId, values) {

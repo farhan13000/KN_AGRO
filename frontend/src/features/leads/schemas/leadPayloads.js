@@ -41,7 +41,17 @@ const productQuantitiesOf = (values) => {
   const selected = normalizeProductIds(values.interestedProducts);
   if (!selected?.length) return undefined;
 
-  const quantities = values.productQuantities || {};
+  // Accepts either shape: the form's `{ productId: quantity }` map, or
+  // the `[{ productId, quantity }]` array this function itself produces.
+  // Being handed its own output is not hypothetical — it happened, and
+  // because a map lookup on an array silently yields undefined, every
+  // quantity vanished without a single error anywhere. A function that
+  // loses data when fed its own result is a trap; this one is idempotent.
+  const given = values.productQuantities;
+  const quantities = Array.isArray(given)
+    ? Object.fromEntries(given.map((row) => [String(row?.productId ?? row?.product), row?.quantity]))
+    : given || {};
+
   const rows = selected
     .map((id) => ({ productId: String(id), quantity: Number(quantities[String(id)]) }))
     .filter((row) => Number.isFinite(row.quantity) && row.quantity > 0);

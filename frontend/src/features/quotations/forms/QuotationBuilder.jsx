@@ -180,8 +180,11 @@ export default function QuotationBuilder({
   const [notes, setNotes] = useState(() => initialQuotation?.notes || "");
   const [errors, setErrors] = useState({});
 
-  const handleAddProduct = (product) => {
-    setItems((current) => [...current, toEditableItem(product, 1)]);
+  // Also the "put it back" path for a line removed from the lead's own
+  // requirement — same shape either way, at the quantity the lead asked
+  // for where there is one.
+  const handleAddProduct = (product, quantity) => {
+    setItems((current) => [...current, toEditableItem(product, quantity)]);
   };
 
   /**
@@ -214,13 +217,19 @@ export default function QuotationBuilder({
   );
   const shouldPrefill = Boolean(lead) && prefilledLeadRef.current !== lead?._id && requestedProducts.length > 0;
 
+  // The id list stays in the query key after the prefill has happened,
+  // rather than being blanked once `shouldPrefill` goes false — the
+  // fetched products are still needed afterwards, to offer a removed
+  // line back. Blanking it would change the key and throw the cache
+  // away, so a removed product could never be restored.
+  const requestedProductIds = useMemo(
+    () => requestedProducts.map((product) => product._id).join(","),
+    [requestedProducts],
+  );
+
   const requestedProductsState = useProductList(
-    {
-      ids: shouldPrefill ? requestedProducts.map((product) => product._id).join(",") : "",
-      limit: 50,
-      status: "ACTIVE",
-    },
-    { enabled: shouldPrefill },
+    { ids: requestedProductIds, limit: 50, status: "ACTIVE" },
+    { enabled: Boolean(requestedProductIds) },
   );
 
   const requestedProductsData = requestedProductsState.data?.products;
@@ -252,6 +261,52 @@ export default function QuotationBuilder({
       unavailable: requestedProducts.length - requestedProductsData.length,
     });
   }, [items.length, lead, requestedProducts, requestedProductsData, shouldPrefill]);
+
+  /**
+   * THE PRODUCT LIST IS THE LEAD'S, NOT THE MANAGER'S.
+   *
+   * Whoever met the customer wrote down what they asked for. A manager
+   * pricing that enquiry is doing exactly that — pricing it — so there is
+   * no product search here to add something the customer never mentioned.
+   * They set quantity, rate, discount and tax; the line-up is decided.
+   *
+   * A line can still be dropped (the customer changed their mind on one
+   * item) and offered back, so removing is never a one-way door.
+   *
+   * In edit mode the saved quotation's own items play the same part: the
+   * line-up was settled when it was created, and an edit re-prices it.
+   * The fallback — a free product search — is only reached when there is
+   * no requirement to work from at all, which means a lead recorded no
+   * products. Without it that quotation could not be built at all.
+   */
+  const savedItemProducts = useMemo(
+    () => mapQuotationItemsToEditable(initialQuotation?.items).map((item) => item.product),
+    [initialQuotation],
+  );
+  const requirementProducts = isEditMode ? savedItemProducts : requestedProductsData || [];
+  const isLineUpFixed = requirementProducts.length > 0;
+
+  // What a restored line should come back as: the lead's own quantity
+  // when creating, the saved line's quantity when editing.
+  const requirementQuantityById = useMemo(() => {
+    const source = isEditMode
+      ? (initialQuotation?.items ?? []).map((item) => ({ _id: item.product, quantity: item.quantity }))
+      : requestedProducts;
+    return new Map(source.map((entry) => [String(entry._id), entry.quantity]));
+  }, [initialQuotation, isEditMode, requestedProducts]);
+
+  const chosenProductIds = new Set(items.map((item) => String(item.product._id)));
+  const removedProducts = requirementProducts.filter(
+    (product) => !chosenProductIds.has(String(product._id)),
+  );
+
+  // Products on this lead that nobody put a number against. New leads
+  // cannot be saved that way any more, but older ones exist, and a line
+  // silently sitting at 1 is exactly what this whole change is meant to
+  // stop being invisible.
+  const unquantifiedCount = isEditMode
+    ? 0
+    : requestedProducts.filter((product) => !(Number(product.quantity) > 0)).length;
 
   const handleItemChange = (index, nextItem) => {
     setItems((current) => current.map((item, itemIndex) => (itemIndex === index ? nextItem : item)));
@@ -342,6 +397,13 @@ export default function QuotationBuilder({
           {requestedProductsState.isLoading ? (
             <p className="text-sm text-muted">Filling in what this lead asked for...</p>
           ) : null}
+          {unquantifiedCount ? (
+            <p className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-900">
+              This lead did not record a quantity for {unquantifiedCount} of its product
+              {unquantifiedCount === 1 ? "" : "s"}, so {unquantifiedCount === 1 ? "it is" : "they are"} sitting
+              at 1. Check with whoever took the enquiry before you send this.
+            </p>
+          ) : null}
           {prefillSummary?.filled ? (
             <p className="rounded-lg border border-forest/15 bg-mint/50 px-3 py-2 text-sm font-semibold text-forest">
               Filled in {prefillSummary.filled} product{prefillSummary.filled === 1 ? "" : "s"} this lead asked
@@ -353,10 +415,41 @@ export default function QuotationBuilder({
                 : ""}
             </p>
           ) : null}
-          <QuotationProductSelector
-            excludeProductIds={items.map((item) => item.product._id)}
-            onSelect={handleAddProduct}
-          />
+          {isLineUpFixed ? (
+            <>
+              <p className="rounded-lg border border-forest/15 bg-white px-3 py-2 text-sm font-semibold text-muted">
+                These are the products {lead?.name ? <span className="text-ink">{lead.name}</span> : "the lead"}{" "}
+                asked for. Set the quantity, rate and discount — the product list itself is theirs, so nothing
+                can be added here that they did not ask about.
+              </p>
+              {removedProducts.length ? (
+                <div className="rounded-lg border border-forest/15 bg-white p-3">
+                  <p className="text-xs font-black uppercase tracking-[0.1em] text-muted">
+                    Removed from this quotation
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {removedProducts.map((product) => (
+                      <Button
+                        key={product._id}
+                        onClick={() =>
+                          handleAddProduct(product, requirementQuantityById.get(String(product._id)))
+                        }
+                        type="button"
+                        variant="secondary"
+                      >
+                        Put {product.name} back
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <QuotationProductSelector
+              excludeProductIds={items.map((item) => item.product._id)}
+              onSelect={handleAddProduct}
+            />
+          )}
           {errors.items ? <p className="form-error">{errors.items}</p> : null}
           {items.length ? (
             // Real table on a desktop screen; one card per item on a

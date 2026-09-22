@@ -76,6 +76,13 @@ export const getQuotationCapabilities = ({ currentUserId, hasPermission, quotati
     // backend flips this same quotation to CONVERTED, so the button
     // naturally stops rendering afterward without any extra bookkeeping.
     canCreateOrderFromQuotation:
-      hasPermission(PERMISSIONS.ORDERS_CREATE) && status === QUOTATION_STATUS.ACCEPTED,
+      hasPermission(PERMISSIONS.ORDERS_CREATE_FROM_QUOTATION) && status === QUOTATION_STATUS.ACCEPTED,
+    // Accepted, and the reader is not the one who turns it into an
+    // order. Worth saying rather than leaving a blank space where they
+    // expected the next step: the person who just recorded the
+    // customer's yes is entitled to know what happens now.
+    isAwaitingManagerOrder:
+      status === QUOTATION_STATUS.ACCEPTED &&
+      !hasPermission(PERMISSIONS.ORDERS_CREATE_FROM_QUOTATION),
   };
 };

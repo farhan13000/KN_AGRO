@@ -33,15 +33,23 @@ export default function QuotationItemEditableRow({ item, onChange, onRemove }) {
       </td>
       <td className="px-3 py-3 md:w-40">
         <span className="item-grid-label">Quantity</span>
-        <input
-          aria-label={`Quantity for ${productLabel}`}
-          className="form-field"
-          min="0.001"
-          onChange={(event) => update({ quantity: event.target.value })}
-          step="any"
-          type="number"
-          value={item.quantity}
-        />
+        {/* The unit sits beside the number, not only up in the product
+            cell: this column is where the figure is actually read and
+            changed, and 12 bags is not 12 packets. */}
+        <div className="flex items-center gap-2">
+          <input
+            aria-label={`Quantity for ${productLabel}`}
+            className="form-field"
+            min="0.001"
+            onChange={(event) => update({ quantity: event.target.value })}
+            step="any"
+            type="number"
+            value={item.quantity}
+          />
+          <span className="shrink-0 text-xs font-bold text-muted">
+            {getProductUnitLabel(item.product?.unit)}
+          </span>
+        </div>
       </td>
       <td className="px-3 py-3 md:w-36">
         <span className="item-grid-label">Rate</span>
