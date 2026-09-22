@@ -50,6 +50,14 @@ export const invoiceApi = {
     return post(API_ENDPOINTS.INVOICES.ISSUE(invoiceId), payload);
   },
 
+  /** The approval answer on a bill — same contract as Quotation's. */
+  async decideInvoiceApproval(invoiceId, decision, reason) {
+    return post(API_ENDPOINTS.INVOICES.APPROVAL(invoiceId), {
+      decision,
+      ...(reason ? { reason: String(reason).trim() } : {}),
+    });
+  },
+
   async cancelInvoice(invoiceId, reason) {
     const payload = pickCancelInvoicePayload(reason);
     return post(API_ENDPOINTS.INVOICES.CANCEL(invoiceId), payload);

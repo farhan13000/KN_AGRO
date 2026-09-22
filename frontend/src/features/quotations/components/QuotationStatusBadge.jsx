@@ -4,6 +4,7 @@ import { formatQuotationStatus } from "../utils";
 
 const statusClasses = {
   [QUOTATION_STATUS.DRAFT]: "bg-slate-100 text-slate-800 ring-slate-200",
+  [QUOTATION_STATUS.PENDING_APPROVAL]: "bg-amber-50 text-amber-900 ring-amber-300",
   [QUOTATION_STATUS.SENT]: "bg-indigo-50 text-indigo-800 ring-indigo-200",
   [QUOTATION_STATUS.ACCEPTED]: "bg-green-50 text-green-800 ring-green-200",
   [QUOTATION_STATUS.REJECTED]: "bg-red-50 text-red-800 ring-red-200",

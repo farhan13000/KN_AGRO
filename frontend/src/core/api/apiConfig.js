@@ -96,6 +96,10 @@ export const API_ENDPOINTS = Object.freeze({
     DETAIL: (quotationId) => `/quotations/${quotationId}`,
     PRINT: (quotationId) => `/quotations/${quotationId}/print`,
     SEND: (quotationId) => `/quotations/${quotationId}/send`,
+    // The Super Admin's / Office Admin's answer on a quotation
+    // someone else prepared. One endpoint for both answers; the
+    // body carries the decision.
+    APPROVAL: (quotationId) => `/quotations/${quotationId}/approval`,
     ACCEPT: (quotationId) => `/quotations/${quotationId}/accept`,
     REJECT: (quotationId) => `/quotations/${quotationId}/reject`,
     CANCEL: (quotationId) => `/quotations/${quotationId}/cancel`,
@@ -201,6 +205,7 @@ export const API_ENDPOINTS = Object.freeze({
     DETAIL: (invoiceId) => `/invoices/${invoiceId}`,
     PRINT: (invoiceId) => `/invoices/${invoiceId}/print`,
     ISSUE: (invoiceId) => `/invoices/${invoiceId}/issue`,
+    APPROVAL: (invoiceId) => `/invoices/${invoiceId}/approval`,
     CANCEL: (invoiceId) => `/invoices/${invoiceId}/cancel`,
     PAYMENTS: (invoiceId) => `/invoices/${invoiceId}/payments`,
   },

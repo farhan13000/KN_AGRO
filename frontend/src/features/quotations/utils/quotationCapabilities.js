@@ -31,11 +31,21 @@ export const getQuotationCapabilities = ({ hasPermission, quotation }) => {
     canCreateQuotation: hasPermission(PERMISSIONS.QUOTATIONS_CREATE),
     canEditQuotation: hasPermission(PERMISSIONS.QUOTATIONS_UPDATE) && status === QUOTATION_STATUS.DRAFT,
     canSendQuotation: hasPermission(PERMISSIONS.QUOTATIONS_SEND) && status === QUOTATION_STATUS.DRAFT,
+    // Pressing Send does one of two things depending on who is pressing
+    // it (see the backend's documentApproval.js), so the button has to
+    // say which. Anyone WITHOUT the approve permission is submitting for
+    // approval, not sending.
+    sendGoesForApproval:
+      hasPermission(PERMISSIONS.QUOTATIONS_SEND) && !hasPermission(PERMISSIONS.QUOTATIONS_APPROVE),
+    // Answering on someone else's submission. The permission alone is
+    // never enough — the document has to actually be waiting.
+    canApproveQuotation:
+      hasPermission(PERMISSIONS.QUOTATIONS_APPROVE) && status === QUOTATION_STATUS.PENDING_APPROVAL,
     canAcceptQuotation: hasPermission(PERMISSIONS.QUOTATIONS_ACCEPT) && status === QUOTATION_STATUS.SENT,
     canRejectQuotation: hasPermission(PERMISSIONS.QUOTATIONS_REJECT) && status === QUOTATION_STATUS.SENT,
     canCancelQuotation:
       hasPermission(PERMISSIONS.QUOTATIONS_MANAGE) &&
-      [QUOTATION_STATUS.DRAFT, QUOTATION_STATUS.SENT].includes(status),
+      [QUOTATION_STATUS.DRAFT, QUOTATION_STATUS.PENDING_APPROVAL, QUOTATION_STATUS.SENT].includes(status),
     canReviseQuotation:
       hasPermission(PERMISSIONS.QUOTATIONS_CREATE) &&
       [QUOTATION_STATUS.REJECTED, QUOTATION_STATUS.EXPIRED].includes(status),

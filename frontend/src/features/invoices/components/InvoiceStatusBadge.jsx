@@ -4,6 +4,7 @@ import { formatInvoiceStatus } from "../utils";
 
 const statusClasses = {
   [INVOICE_STATUS.DRAFT]: "bg-slate-100 text-slate-800 ring-slate-200",
+  [INVOICE_STATUS.PENDING_APPROVAL]: "bg-amber-50 text-amber-900 ring-amber-300",
   [INVOICE_STATUS.ISSUED]: "bg-blue-50 text-blue-800 ring-blue-200",
   [INVOICE_STATUS.CANCELLED]: "bg-red-50 text-red-800 ring-red-200",
 };

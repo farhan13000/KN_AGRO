@@ -47,6 +47,7 @@ export const useQuotationActions = ({ onError, onSuccess } = {}) => ({
   createQuotation: useAsyncMutation(quotationApi.createQuotation, { onError, onSuccess }),
   updateQuotation: useAsyncMutation(quotationApi.updateQuotation, { onError, onSuccess }),
   sendQuotation: useAsyncMutation(quotationApi.sendQuotation, { onError, onSuccess }),
+  decideQuotationApproval: useAsyncMutation(quotationApi.decideQuotationApproval, { onError, onSuccess }),
   acceptQuotation: useAsyncMutation(quotationApi.acceptQuotation, { onError, onSuccess }),
   rejectQuotation: useAsyncMutation(quotationApi.rejectQuotation, { onError, onSuccess }),
   cancelQuotation: useAsyncMutation(quotationApi.cancelQuotation, { onError, onSuccess }),

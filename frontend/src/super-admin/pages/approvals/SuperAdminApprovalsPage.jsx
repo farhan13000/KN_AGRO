@@ -1,5 +1,6 @@
 import { PERMISSIONS, ROUTES } from "../../../shared/constants";
 import TabbedWorkspace from "../../../shared/components/TabbedWorkspace";
+import { PendingDocumentApprovals } from "../../../features/documentApprovals";
 import { PendingApplicationsView } from "../../../features/employees";
 import { HiringPipelineView } from "../../../features/hiring";
 import { PendingApprovalsView } from "../../../features/promotions";
@@ -15,6 +16,21 @@ import { SalaryProposalPipelineView } from "../../../features/salaryProposals";
  * and URL behaviour; this file only says which queues exist.
  */
 const TABS = [
+  {
+    // First, because it is the queue that holds up money: a quotation
+    // sitting here is a customer who has not been quoted yet.
+    id: "documents",
+    label: "Quotations & bills",
+    permission: PERMISSIONS.QUOTATIONS_APPROVE,
+    blurb:
+      "Quotations and bills a manager has prepared. Nothing here has reached the customer yet — open one to read it, then approve it or send it back with a note.",
+    render: () => (
+      <PendingDocumentApprovals
+        invoiceDetailPath={(invoice) => `${ROUTES.SUPER_ADMIN.INVOICES}/${invoice._id}`}
+        quotationDetailPath={(quotation) => `${ROUTES.SUPER_ADMIN.QUOTATIONS}/${quotation._id}`}
+      />
+    ),
+  },
   {
     id: "hiring",
     label: "Hiring",

@@ -5,6 +5,7 @@ export { default as Button } from "./Button";
 export { default as Card } from "./Card";
 export { default as ConfirmDialog } from "./ConfirmDialog";
 export { default as DataTable, rowActionClass, rowIconActionClass } from "./DataTable";
+export { default as DocumentApprovalPanel } from "./DocumentApprovalPanel";
 export { default as EmptyState } from "./EmptyState";
 export { default as ErrorState } from "./ErrorState";
 export { default as FilterPanel } from "./FilterPanel";

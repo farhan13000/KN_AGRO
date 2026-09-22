@@ -43,5 +43,6 @@ export const useInvoicePrintView = (invoiceId, options) => {
 export const useInvoiceActions = ({ onError, onSuccess } = {}) => ({
   generateInvoice: useAsyncMutation(invoiceApi.generateInvoice, { onError, onSuccess }),
   issueInvoice: useAsyncMutation(invoiceApi.issueInvoice, { onError, onSuccess }),
+  decideInvoiceApproval: useAsyncMutation(invoiceApi.decideInvoiceApproval, { onError, onSuccess }),
   cancelInvoice: useAsyncMutation(invoiceApi.cancelInvoice, { onError, onSuccess }),
 });

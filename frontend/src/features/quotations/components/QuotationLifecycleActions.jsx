@@ -4,6 +4,7 @@ import { useAuth } from "../../../core/auth";
 import Button from "../../../shared/components/Button";
 import Card from "../../../shared/components/Card";
 import ConfirmDialog from "../../../shared/components/ConfirmDialog";
+import { DocumentApprovalPanel } from "../../../shared/components";
 import Modal from "../../../shared/components/Modal";
 import { useAsyncMutation } from "../../../shared/hooks";
 import TextInput from "../../../shared/forms/TextInput";
@@ -17,6 +18,7 @@ import { orderApi } from "../../orders/services";
 import { quotationApi } from "../services";
 import { useQuotationActions } from "../hooks";
 import { getQuotationCapabilities } from "../utils";
+import { QUOTATION_STATUS } from "../constants";
 
 const actionButtonClass = "w-full justify-start rounded-lg";
 
@@ -57,6 +59,8 @@ export default function QuotationLifecycleActions({
   const [orderNotes, setOrderNotes] = useState("");
 
   const {
+    canApproveQuotation,
+    sendGoesForApproval,
     canAcceptQuotation,
     canCancelQuotation,
     canCreateOrderFromQuotation,
@@ -65,6 +69,12 @@ export default function QuotationLifecycleActions({
     canReviseQuotation,
     canSendQuotation,
   } = getQuotationCapabilities({ hasPermission, quotation });
+
+  const isWaitingForApproval = quotation.status === QUOTATION_STATUS.PENDING_APPROVAL;
+  // A refusal that has not been acted on yet: back in DRAFT, still
+  // carrying the note that says why.
+  const wasSentBack =
+    quotation.status === QUOTATION_STATUS.DRAFT && quotation.approval?.decision === "REJECTED";
 
   const closeDialog = () => {
     setDialog("");
@@ -126,6 +136,9 @@ export default function QuotationLifecycleActions({
   );
 
   if (
+    !canApproveQuotation &&
+    !isWaitingForApproval &&
+    !wasSentBack &&
     !canEditQuotation &&
     !canSendQuotation &&
     !canAcceptQuotation &&
@@ -138,6 +151,9 @@ export default function QuotationLifecycleActions({
   }
 
   const handleSend = () => actions.sendQuotation.mutate(quotation._id).catch(ignoreHandledError);
+
+  const handleDecision = (decision, reason) =>
+    actions.decideQuotationApproval.mutate(quotation._id, decision, reason).catch(ignoreHandledError);
   const handleAccept = () => actions.acceptQuotation.mutate(quotation._id).catch(ignoreHandledError);
   const handleRevise = () => reviseQuotation.mutate(quotation._id).catch(ignoreHandledError);
 
@@ -160,6 +176,19 @@ export default function QuotationLifecycleActions({
 
   return (
     <>
+      {/* Above the action bar on purpose: while a quotation is waiting,
+          or has just come back with changes asked for, that is the only
+          thing about it worth reading first. */}
+      <DocumentApprovalPanel
+        approval={quotation.approval}
+        canApprove={canApproveQuotation}
+        documentLabel="quotation"
+        errorMessage={actions.decideQuotationApproval.errorMessage}
+        isDeciding={actions.decideQuotationApproval.isLoading}
+        isWaiting={isWaitingForApproval}
+        onDecide={handleDecision}
+      />
+
       <Card className="p-5">
         <h2 className="text-lg font-black text-ink">Actions</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -172,7 +201,10 @@ export default function QuotationLifecycleActions({
           {canSendQuotation ? (
             <Button className={actionButtonClass} onClick={() => setDialog("send")} variant="secondary">
               <GitPullRequest className="h-4 w-4" />
-              Send
+              {/* The same press means two different things depending on
+                  who makes it, so the button says which one it will be
+                  rather than letting the result be a surprise. */}
+              {sendGoesForApproval ? "Send for approval" : "Send"}
             </Button>
           ) : null}
           {canCreateOrderFromQuotation ? (
@@ -210,12 +242,22 @@ export default function QuotationLifecycleActions({
 
       <ConfirmDialog
         cancelLabel="Back"
-        confirmLabel={actions.sendQuotation.isLoading ? "Sending..." : "Send"}
-        description={`Send ${quotation.quotationNumber} to the customer? The related Lead moves to "Quotation Sent" automatically.`}
+        confirmLabel={
+          actions.sendQuotation.isLoading
+            ? "Sending..."
+            : sendGoesForApproval
+              ? "Send for approval"
+              : "Send"
+        }
+        description={
+          sendGoesForApproval
+            ? `Send ${quotation.quotationNumber} to the Super Admin for approval? It reaches the customer only once they say yes, and you cannot edit it while it waits.`
+            : `Send ${quotation.quotationNumber} to the customer? The related Lead moves to "Quotation Sent" automatically.`
+        }
         isOpen={dialog === "send"}
         onCancel={closeDialog}
         onConfirm={handleSend}
-        title="Send quotation"
+        title={sendGoesForApproval ? "Send for approval" : "Send quotation"}
       />
       {dialog === "send" ? <ActionError message={actions.sendQuotation.errorMessage} /> : null}
 

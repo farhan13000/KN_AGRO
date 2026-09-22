@@ -1,5 +1,8 @@
 export const INVOICE_STATUS = Object.freeze({
   DRAFT: "DRAFT",
+  // Finished and submitted, waiting on the Super Admin or Office Admin
+  // to let it be issued to the customer.
+  PENDING_APPROVAL: "PENDING_APPROVAL",
   ISSUED: "ISSUED",
   CANCELLED: "CANCELLED",
 });
@@ -8,6 +11,7 @@ export const INVOICE_STATUSES = Object.freeze(Object.values(INVOICE_STATUS));
 
 export const INVOICE_STATUS_LABELS = Object.freeze({
   [INVOICE_STATUS.DRAFT]: "Draft",
+  [INVOICE_STATUS.PENDING_APPROVAL]: "Waiting for approval",
   [INVOICE_STATUS.ISSUED]: "Issued",
   [INVOICE_STATUS.CANCELLED]: "Cancelled",
 });

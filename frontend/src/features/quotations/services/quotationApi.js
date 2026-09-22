@@ -57,6 +57,18 @@ export const quotationApi = {
     return post(API_ENDPOINTS.QUOTATIONS.SEND(quotationId));
   },
 
+  /**
+   * The approval answer. `decision` is "APPROVED" or "REJECTED"; a
+   * rejection must carry a reason, which the backend enforces — this
+   * sends what it is given rather than guessing a default.
+   */
+  async decideQuotationApproval(quotationId, decision, reason) {
+    return post(API_ENDPOINTS.QUOTATIONS.APPROVAL(quotationId), {
+      decision,
+      ...(reason ? { reason: String(reason).trim() } : {}),
+    });
+  },
+
   async acceptQuotation(quotationId) {
     return post(API_ENDPOINTS.QUOTATIONS.ACCEPT(quotationId));
   },

@@ -24,15 +24,24 @@ export const getInvoiceCapabilities = ({ hasPermission, invoice }) => {
     canListInvoice: hasPermission(PERMISSIONS.INVOICES_READ),
     canViewInvoice: hasPermission(PERMISSIONS.INVOICES_READ),
     canIssueInvoice: hasPermission(PERMISSIONS.INVOICES_ISSUE) && status === INVOICE_STATUS.DRAFT,
+    // Pressing Issue does one of two things depending on who is pressing
+    // it (see the backend's documentApproval.js), so the button has to
+    // say which. Anyone WITHOUT the approve permission is submitting.
+    issueGoesForApproval:
+      hasPermission(PERMISSIONS.INVOICES_ISSUE) && !hasPermission(PERMISSIONS.INVOICES_APPROVE),
+    // Answering on someone else's submission — the permission alone is
+    // never enough, the bill has to actually be waiting.
+    canApproveInvoice:
+      hasPermission(PERMISSIONS.INVOICES_APPROVE) && status === INVOICE_STATUS.PENDING_APPROVAL,
     canCancelInvoice:
       hasPermission(PERMISSIONS.INVOICES_CANCEL) &&
-      [INVOICE_STATUS.DRAFT, INVOICE_STATUS.ISSUED].includes(status) &&
+      [INVOICE_STATUS.DRAFT, INVOICE_STATUS.PENDING_APPROVAL, INVOICE_STATUS.ISSUED].includes(status) &&
       paidAmount === 0 &&
       // Cancelling an ISSUED invoice reverses money that has already been
       // billed, so it stays narrower than cancelling a draft — gated on
       // INVOICES_MANAGE rather than a role name, so the Office Admin
       // (who holds it) can act without SA being named here directly.
-      (status === INVOICE_STATUS.DRAFT || hasPermission(PERMISSIONS.INVOICES_MANAGE)),
+      (status !== INVOICE_STATUS.ISSUED || hasPermission(PERMISSIONS.INVOICES_MANAGE)),
     canRecordPayment:
       hasPermission(PERMISSIONS.PAYMENTS_CREATE) && status === INVOICE_STATUS.ISSUED && dueAmount > 0,
   };
