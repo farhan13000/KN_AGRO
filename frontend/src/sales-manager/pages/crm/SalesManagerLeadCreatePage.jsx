@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getApiErrorMessage } from "../../../core/api";
 import Card from "../../../shared/components/Card";
 import ErrorState from "../../../shared/components/ErrorState";
-import { ROUTES } from "../../../shared/constants";
+import { priceForLeadType, ROUTES } from "../../../shared/constants";
 import { useProductList } from "../../../features/products";
 import {
   LeadForm,
@@ -19,12 +19,17 @@ export default function SalesManagerLeadCreatePage() {
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState("");
   const productsState = useProductList({ limit: 100, status: "ACTIVE", sortBy: "name", sortOrder: "asc" });
+  // Priced for THIS lead's kind of buyer: a super stockist and a dealer
+  // see different rates for the same product, so the pipeline estimate
+  // has to be built from the one that actually applies. Recomputed
+  // whenever the lead type changes, which is what the effect below is
+  // for.
   const productOptions = (productsState.data?.products || []).map((product) => ({
     label: [product.productCode, product.name].filter(Boolean).join(" - "),
     value: product._id,
     // What the pipeline value is worked out from: the catalogue price the
     // Super Admin / Office Admin set, and the product's own tax rate.
-    price: product.sellingPrice,
+    price: priceForLeadType(product, values.leadType),
     taxRate: product.taxRate,
     unit: product.unit,
   }));
@@ -40,8 +45,25 @@ export default function SalesManagerLeadCreatePage() {
   // it up while the person fixes exactly what it complained about reads
   // as "I fixed it and it still says no", which is what it did say.
   const handleChange = (event) => {
-    setValues((current) => ({ ...current, [event.target.name]: event.target.value }));
-    setErrors((current) => ({ ...current, [event.target.name]: "" }));
+    const { name, value } = event.target;
+    setValues((current) => {
+      const next = { ...current, [name]: value };
+      // Changing the kind of buyer re-prices everything already picked —
+      // the estimate is only meaningful against one tier at a time.
+      if (name === "leadType") {
+        next.expectedValue = pipelineValueFromProducts(
+          next.interestedProducts,
+          (productsState.data?.products || []).map((product) => ({
+            value: product._id,
+            price: priceForLeadType(product, value),
+            taxRate: product.taxRate,
+          })),
+          next.productQuantities,
+        );
+      }
+      return next;
+    });
+    setErrors((current) => ({ ...current, [name]: "" }));
     setFormError("");
   };
 

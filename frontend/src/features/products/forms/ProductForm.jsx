@@ -1,4 +1,5 @@
 import Button from "../../../shared/components/Button";
+import { LEAD_TYPE_OPTIONS } from "../../../shared/constants";
 import Select from "../../../shared/forms/Select";
 import TextInput from "../../../shared/forms/TextInput";
 import Textarea from "../../../shared/forms/Textarea";
@@ -84,6 +85,31 @@ export default function ProductForm({
             onChange={onChange}
             value={values.description}
           />
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-lg font-black text-ink">Price by kind of buyer</h2>
+        <p className="mt-1 text-sm leading-6 text-muted">
+          What this product costs each kind of buyer. Leave a box empty and that buyer pays the selling price
+          below — so a product nobody has set special rates for behaves exactly as it always has.
+        </p>
+        <div className="mt-4 grid gap-5 sm:grid-cols-3">
+          {LEAD_TYPE_OPTIONS.map((option) => (
+            <TextInput
+              error={errors[`leadTypePrices.${option.value}`]}
+              id={`product-price-${option.value.toLowerCase()}`}
+              key={option.value}
+              label={option.label}
+              min="0"
+              name={`leadTypePrices.${option.value}`}
+              onChange={onChange}
+              placeholder="Same as selling price"
+              step="0.01"
+              type="number"
+              value={values.leadTypePrices?.[option.value] ?? ""}
+            />
+          ))}
         </div>
       </section>
 

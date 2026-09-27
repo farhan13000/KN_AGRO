@@ -6,9 +6,11 @@ import { employeeSelectOption, getEmployeeDisplayName } from "../utils";
 
 export default function ManagerAssignmentDialog({ employee, isOpen, onClose, onSuccess }) {
   const [managerId, setManagerId] = useState("");
-  // Narrowed to the one tier this employee's role must report to, so the
-  // list cannot offer a pairing the backend will then refuse — a GM, for
-  // instance, is only ever shown Office Admins.
+  // Narrowed to everyone who outranks this employee, so the list cannot
+  // offer a pairing the backend will then refuse — but it no longer
+  // narrows to a single tier: a field officer in a thin district may
+  // well report straight to the ASM or the RM, and the company decides
+  // that, not this dialog.
   const managerState = useEligibleManagerCandidates({
     enabled: isOpen,
     excludeEmployeeId: employee?._id,

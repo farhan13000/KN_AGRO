@@ -2,6 +2,7 @@ import { PERMISSIONS, ROUTES } from "../../../shared/constants";
 import TabbedWorkspace from "../../../shared/components/TabbedWorkspace";
 import { PendingDocumentApprovals } from "../../../features/documentApprovals";
 import { PendingApplicationsView } from "../../../features/employees";
+import { PendingEmployeeChanges } from "../../../features/employeeChangeRequests";
 import { HiringPipelineView } from "../../../features/hiring";
 import { PendingApprovalsView } from "../../../features/promotions";
 import { SalaryProposalPipelineView } from "../../../features/salaryProposals";
@@ -30,6 +31,17 @@ const TABS = [
         quotationDetailPath={(quotation) => `${ROUTES.SUPER_ADMIN.QUOTATIONS}/${quotation._id}`}
       />
     ),
+  },
+  {
+    // Second, because an employee record decides what somebody can see
+    // and do — a wrong role left waiting is an access problem, not a
+    // paperwork one.
+    id: "employee-changes",
+    label: "Employee changes",
+    permission: PERMISSIONS.EMPLOYEES_EDIT_APPROVE,
+    blurb:
+      "Changes an Office Admin has made to an employee — role, locations, details. Nothing has taken effect yet; approving applies it, sending it back returns it with your note.",
+    render: () => <PendingEmployeeChanges />,
   },
   {
     id: "hiring",

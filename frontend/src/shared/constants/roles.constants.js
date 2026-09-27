@@ -54,13 +54,10 @@ export const MANAGER_TIER_ROLES = Object.freeze([
   BACKEND_ROLES.SO,
 ]);
 
-// Mirrors the backend's own REQUIRED_MANAGER_ROLE (also
-// core/authorization/hierarchy.service.js) — the fixed one-tier-up chain
-// for the 7-role sales hierarchy. Kept in sync by hand, same as
-// MANAGER_TIER_ROLES above. Use ONLY to narrow a manager picker to the
-// tier a given role structurally must report to, never for an actual
-// access-control decision — the backend's own validateReportingRelationship
-// is what actually enforces this at completeHiring/assignManager time.
+// Mirrors the backend's REQUIRED_MANAGER_ROLE — the manager each role
+// would NORMALLY have, one tier up. No longer a restriction on either
+// side: a manager may be anyone more senior (see getEligibleManagerRoles
+// below). Kept so a picker can put the obvious choice first.
 export const REQUIRED_MANAGER_ROLE = Object.freeze({
   [BACKEND_ROLES.FO]: BACKEND_ROLES.SO,
   [BACKEND_ROLES.SO]: BACKEND_ROLES.ASM,
@@ -73,19 +70,42 @@ export const REQUIRED_MANAGER_ROLE = Object.freeze({
 });
 
 // Mirrors the backend's MANAGER_ASSIGNABLE_ROLES — every role that may
-// be picked as somebody's manager. Wider than MANAGER_TIER_ROLES by the
-// Office Admin, who a GM reports to. Same "pickers only" rule as above.
-export const MANAGER_ASSIGNABLE_ROLES = Object.freeze([...MANAGER_TIER_ROLES, BACKEND_ROLES.OA]);
+// be picked as somebody's manager: everyone except the FO, who is the
+// bottom tier. Same "pickers only" rule as above.
+export const MANAGER_ASSIGNABLE_ROLES = Object.freeze([
+  ...MANAGER_TIER_ROLES,
+  BACKEND_ROLES.OA,
+  BACKEND_ROLES.SA,
+]);
 
 /**
- * Which roles should be offered as reporting-manager candidates for a
- * given role name. Roles with a fixed one-tier-up rule (FO/SO/ASM/RM/GM)
- * resolve to exactly that one role; anything else (OA/SA, or no role
- * picked yet) falls back to the full list.
+ * The whole company, most senior first — mirrors the backend's
+ * ORG_SENIORITY. Separate from MANAGER_TIER_ROLES because this one
+ * answers "who outranks whom", which includes SA and OA.
+ */
+export const ORG_SENIORITY = Object.freeze([
+  BACKEND_ROLES.SA,
+  BACKEND_ROLES.OA,
+  BACKEND_ROLES.GM,
+  BACKEND_ROLES.RM,
+  BACKEND_ROLES.ASM,
+  BACKEND_ROLES.SO,
+  BACKEND_ROLES.FO,
+]);
+
+/**
+ * Which roles to offer as reporting-manager candidates for a given role:
+ * everyone who outranks them. A field officer may report to an SO, an
+ * ASM, an RM, a GM, the Office Admin or the Super Admin — which one is
+ * the company's decision, not the form's.
+ *
+ * An unknown role (or none picked yet) falls back to the full list
+ * rather than showing nobody.
  */
 export const getEligibleManagerRoles = (roleName) => {
   const normalized = normalizeRoleName(roleName);
-  const requiredRole = REQUIRED_MANAGER_ROLE[normalized];
-  return requiredRole ? [requiredRole] : MANAGER_ASSIGNABLE_ROLES;
+  const rank = ORG_SENIORITY.indexOf(normalized);
+  if (rank === -1) return MANAGER_ASSIGNABLE_ROLES;
+  return ORG_SENIORITY.slice(0, rank).filter((role) => MANAGER_ASSIGNABLE_ROLES.includes(role));
 };
 

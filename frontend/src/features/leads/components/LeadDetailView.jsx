@@ -1,4 +1,5 @@
 import Card from "../../../shared/components/Card";
+import { getLeadTypeLabel } from "../../../shared/constants";
 // Narrow subpath, not the products barrel — this needs one formatter.
 import { getProductUnitLabel } from "../../products/utils";
 import { LeadActivityTimeline } from "../../lead-activities";
@@ -44,6 +45,7 @@ function LeadOverviewSection({ lead }) {
         <DetailRow label="Name" value={lead.name} />
         <DetailRow label="Company" value={lead.companyName} />
         <DetailRow label="Source" value={lead.source} />
+        <DetailRow label="Lead Type" value={getLeadTypeLabel(lead.leadType)} />
         <DetailRow label="Created" value={formatDateTime(lead.createdAt)} />
         <DetailRow label="Updated" value={formatDateTime(lead.updatedAt)} />
       </dl>

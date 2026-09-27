@@ -9,6 +9,7 @@ export {
   getEligibleManagerRoles,
   normalizeRoleName,
 } from "./roles.constants";
+export * from "./leadType.constants";
 export { ROUTES } from "./routes.constants";
 export { DEPARTMENT_OPTIONS, DEPARTMENT_LABELS } from "./department.constants";
 

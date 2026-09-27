@@ -42,8 +42,16 @@ export default function SuperAdminProductEditPage() {
     }
   }, [hydratedProductId, product]);
 
+  // The tier price boxes are named `leadTypePrices.DEALER` and so on, so
+  // a dotted name sets a key inside that object rather than creating a
+  // top-level field with a full stop in its name.
   const handleChange = (event) => {
-    setValues((current) => ({ ...current, [event.target.name]: event.target.value }));
+    const { name, value } = event.target;
+    setValues((current) => {
+      if (!name.includes(".")) return { ...current, [name]: value };
+      const [group, key] = name.split(".");
+      return { ...current, [group]: { ...(current[group] || {}), [key]: value } };
+    });
   };
 
   const handleSubmit = async (event) => {

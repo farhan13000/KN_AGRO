@@ -9,6 +9,7 @@ import QuotationProductSelector from "../components/QuotationProductSelector";
 // Narrow subpath, not the products feature barrel: this needs one hook,
 // not the whole Products UI graph in the Quotations bundle.
 import { useProductList } from "../../products/hooks";
+import { getLeadTypeLabel, priceForLeadType } from "../../../shared/constants";
 import { QUOTATION_DISCOUNT_TYPE, QUOTATION_DISCOUNT_TYPE_LABELS } from "../constants";
 import { calculateQuotationTotalsPreview } from "../utils";
 
@@ -61,13 +62,17 @@ const mapQuotationItemsToEditable = (items = []) =>
  * asked for — a prefilled row is an ordinary editable row, never a
  * locked or specially-marked one.
  */
-const toEditableItem = (product, quantity) => ({
+const toEditableItem = (product, quantity, leadType) => ({
   description: "",
   discountType: null,
   discountValue: "",
   product,
   quantity: quantity && Number(quantity) > 0 ? Number(quantity) : 1,
-  rate: product.sellingPrice ?? 0,
+  // The buyer's own rate, not the headline selling price: a super
+  // stockist and a dealer pay differently for the same bag, and which
+  // applies is a fact about the lead this quotation is for. The rate
+  // stays editable — this is the opening figure, not the last word.
+  rate: priceForLeadType(product, leadType),
   taxRate: product.taxRate ?? 0,
 });
 
@@ -184,7 +189,7 @@ export default function QuotationBuilder({
   // requirement — same shape either way, at the quantity the lead asked
   // for where there is one.
   const handleAddProduct = (product, quantity) => {
-    setItems((current) => [...current, toEditableItem(product, quantity)]);
+    setItems((current) => [...current, toEditableItem(product, quantity, lead?.leadType)]);
   };
 
   /**
@@ -249,7 +254,7 @@ export default function QuotationBuilder({
 
     setItems(
       requestedProductsData.map((product) =>
-        toEditableItem(product, quantityByProduct.get(String(product._id))),
+        toEditableItem(product, quantityByProduct.get(String(product._id)), lead?.leadType),
       ),
     );
 
@@ -419,8 +424,10 @@ export default function QuotationBuilder({
             <>
               <p className="rounded-lg border border-forest/15 bg-white px-3 py-2 text-sm font-semibold text-muted">
                 These are the products {lead?.name ? <span className="text-ink">{lead.name}</span> : "the lead"}{" "}
-                asked for. Set the quantity, rate and discount — the product list itself is theirs, so nothing
-                can be added here that they did not ask about.
+                asked for, priced as a{" "}
+                <span className="text-ink">{getLeadTypeLabel(lead?.leadType)}</span>. Set the quantity, rate and
+                discount — the product list itself is theirs, so nothing can be added here that they did not ask
+                about.
               </p>
               {removedProducts.length ? (
                 <div className="rounded-lg border border-forest/15 bg-white p-3">

@@ -224,6 +224,10 @@ export const API_ENDPOINTS = Object.freeze({
   LEAD_HANDLERS: {
     RELEASE: (leadId) => `/lead-handlers/${leadId}/release`,
   },
+  EMPLOYEE_CHANGE_REQUESTS: {
+    BASE: "/employee-change-requests",
+    DECISION: (requestId) => `/employee-change-requests/${requestId}/decision`,
+  },
   LEAD_ACTION_REQUESTS: {
     BASE: "/lead-action-requests",
     COMPLETE: (requestId) => `/lead-action-requests/${requestId}/complete`,

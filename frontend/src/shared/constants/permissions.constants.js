@@ -7,6 +7,10 @@ export const PERMISSIONS = Object.freeze({
   EMPLOYEES_READ: "employees.read",
   EMPLOYEES_CREATE: "employees.create",
   EMPLOYEES_UPDATE: "employees.update",
+  // Deciding on someone else's proposed edit to an employee record.
+  // Held by the Super Admin only: an Office Admin may change anything
+  // here, but their change is a proposal until the owner says yes.
+  EMPLOYEES_EDIT_APPROVE: "employees.editApprove",
   EMPLOYEES_PROMOTE: "employees.promote",
   EMPLOYEES_PROMOTE_REQUEST: "employees.promote_request",
   EMPLOYEES_DEACTIVATE: "employees.deactivate",

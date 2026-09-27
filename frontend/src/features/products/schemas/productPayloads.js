@@ -57,6 +57,10 @@ export const initialProductFormValues = {
   description: "",
   unit: PRODUCT_UNIT.KG,
   sellingPrice: "",
+  // One price per kind of buyer. Blank means "no special price" — the
+  // standard selling price above applies — which is a different thing
+  // from 0, and why these start empty rather than at zero.
+  leadTypePrices: { SUPER_STOCK: "", DISTRIBUTOR: "", DEALER: "" },
   taxRate: "0",
   minimumStock: "0",
   images: [],
@@ -71,6 +75,11 @@ export const productToFormValues = (product) => ({
   description: product?.description || "",
   unit: product?.unit || PRODUCT_UNIT.KG,
   sellingPrice: String(product?.sellingPrice ?? ""),
+  leadTypePrices: {
+    SUPER_STOCK: product?.leadTypePrices?.SUPER_STOCK == null ? "" : String(product.leadTypePrices.SUPER_STOCK),
+    DISTRIBUTOR: product?.leadTypePrices?.DISTRIBUTOR == null ? "" : String(product.leadTypePrices.DISTRIBUTOR),
+    DEALER: product?.leadTypePrices?.DEALER == null ? "" : String(product.leadTypePrices.DEALER),
+  },
   taxRate: String(product?.taxRate ?? 0),
   minimumStock: String(product?.minimumStock ?? 0),
   // Primary first, so it keeps its place as the main image.
@@ -105,6 +114,13 @@ export const validateProductForm = (values) => {
   }
   if (!hasAtMostTwoDecimals(values.sellingPrice) || Number(values.sellingPrice) < 0) {
     errors.sellingPrice = "Selling price must be 0 or greater with at most 2 decimal places.";
+  }
+  // Each tier is optional; a filled one has to be a real price.
+  for (const [tier, amount] of Object.entries(values.leadTypePrices || {})) {
+    if (String(amount).trim() === "") continue;
+    if (!hasAtMostTwoDecimals(amount) || Number(amount) < 0) {
+      errors[`leadTypePrices.${tier}`] = "Enter a price of 0 or more, with at most 2 decimal places.";
+    }
   }
   if (!Number.isFinite(Number(values.taxRate)) || Number(values.taxRate) < 0 || Number(values.taxRate) > 100) {
     errors.taxRate = "Tax rate must be between 0 and 100.";
@@ -153,6 +169,17 @@ export const pickProductPayload = (values) => {
     ...(trimOrUndefined(values.description) ? { description: values.description.trim() } : {}),
     unit: values.unit,
     sellingPrice: Number(values.sellingPrice),
+    // Always sent, every tier, so emptying a box actually clears that
+    // tier back to the standard price instead of leaving the old one
+    // behind — `null` is what the API reads as "no special price".
+    leadTypePrices: Object.fromEntries(
+      ["SUPER_STOCK", "DISTRIBUTOR", "DEALER"].map((tier) => [
+        tier,
+        String(values.leadTypePrices?.[tier] ?? "").trim() === ""
+          ? null
+          : Number(values.leadTypePrices[tier]),
+      ]),
+    ),
     taxRate: Number(values.taxRate || 0),
     minimumStock: Number(values.minimumStock || 0),
     // Always sent, so removing every photo while editing actually removes them.

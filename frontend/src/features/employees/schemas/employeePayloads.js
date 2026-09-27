@@ -27,6 +27,11 @@ export const pickCreateEmployeePayload = (values) => ({
 });
 
 export const pickUpdateEmployeePayload = (values) => ({
+  // Left out entirely when unchanged: sending the same role back would
+  // be a no-op the backend refuses ("already holds this role"), and on
+  // the approval path it would put a meaningless line in front of the
+  // approver.
+  ...(values.roleId && values.roleId !== values.originalRoleId ? { roleId: values.roleId } : {}),
   phone: values.phone,
   coverage: values.coverage,
   department: values.department,

@@ -78,6 +78,7 @@ export const pickCreateLeadPayload = (values) =>
     email: trimOrUndefined(values.email),
     location: trimOrUndefined(values.location),
     source: LEAD_SOURCES.includes(values.source) ? values.source : undefined,
+    leadType: trimOrUndefined(values.leadType),
     interestedProducts: normalizeProductIds(values.interestedProducts),
     productQuantities: productQuantitiesOf(values),
     message: trimOrUndefined(values.message),
@@ -118,6 +119,7 @@ export const pickUpdateLeadPayload = (values) => {
   put("location", trimOrText(values.location));
   put("message", trimOrText(values.message));
   put("source", LEAD_SOURCES.includes(values.source) ? values.source : undefined);
+  put("leadType", trimOrUndefined(values.leadType));
   put("interestedProducts", normalizeProductIds(values.interestedProducts));
   put("productQuantities", productQuantitiesOf(values));
   // Emptying the pipeline-value box means "no expected value yet", which

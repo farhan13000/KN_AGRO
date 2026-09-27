@@ -4,6 +4,7 @@ import { getProductUnitLabel } from "../../products/utils";
 import Select from "../../../shared/forms/Select";
 import TextInput from "../../../shared/forms/TextInput";
 import Textarea from "../../../shared/forms/Textarea";
+import { DEFAULT_LEAD_TYPE, LEAD_TYPE_OPTIONS } from "../../../shared/constants";
 import {
   LEAD_PRIORITIES,
   LEAD_PRIORITY_LABELS,
@@ -18,6 +19,7 @@ export const initialLeadFormValues = {
   email: "",
   location: "",
   source: "MANUAL",
+  leadType: DEFAULT_LEAD_TYPE,
   interestedProducts: [],
   productQuantities: {},
   message: "",
@@ -34,6 +36,9 @@ export const validateLeadForm = (values) => {
   }
   if (!values.phone && !values.email) {
     errors.phone = "Enter a phone number or email address.";
+  }
+  if (!values.leadType) {
+    errors.leadType = "Choose whether this is a super stockist, a distributor or a dealer.";
   }
   if (values.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
     errors.email = "Enter a valid email address.";
@@ -143,6 +148,22 @@ export default function LeadForm({
             required
             value={values.source}
           />
+          <label className="sm:col-span-2">
+            <Select
+              error={errors.leadType}
+              id="lead-type"
+              label="Lead Type"
+              name="leadType"
+              onChange={onChange}
+              options={LEAD_TYPE_OPTIONS}
+              required
+              value={values.leadType}
+            />
+            <span className="mt-1 block text-xs font-semibold text-muted">
+              What kind of buyer this is. It decides which price they are quoted — a super stockist and a dealer
+              pay different rates for the same product.
+            </span>
+          </label>
         </div>
       </section>
 
