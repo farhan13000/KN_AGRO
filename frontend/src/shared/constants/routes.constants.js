@@ -22,6 +22,8 @@ export const ROUTES = Object.freeze({
   },
   SUPER_ADMIN: {
     DASHBOARD: "/super-admin/dashboard",
+    CHATS: "/super-admin/chats",
+    CHAT_THREAD: "/super-admin/chats/:conversationId",
     EMPLOYEES: "/super-admin/employees",
     EMPLOYEE_PENDING: "/super-admin/employees/pending",
     // Deliberately NOT nested under /super-admin/employees/... — it is a
@@ -108,6 +110,8 @@ export const ROUTES = Object.freeze({
   },
   SALES_MANAGER: {
     DASHBOARD: "/manager/dashboard",
+    CHATS: "/manager/chats",
+    CHAT_THREAD: "/manager/chats/:conversationId",
     TEAM: "/manager/team",
     TEAM_MEMBER_DETAIL: "/manager/team/:employeeId",
     LOCATIONS: "/manager/locations",
@@ -161,6 +165,8 @@ export const ROUTES = Object.freeze({
   },
   EMPLOYEE: {
     DASHBOARD: "/employee/dashboard",
+    CHATS: "/employee/chats",
+    CHAT_THREAD: "/employee/chats/:conversationId",
     PROFILE: "/employee/profile",
     PROFILE_EDIT: "/employee/profile/edit",
     LEADS: "/employee/leads",

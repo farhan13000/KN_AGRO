@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   Lightbulb,
   MapPin,
+  MessagesSquare,
   PhoneCall,
   Receipt,
   ShoppingCart,
@@ -24,6 +25,16 @@ export const salesManagerNavigation = [
     label: "Dashboard",
     route: ROUTES.SALES_MANAGER.DASHBOARD,
     icon: LayoutDashboard,
+  },
+  {
+    // Staff chat. Short messages only — there is a small daily allowance
+    // per chat, after which the screen hands you a call/WhatsApp button
+    // instead (see features/conversations).
+    label: "Chats",
+    route: ROUTES.SALES_MANAGER.CHATS,
+    icon: MessagesSquare,
+    permission: PERMISSIONS.MESSAGES_READ,
+    badgeKey: "messages",
   },
   {
     label: "My Team",

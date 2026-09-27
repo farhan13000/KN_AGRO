@@ -9,15 +9,16 @@ import {
   LayoutDashboard,
   Lightbulb,
   MapPin,
+  MessagesSquare,
   Package,
   PhoneCall,
   Receipt,
   ScrollText,
   ShoppingCart,
+  Target,
   UserCircle,
   Users,
   UsersRound,
-  Target,
   Wallet,
   Warehouse,
 } from "lucide-react";
@@ -32,6 +33,16 @@ export const superAdminNavigation = [
     label: "Dashboard",
     route: ROUTES.SUPER_ADMIN.DASHBOARD,
     icon: LayoutDashboard,
+  },
+  {
+    // Staff chat. Short messages only — there is a small daily allowance
+    // per chat, after which the screen hands you a call/WhatsApp button
+    // instead (see features/conversations).
+    label: "Chats",
+    route: ROUTES.SUPER_ADMIN.CHATS,
+    icon: MessagesSquare,
+    permission: PERMISSIONS.MESSAGES_READ,
+    badgeKey: "messages",
   },
   {
     label: "Employees",

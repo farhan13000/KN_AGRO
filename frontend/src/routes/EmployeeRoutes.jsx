@@ -39,6 +39,7 @@ const EmployeeDSRSubmitPage = lazy(() => import("../employee/pages/dsr/EmployeeD
 const EmployeeProductRecommendationsPage = lazy(
   () => import("../employee/pages/productRecommendations/EmployeeProductRecommendationsPage"),
 );
+const EmployeeChatsPage = lazy(() => import("../employee/pages/chats/EmployeeChatsPage"));
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const DSRPrintRouteView = lazy(() => import("../features/dsr/components/DSRPrintRouteView"));
@@ -183,6 +184,17 @@ export const employeeRouteConfig = {
         {
           path: ROUTES.EMPLOYEE.MY_PAYROLL,
           element: <Navigate replace to={`${ROUTES.EMPLOYEE.MY_WORKSPACE}?tab=payroll`} />,
+        },
+        {
+          path: ROUTES.EMPLOYEE.CHATS,
+          element: withPermission(PERMISSIONS.MESSAGES_READ, <EmployeeChatsPage />),
+        },
+        {
+          // Same screen, with one chat open — the conversation id
+          // lives in the URL so a chat can be linked to and Back
+          // behaves the way anyone would expect.
+          path: ROUTES.EMPLOYEE.CHAT_THREAD,
+          element: withPermission(PERMISSIONS.MESSAGES_READ, <EmployeeChatsPage />),
         },
         { path: "/employee/*", element: <InternalNotFoundPage /> },
       ],

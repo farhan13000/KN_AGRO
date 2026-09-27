@@ -173,6 +173,13 @@ export const PERMISSIONS = Object.freeze({
   // here since there is nothing for it to gate on the frontend.
   NOTIFICATIONS_READ: "notifications.read",
 
+  // Staff chat. MESSAGES_READ opens the Chats screen and the inbox;
+  // MESSAGES_SEND is what lets someone write, and is also what gates the
+  // people directory — "who may I write to" is a question only someone
+  // who may write at all has any business asking.
+  MESSAGES_READ: "messages.read",
+  MESSAGES_SEND: "messages.send",
+
   // Audit log (backend Phase 9, extended Phase 16; Phase F14 built the
   // first frontend consumer). Gates BOTH /audit routes (list + single
   // entry). Verified against seedRoles.js — held ONLY via the SA/legacy

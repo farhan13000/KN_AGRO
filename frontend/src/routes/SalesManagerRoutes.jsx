@@ -89,6 +89,7 @@ const SalesManagerDSRSubmitPage = lazy(() => import("../sales-manager/pages/dsr/
 const SalesManagerProductRecommendationsPage = lazy(
   () => import("../sales-manager/pages/productRecommendations/SalesManagerProductRecommendationsPage"),
 );
+const SalesManagerChatsPage = lazy(() => import("../sales-manager/pages/chats/SalesManagerChatsPage"));
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const DSRPrintRouteView = lazy(() => import("../features/dsr/components/DSRPrintRouteView"));
@@ -315,6 +316,17 @@ export const salesManagerRouteConfig = {
         {
           path: ROUTES.SALES_MANAGER.MY_PROFILE,
           element: <Navigate replace to={`${ROUTES.SALES_MANAGER.MY_WORKSPACE}?tab=profile`} />,
+        },
+        {
+          path: ROUTES.SALES_MANAGER.CHATS,
+          element: withPermission(PERMISSIONS.MESSAGES_READ, <SalesManagerChatsPage />),
+        },
+        {
+          // Same screen, with one chat open — the conversation id
+          // lives in the URL so a chat can be linked to and Back
+          // behaves the way anyone would expect.
+          path: ROUTES.SALES_MANAGER.CHAT_THREAD,
+          element: withPermission(PERMISSIONS.MESSAGES_READ, <SalesManagerChatsPage />),
         },
         { path: "/manager/*", element: <InternalNotFoundPage /> },
       ],

@@ -128,6 +128,7 @@ const SuperAdminAllReportRequestsPage = lazy(
   () => import("../super-admin/pages/reportRequests/SuperAdminAllReportRequestsPage"),
 );
 const SuperAdminPayrollPage = lazy(() => import("../super-admin/pages/payroll/SuperAdminPayrollPage"));
+const SuperAdminChatsPage = lazy(() => import("../super-admin/pages/chats/SuperAdminChatsPage"));
 const InternalNotFoundPage = lazy(() => import("./InternalNotFoundPage"));
 
 const DSRPrintRouteView = lazy(() => import("../features/dsr/components/DSRPrintRouteView"));
@@ -422,6 +423,17 @@ export const superAdminRouteConfig = {
         {
           path: ROUTES.SUPER_ADMIN.MY_PROFILE,
           element: <Navigate replace to={`${ROUTES.SUPER_ADMIN.MY_WORKSPACE}?tab=profile`} />,
+        },
+        {
+          path: ROUTES.SUPER_ADMIN.CHATS,
+          element: withPermission(PERMISSIONS.MESSAGES_READ, <SuperAdminChatsPage />),
+        },
+        {
+          // Same screen, with one chat open — the conversation id
+          // lives in the URL so a chat can be linked to and Back
+          // behaves the way anyone would expect.
+          path: ROUTES.SUPER_ADMIN.CHAT_THREAD,
+          element: withPermission(PERMISSIONS.MESSAGES_READ, <SuperAdminChatsPage />),
         },
         { path: "/super-admin/*", element: <InternalNotFoundPage /> },
       ],

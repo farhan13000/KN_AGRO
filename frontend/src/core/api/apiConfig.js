@@ -273,6 +273,15 @@ export const API_ENDPOINTS = Object.freeze({
     EMPLOYEE_DASHBOARD: "/analytics/employee/dashboard",
     SO_DASHBOARD: "/analytics/so/dashboard",
   },
+  CONVERSATIONS: {
+    BASE: "/conversations",
+    DIRECT: "/conversations/direct",
+    DIRECTORY: "/conversations/directory",
+    UNREAD_COUNT: "/conversations/unread-count",
+    DETAIL: (conversationId) => `/conversations/${conversationId}`,
+    READ: (conversationId) => `/conversations/${conversationId}/read`,
+    MESSAGES: (conversationId) => `/conversations/${conversationId}/messages`,
+  },
   NOTIFICATIONS: {
     BASE: "/notifications",
     UNREAD_COUNT: "/notifications/unread-count",

@@ -2,6 +2,7 @@ import {
   FileText,
   LayoutDashboard,
   Lightbulb,
+  MessagesSquare,
   PhoneCall,
   Receipt,
   ShoppingCart,
@@ -16,6 +17,16 @@ export const employeeNavigation = [
     label: "Dashboard",
     route: ROUTES.EMPLOYEE.DASHBOARD,
     icon: LayoutDashboard,
+  },
+  {
+    // Staff chat. Short messages only — there is a small daily allowance
+    // per chat, after which the screen hands you a call/WhatsApp button
+    // instead (see features/conversations).
+    label: "Chats",
+    route: ROUTES.EMPLOYEE.CHATS,
+    icon: MessagesSquare,
+    permission: PERMISSIONS.MESSAGES_READ,
+    badgeKey: "messages",
   },
   {
     // The lead list and the follow-up queue are the same records, so they
