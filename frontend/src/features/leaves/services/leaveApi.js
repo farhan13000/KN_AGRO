@@ -45,4 +45,14 @@ export const leaveApi = {
   async cancelLeave(leaveId, cancellationReason) {
     return post(API_ENDPOINTS.LEAVES.CANCEL(leaveId), { cancellationReason });
   },
+
+  // ADMIN OVERRIDE — `reason` is required by the backend on both of
+  // these, unlike managerComment on approve. See overrideLeaveSchema.
+  async overrideLeave(leaveId, { action, reason }) {
+    return post(API_ENDPOINTS.LEAVES.OVERRIDE(leaveId), { action, reason });
+  },
+
+  async amendLeave(leaveId, payload) {
+    return unwrapApiData(await apiClient.patch(API_ENDPOINTS.LEAVES.AMEND(leaveId), payload));
+  },
 };

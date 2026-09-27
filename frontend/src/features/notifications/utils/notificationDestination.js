@@ -7,15 +7,16 @@ import { getPortalRoutesForRole } from "../../../core/auth";
  * might exist). Each receives the current portal's ROUTES block and the
  * notification's `referenceId`, and returns a real route or null.
  *
- * Deliberately absent: VIEW_LEAVE_REQUEST, VIEW_REPORT_REQUEST,
- * VIEW_CONVERSATION. These actionKeys are real (the backend sets them),
- * but Frontend Phase F10 found that no Leave/ReportRequest/Messaging UI
- * exists anywhere in this frontend to link to. Per this codebase's own
- * rule (report a gap rather than fabricate a destination), these
- * notifications render with their icon/label/text but no click-through.
+ * Deliberately absent: VIEW_REPORT_REQUEST, VIEW_CONVERSATION. These
+ * actionKeys are real (the backend sets them), but Frontend Phase F10
+ * found that no ReportRequest/Messaging UI exists anywhere in this
+ * frontend to link to. Per this codebase's own rule (report a gap
+ * rather than fabricate a destination), these notifications render with
+ * their icon/label/text but no click-through.
  *
- * VIEW_PAYROLL was in that list until Phase F19 built the payroll UI —
- * it now resolves, closing one of the gaps F10 flagged.
+ * VIEW_PAYROLL and VIEW_LEAVE_REQUEST were both in that list until the
+ * payroll and leave screens were built — they now resolve, closing two
+ * of the gaps F10 flagged.
  */
 const ACTION_ROUTE_BUILDERS = Object.freeze({
   VIEW_LEAD: (routes, id) => (routes.LEAD_DETAIL && id ? routes.LEAD_DETAIL.replace(":leadId", id) : null),
@@ -26,6 +27,30 @@ const ACTION_ROUTE_BUILDERS = Object.freeze({
   // Payments have no per-record detail page in this frontend (list only)
   // — the list is still a real, useful destination.
   VIEW_PAYMENT: (routes) => routes.PAYMENTS || null,
+  /**
+   * Leave has no per-record page either, so this lands on the right
+   * LIST — and which list is right depends on why you were told.
+   *
+   * Being asked to decide someone's request (or watching them as the
+   * Office Admin) belongs on the team/company queue; hearing the
+   * outcome of your own belongs on your own leaves. The notification's
+   * TYPE is what separates those two, which is why this builder reads
+   * it — `notification` is passed to every builder and ignored by the
+   * ones that don't need it.
+   *
+   * LEAVE_OVERRIDDEN goes to both an employee and their manager, and
+   * nothing on the notification says which one is reading it, so it
+   * follows the "your own" branch. A manager who was told about their
+   * report's override lands one click away rather than exactly on it.
+   */
+  VIEW_LEAVE_REQUEST: (routes, id, notification) => {
+    const isApproverFacing =
+      notification?.type === "LEAVE_REQUESTED" || notification?.type === "LEAVE_REQUEST_MONITOR";
+
+    return isApproverFacing
+      ? routes.LEAVES_TEAM || routes.LEAVES || routes.LEAVES_ME || null
+      : routes.LEAVES_ME || routes.LEAVES || null;
+  },
   VIEW_INVENTORY: (routes, id) =>
     routes.INVENTORY_DETAIL && id ? routes.INVENTORY_DETAIL.replace(":productId", id) : null,
   VIEW_EMPLOYEE_APPLICATION: (routes, id) =>
@@ -96,5 +121,9 @@ export const resolveNotificationRoute = (notification, roleName) => {
   const buildRoute = ACTION_ROUTE_BUILDERS[notification.actionKey];
   if (!buildRoute) return null;
 
-  return buildRoute(portalRoutes, notification.referenceId) || null;
+  // The whole notification is passed as a third argument for the few
+  // builders whose destination depends on more than the reference id —
+  // VIEW_LEAVE_REQUEST needs the type to tell "decide this" from "here
+  // is your outcome". Every other builder ignores it.
+  return buildRoute(portalRoutes, notification.referenceId, notification) || null;
 };

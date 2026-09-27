@@ -14,12 +14,16 @@ import { getApiErrorMessage } from "../../core/api";
  * and two components asking for the same key share one request instead
  * of each firing their own.
  */
-export const useAsyncResource = (queryKey, request, { enabled = true } = {}) => {
+export const useAsyncResource = (queryKey, request, { enabled = true, refetchInterval } = {}) => {
   const query = useQuery({
     // Callers pass either an array key or a bare value; v5 requires an array.
     queryKey: Array.isArray(queryKey) ? queryKey : [queryKey],
     queryFn: request,
     enabled,
+    // Opt-in polling for the handful of resources that must stay live on
+    // their own (notification badges). Undefined for everyone else, which
+    // is exactly TanStack's default, so no existing caller changes.
+    refetchInterval,
   });
 
   return {

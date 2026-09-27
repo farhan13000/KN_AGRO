@@ -11,6 +11,16 @@ export const notificationApi = {
     return unwrapApiData(response);
   },
 
+  async getUnreadCounts() {
+    const response = await apiClient.get(API_ENDPOINTS.NOTIFICATIONS.UNREAD_COUNTS);
+    return unwrapApiData(response);
+  },
+
+  async markModuleNotificationsRead(module) {
+    const response = await apiClient.patch(API_ENDPOINTS.NOTIFICATIONS.READ_MODULE(module));
+    return unwrapApiData(response);
+  },
+
   async markNotificationRead(notificationId) {
     const response = await apiClient.patch(API_ENDPOINTS.NOTIFICATIONS.READ(notificationId));
     return unwrapApiData(response);

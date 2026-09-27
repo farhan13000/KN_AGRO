@@ -205,6 +205,10 @@ export const PERMISSIONS = Object.freeze({
   LEAVES_READ_TEAM: "leaves.read_team",
   LEAVES_APPROVE: "leaves.approve",
   LEAVES_READ_ALL: "leaves.read_all",
+  // Administrator override on someone else's leave — held only by the
+  // Office Admin and Super Admin. Deliberately NOT leaves.approve:
+  // those two are not normal approvers, they step in exceptionally.
+  LEAVES_MANAGE: "leaves.manage",
 
   // Report Requests — ask-then-answer, distinct from DSR (backend Phase
   // 12, verified; Phase F18 built the first frontend consumer).

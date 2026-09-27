@@ -1,3 +1,4 @@
+import DocumentLetterhead from "../../../shared/components/DocumentLetterhead";
 import PrintWatermark from "../../../shared/components/PrintWatermark";
 import { formatBusinessDateTime } from "../../../shared/utils";
 import QuotationAmountSummary from "./QuotationAmountSummary";
@@ -14,27 +15,16 @@ export default function QuotationPrintView({ quotation }) {
     <div className="relative mx-auto max-w-3xl bg-white p-4 text-ink sm:p-8 print:max-w-none print:p-0" data-print-sheet>
       <PrintWatermark />
       <div className="relative">
-      <div className="flex flex-wrap items-start justify-between gap-6 border-b-2 border-ink/80 pb-6">
-        <div>
-          <h1 className="text-2xl font-black">{quotation.company?.name || "KN Agro"}</h1>
-          {quotation.company?.address ? (
-            <p className="mt-1 max-w-xs whitespace-pre-line text-sm text-muted">{quotation.company.address}</p>
-          ) : null}
-          <p className="mt-1 text-sm text-muted">
-            {[quotation.company?.phone, quotation.company?.email].filter(Boolean).join(" · ")}
-          </p>
-          {quotation.company?.gstin ? <p className="mt-1 text-xs text-muted">GSTIN: {quotation.company.gstin}</p> : null}
-        </div>
-        <div className="text-right">
-          <h2 className="text-xl font-black uppercase tracking-wide">Quotation</h2>
-          <p className="mt-1 text-sm font-bold">{quotation.quotationNumber}</p>
-          <p className="mt-1 text-xs text-muted">Date: {formatBusinessDateTime(quotation.quotationDate)}</p>
-          <p className="mt-1 text-xs text-muted">Valid Until: {formatBusinessDateTime(quotation.validUntil)}</p>
-          <div className="mt-2 flex justify-end">
-            <QuotationStatusBadge status={quotation.status} />
-          </div>
-        </div>
-      </div>
+      <DocumentLetterhead
+        company={quotation.company}
+        documentNumber={quotation.quotationNumber}
+        meta={[
+          { label: "Date", value: formatBusinessDateTime(quotation.quotationDate) },
+          { label: "Valid Until", value: formatBusinessDateTime(quotation.validUntil) },
+        ]}
+        status={<QuotationStatusBadge status={quotation.status} />}
+        title="Quotation"
+      />
 
       <div className="mt-6">
         <p className="text-xs font-black uppercase tracking-[0.12em] text-muted">Customer</p>

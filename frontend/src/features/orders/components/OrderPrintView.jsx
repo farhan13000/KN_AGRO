@@ -1,3 +1,4 @@
+import DocumentLetterhead from "../../../shared/components/DocumentLetterhead";
 import PrintWatermark from "../../../shared/components/PrintWatermark";
 import { formatBusinessDateTime } from "../../../shared/utils";
 import { formatOrderAmount } from "../utils";
@@ -16,24 +17,18 @@ export default function OrderPrintView({ order }) {
     <div className="relative mx-auto max-w-3xl bg-white p-4 text-ink sm:p-8 print:max-w-none print:p-0" data-print-sheet>
       <PrintWatermark />
       <div className="relative">
-      <div className="flex flex-wrap items-start justify-between gap-6 border-b-2 border-ink/80 pb-6">
-        <div>
-          <h1 className="text-2xl font-black">KN Agro</h1>
-        </div>
-        <div className="text-right">
-          <h2 className="text-xl font-black uppercase tracking-wide">Order</h2>
-          <p className="mt-1 text-sm font-bold">{order.orderNumber}</p>
-          <p className="mt-1 text-xs text-muted">Date: {formatBusinessDateTime(order.createdAt)}</p>
-          {order.expectedDeliveryDate ? (
-            <p className="mt-1 text-xs text-muted">
-              Expected Delivery: {formatBusinessDateTime(order.expectedDeliveryDate)}
-            </p>
-          ) : null}
-          <div className="mt-2 flex justify-end">
-            <OrderStatusBadge status={order.orderStatus} />
-          </div>
-        </div>
-      </div>
+      <DocumentLetterhead
+        company={order.company}
+        documentNumber={order.orderNumber}
+        meta={[
+          { label: "Date", value: formatBusinessDateTime(order.createdAt) },
+          ...(order.expectedDeliveryDate
+            ? [{ label: "Expected Delivery", value: formatBusinessDateTime(order.expectedDeliveryDate) }]
+            : []),
+        ]}
+        status={<OrderStatusBadge status={order.orderStatus} />}
+        title="Order"
+      />
 
       <div className="mt-6">
         <p className="text-xs font-black uppercase tracking-[0.12em] text-muted">Customer</p>

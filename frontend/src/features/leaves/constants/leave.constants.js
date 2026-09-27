@@ -27,3 +27,23 @@ export const LEAVE_STATUS_LABELS = Object.freeze({
   [LEAVE_STATUS.REJECTED]: "Rejected",
   [LEAVE_STATUS.CANCELLED]: "Cancelled",
 });
+
+/**
+ * Administrator override actions — mirrors the backend's
+ * LEAVE_OVERRIDE_ACTION. AMEND changes the request's content rather
+ * than its status, but is grouped here because it is the same kind of
+ * exceptional act and carries the same mandatory reason.
+ */
+export const LEAVE_OVERRIDE_ACTION = Object.freeze({
+  APPROVE: "APPROVE",
+  REJECT: "REJECT",
+  CANCEL: "CANCEL",
+  AMEND: "AMEND",
+});
+
+export const LEAVE_OVERRIDE_ACTION_LABELS = Object.freeze({
+  [LEAVE_OVERRIDE_ACTION.APPROVE]: "Approve",
+  [LEAVE_OVERRIDE_ACTION.REJECT]: "Reject",
+  [LEAVE_OVERRIDE_ACTION.CANCEL]: "Cancel",
+  [LEAVE_OVERRIDE_ACTION.AMEND]: "Amend dates or type",
+});

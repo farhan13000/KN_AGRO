@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import EmptyState from "../../../shared/components/EmptyState";
 import ErrorState from "../../../shared/components/ErrorState";
@@ -6,7 +7,11 @@ import Pagination from "../../../shared/components/Pagination";
 import { LEAVE_STATUS, LEAVE_STATUS_LABELS } from "../constants";
 import { useAllLeaveList } from "../hooks";
 import LeaveCard from "./LeaveCard";
+import LeaveOverrideDialog from "./LeaveOverrideDialog";
+import Button from "../../../shared/components/Button";
 import { FilterPanel } from "../../../shared/components";
+import { useAuth } from "../../../core/auth";
+import { PERMISSIONS } from "../../../shared/constants";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
@@ -17,7 +22,12 @@ export default function AllLeavesListView({ description, portalLabel }) {
     limit: 20,
     status: getQueryValue(searchParams, "status") || undefined,
   };
-  const { errorMessage, isError, isLoading, leaves, pagination } = useAllLeaveList(query);
+  const { errorMessage, isError, isLoading, leaves, pagination, refetch } = useAllLeaveList(query);
+  const { hasPermission } = useAuth();
+  // leaves.manage is held only by the Office Admin and Super Admin — the
+  // two roles the override exists for. Everyone else never sees it.
+  const canOverride = hasPermission(PERMISSIONS.LEAVES_MANAGE);
+  const [overrideTarget, setOverrideTarget] = useState(null);
 
   const updateQuery = (updates) => {
     const next = new URLSearchParams(searchParams);
@@ -67,7 +77,18 @@ export default function AllLeavesListView({ description, portalLabel }) {
         <>
           <ul className="space-y-3">
             {leaves.map((leave) => (
-              <LeaveCard key={leave._id} leave={leave} showEmployee />
+              <LeaveCard
+                actions={
+                  canOverride && leave.status !== "CANCELLED" ? (
+                    <Button onClick={() => setOverrideTarget(leave)} type="button" variant="secondary">
+                      Administrator override
+                    </Button>
+                  ) : null
+                }
+                key={leave._id}
+                leave={leave}
+                showEmployee
+              />
             ))}
           </ul>
           <Pagination
@@ -77,6 +98,15 @@ export default function AllLeavesListView({ description, portalLabel }) {
             totalPages={pagination.pages || 1}
           />
         </>
+      ) : null}
+
+      {overrideTarget ? (
+        <LeaveOverrideDialog
+          isOpen
+          leave={overrideTarget}
+          onClose={() => setOverrideTarget(null)}
+          onSuccess={refetch}
+        />
       ) : null}
     </div>
   );

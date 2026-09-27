@@ -54,7 +54,7 @@ export default function DSRPrintView({ dsr }) {
           <h1 className="text-2xl font-bold text-[#1f3b8a]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
             K N Agro &amp; Bio Fertilizers Pvt. Ltd.
           </h1>
-          <p className="text-[13px] font-semibold text-slate-800">Dharavan, Inderagarh, Bundi, Rajashtan - 323613</p>
+          <p className="text-[13px] font-semibold text-slate-800">Dharavan, Inderagarh, Bundi, Rajasthan - 323613</p>
           <p className="mt-3 text-[15px] font-bold text-[#e0452b]">Daily Sales Report</p>
         </header>
 

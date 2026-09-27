@@ -1,3 +1,4 @@
+import DocumentLetterhead from "../../../shared/components/DocumentLetterhead";
 import PrintWatermark from "../../../shared/components/PrintWatermark";
 import { formatBusinessDateTime } from "../../../shared/utils";
 import InvoiceStatusBadge from "./InvoiceStatusBadge";
@@ -28,27 +29,16 @@ export default function InvoicePrintView({ invoice }) {
     <div className="relative mx-auto max-w-3xl bg-white p-4 text-ink sm:p-8 print:max-w-none print:p-0" data-print-sheet>
       <PrintWatermark />
       <div className="relative">
-      <div className="flex flex-wrap items-start justify-between gap-6 border-b-2 border-ink/80 pb-6">
-        <div>
-          <h1 className="text-2xl font-black">{invoice.company?.name || "KN Agro"}</h1>
-          {invoice.company?.address ? (
-            <p className="mt-1 max-w-xs whitespace-pre-line text-sm text-muted">{invoice.company.address}</p>
-          ) : null}
-          <p className="mt-1 text-sm text-muted">
-            {[invoice.company?.phone, invoice.company?.email].filter(Boolean).join(" · ")}
-          </p>
-          {invoice.company?.gstin ? <p className="mt-1 text-xs text-muted">GSTIN: {invoice.company.gstin}</p> : null}
-        </div>
-        <div className="text-right">
-          <h2 className="text-xl font-black uppercase tracking-wide">Invoice</h2>
-          <p className="mt-1 text-sm font-bold">{invoice.invoiceNumber}</p>
-          <p className="mt-1 text-xs text-muted">Date: {formatBusinessDateTime(invoice.invoiceDate)}</p>
-          <p className="mt-1 text-xs text-muted">Due: {formatBusinessDateTime(invoice.dueDate)}</p>
-          <div className="mt-2 flex justify-end">
-            <InvoiceStatusBadge status={invoice.status} />
-          </div>
-        </div>
-      </div>
+      <DocumentLetterhead
+        company={invoice.company}
+        documentNumber={invoice.invoiceNumber}
+        meta={[
+          { label: "Date", value: formatBusinessDateTime(invoice.invoiceDate) },
+          { label: "Due", value: formatBusinessDateTime(invoice.dueDate) },
+        ]}
+        status={<InvoiceStatusBadge status={invoice.status} />}
+        title="Invoice"
+      />
 
       <div className="mt-6 grid gap-6 sm:grid-cols-2">
         <div>

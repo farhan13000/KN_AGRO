@@ -1,17 +1,95 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, Download, KeyRound, LogOut, Menu, PanelLeftClose, UserCircle, X } from "lucide-react";
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/KN_AGRO_LOGO.png";
 import { useAuth } from "../../core/auth";
 import Avatar from "../components/Avatar";
 import BackButton from "../components/BackButton";
-import { NotificationBell } from "../../features/notifications";
+import { NotificationBell, useNotificationBadges } from "../../features/notifications";
 import { PERMISSIONS, ROLE_LABELS, ROUTES, normalizeRoleName } from "../constants";
 import InstallInstructionsDialog from "../components/InstallInstructionsDialog";
 import { useInstallPrompt } from "../hooks";
 
+/**
+ * A dot, never a number.
+ *
+ * A number claims something exact — "there are 5 things waiting" — and
+ * that claim is only as good as what it counts. This counts unread
+ * notifications, which stop being unread the moment someone opens the
+ * screen, whether or not the work behind them got done. So the number
+ * could read 0 with five approvals still pending, and a badge that
+ * can be wrong that way is worse than no badge.
+ *
+ * A dot only claims "something new is here", which opening the screen
+ * genuinely does settle. It does the job the sidebar badge exists for
+ * — pointing you at the right screen — and makes no promise it cannot
+ * keep. If an exact count is ever wanted, it has to come from the work
+ * itself (pending leaves, pending approvals), not from notifications.
+ */
+function NavBadge({ collapsed, count }) {
+  if (!count) return null;
+
+  return (
+    <span
+      aria-hidden="true"
+      className={`shrink-0 rounded-full bg-red-600 ${
+        collapsed ? "absolute right-2 top-2 h-2.5 w-2.5 ring-2 ring-white" : "ml-auto h-2.5 w-2.5"
+      }`}
+    />
+  );
+}
+
+/**
+ * A badge clears when the person reaches the screen the work is on —
+ * never when they merely open the bell. Seeing that something exists is
+ * not dealing with it, and a badge that disappears on a glance teaches
+ * people within a week that badges mean nothing.
+ *
+ * Only the module whose screen is open is touched; every other badge
+ * survives until its own screen is visited. Keyed off the `count` value
+ * (a number, not the object it came from) so this settles after one
+ * pass instead of re-firing on every poll.
+ */
+function useMarkModuleReadOnVisit(items) {
+  const { pathname } = useLocation();
+  const { byModule, markModuleRead } = useNotificationBadges();
+
+  const modules = useMemo(() => {
+    const matches = items
+      .filter((item) => item.badgeKey && (pathname === item.route || pathname.startsWith(`${item.route}/`)))
+      // Longest route wins, so a nested screen doesn't clear its parent's
+      // badge by accident.
+      .sort((a, b) => b.route.length - a.route.length);
+    const key = matches[0]?.badgeKey;
+    if (!key) return [];
+    return Array.isArray(key) ? key : [key];
+  }, [items, pathname]);
+
+  const count = modules.reduce((sum, module) => sum + (byModule[module] ?? 0), 0);
+  // A stable primitive to depend on: the array is rebuilt every render,
+  // so depending on it directly would re-run this on every poll.
+  const moduleKey = modules.join(",");
+
+  useEffect(() => {
+    if (!moduleKey || count === 0) return;
+
+    for (const module of moduleKey.split(",")) {
+      if (!byModule[module]) continue;
+      markModuleRead(module).catch(() => {
+        // Clearing a badge is housekeeping — if it fails the count simply
+        // stays up and the next visit tries again. Never surface this.
+      });
+    }
+    // `byModule` is read inside but deliberately not a dependency: it is a
+    // fresh object on every poll, and `count` already captures the only
+    // change that should re-run this.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [moduleKey, count, markModuleRead]);
+}
+
 function NavigationItems({ collapsed = false, items, onNavigate }) {
   const { hasPermission, role } = useAuth();
+  const { countFor } = useNotificationBadges();
   const normalizedRole = normalizeRoleName(role);
   // `permission` answers "may this account do it at all"; the optional
   // `roles` narrows an entry further, for the few screens that a
@@ -32,21 +110,28 @@ function NavigationItems({ collapsed = false, items, onNavigate }) {
     <nav className="space-y-1" aria-label="Portal navigation">
       {visibleItems.map((item) => {
         const Icon = item.icon;
+        const count = countFor(item.badgeKey);
+        // The accessible name says exactly what the dot says — no more.
+        // Announcing "3 waiting" to a screen reader would reintroduce
+        // the same unreliable number the dot exists to avoid.
+        const label = count ? `${item.label}, has new activity` : item.label;
 
         return (
           <NavLink
+            aria-label={count ? label : undefined}
             className={({ isActive }) =>
-              `flex min-h-11 items-center gap-3 rounded-xl px-3 py-2 text-sm font-bold transition ${
+              `relative flex min-h-11 items-center gap-3 rounded-xl px-3 py-2 text-sm font-bold transition ${
                 isActive ? "bg-forest text-white shadow-soft" : "text-muted hover:bg-mint hover:text-forest"
               }`
             }
             key={item.route}
             onClick={onNavigate}
             to={item.route}
-            title={collapsed ? item.label : undefined}
+            title={collapsed ? label : undefined}
           >
             {Icon ? <Icon className="h-5 w-5 shrink-0" /> : null}
-            <span className={collapsed ? "sr-only" : ""}>{item.label}</span>
+            <span className={collapsed ? "sr-only" : "truncate"}>{item.label}</span>
+            <NavBadge collapsed={collapsed} count={count} />
           </NavLink>
         );
       })}
@@ -137,6 +222,7 @@ export default function InternalAppLayout({ navigationItems, portalLabel }) {
   };
   // The screens the sidebar reaches directly: Back hides itself on these.
   const rootPaths = useMemo(() => navigationItems.map((item) => item.route), [navigationItems]);
+  useMarkModuleReadOnVisit(navigationItems);
   const desktopSidebarClass = desktopCollapsed ? "lg:w-24" : "lg:w-72";
   const desktopContentClass = desktopCollapsed ? "lg:pl-24" : "lg:pl-72";
 

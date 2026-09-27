@@ -276,7 +276,9 @@ export const API_ENDPOINTS = Object.freeze({
   NOTIFICATIONS: {
     BASE: "/notifications",
     UNREAD_COUNT: "/notifications/unread-count",
+    UNREAD_COUNTS: "/notifications/unread-counts",
     READ_ALL: "/notifications/read-all",
+    READ_MODULE: (module) => `/notifications/read-module/${module}`,
     READ: (notificationId) => `/notifications/${notificationId}/read`,
     ARCHIVE: (notificationId) => `/notifications/${notificationId}/archive`,
   },
@@ -304,6 +306,11 @@ export const API_ENDPOINTS = Object.freeze({
     APPROVE: (leaveId) => `/leaves/${leaveId}/approve`,
     REJECT: (leaveId) => `/leaves/${leaveId}/reject`,
     CANCEL: (leaveId) => `/leaves/${leaveId}/cancel`,
+    // Administrator-only, gated on leaves.manage (Office Admin / Super
+    // Admin). Separate from APPROVE/REJECT above because these bypass
+    // the employee's manager and require a recorded reason.
+    OVERRIDE: (leaveId) => `/leaves/${leaveId}/override`,
+    AMEND: (leaveId) => `/leaves/${leaveId}/amend`,
   },
   // Mounted at /reports in the backend's routes/index.js — the module is
   // named `reportRequests`, the path is not.

@@ -30,4 +30,6 @@ export const useLeaveActions = ({ onSuccess } = {}) => ({
   approveLeave: useAsyncMutation((leaveId, comment) => leaveApi.approveLeave(leaveId, comment), { onSuccess }),
   rejectLeave: useAsyncMutation((leaveId, comment) => leaveApi.rejectLeave(leaveId, comment), { onSuccess }),
   cancelLeave: useAsyncMutation((leaveId, reason) => leaveApi.cancelLeave(leaveId, reason), { onSuccess }),
+  overrideLeave: useAsyncMutation((leaveId, payload) => leaveApi.overrideLeave(leaveId, payload), { onSuccess }),
+  amendLeave: useAsyncMutation((leaveId, payload) => leaveApi.amendLeave(leaveId, payload), { onSuccess }),
 });
