@@ -52,6 +52,10 @@ export const superAdminNavigation = [
     label: "Approvals",
     route: ROUTES.SUPER_ADMIN.APPROVALS,
     icon: ClipboardCheck,
+    // `badgeKey` names the notification module this screen answers (see
+    // the backend's notification.modules.js). Only screens where
+    // something can actually WAIT on the user carry one.
+    badgeKey: "approvals",
   },
   {
     label: "Hierarchy",
@@ -76,6 +80,7 @@ export const superAdminNavigation = [
     label: "Inventory",
     route: ROUTES.SUPER_ADMIN.STOCK,
     icon: Warehouse,
+    badgeKey: "inventory",
   },
   {
     // Lead list + pipeline board + follow-ups: one subject, three readings.
@@ -83,18 +88,21 @@ export const superAdminNavigation = [
     route: ROUTES.SUPER_ADMIN.LEADS,
     icon: PhoneCall,
     permission: PERMISSIONS.LEADS_READ,
+    badgeKey: "leads",
   },
   {
     label: "Quotations",
     route: ROUTES.SUPER_ADMIN.QUOTATIONS,
     icon: FileText,
     permission: PERMISSIONS.QUOTATIONS_READ,
+    badgeKey: "quotations",
   },
   {
     label: "DSRs",
     route: ROUTES.SUPER_ADMIN.DSR,
     icon: ClipboardList,
     permission: PERMISSIONS.DSR_READ_ALL,
+    badgeKey: "dsr",
   },
   {
     // The Office Admin files a DSR of their own, which goes to the Super
@@ -134,6 +142,7 @@ export const superAdminNavigation = [
     label: "Billing",
     route: ROUTES.SUPER_ADMIN.BILLING,
     icon: Receipt,
+    badgeKey: "billing",
   },
   {
     label: "Audit Log",
@@ -146,6 +155,7 @@ export const superAdminNavigation = [
     route: ROUTES.SUPER_ADMIN.ATTENDANCE,
     icon: Clock,
     permission: PERMISSIONS.ATTENDANCE_READ_ALL,
+    badgeKey: "attendance",
   },
   {
     // The Office Admin marks their own attendance; the Super Admin is who
@@ -161,12 +171,14 @@ export const superAdminNavigation = [
     route: ROUTES.SUPER_ADMIN.LEAVES,
     icon: CalendarRange,
     permission: PERMISSIONS.LEAVES_READ_ALL,
+    badgeKey: "leaves",
   },
   {
     label: "Report Requests",
     route: ROUTES.SUPER_ADMIN.REPORT_REQUESTS,
     icon: FileQuestion,
     permission: PERMISSIONS.REPORTS_MANAGE,
+    badgeKey: "reports",
   },
   {
     label: "Payroll Runs",

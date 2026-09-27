@@ -44,6 +44,13 @@ export default function LeaveCard({ actions = null, leave, showEmployee = false 
         </p>
       ) : null}
 
+      {leave.overrideReason ? (
+        <p className="mt-2 rounded-lg bg-red-50 p-2 text-sm text-red-800 ring-1 ring-red-200">
+          <span className="text-xs font-black uppercase tracking-wide">Administrator override</span>{" "}
+          {leave.overrideReason}
+        </p>
+      ) : null}
+
       {actions ? <div className="mt-4 flex flex-wrap gap-3">{actions}</div> : null}
     </li>
   );

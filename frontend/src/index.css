@@ -72,6 +72,25 @@ select:focus-visible {
   }
 }
 
+/**
+ * Leaflet ships its own stacking order — panes at z-index 400, controls
+ * at 800, and the control corners at 1000 — all assigned globally. Those
+ * numbers are meant to order the map's parts against EACH OTHER, but
+ * being global they also outrank the app's own chrome: the mobile
+ * navigation drawer sits at z-50, so on the Locations screen the map and
+ * its zoom buttons painted straight through the open drawer.
+ *
+ * Isolating the map container gives it its own stacking context, so
+ * every one of those numbers is resolved INSIDE the map and none of them
+ * can compete with anything outside it. This is deliberately preferred
+ * over raising the drawer above 1000: that would only move the fight one
+ * rung up, and the next library with an opinion about z-index would win
+ * again.
+ */
+.leaflet-container {
+  isolation: isolate;
+}
+
 @layer components {
   /**
    * A PRINTED DOCUMENT shown on a screen — an invoice, a quotation, an

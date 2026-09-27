@@ -42,6 +42,9 @@ export const salesManagerNavigation = [
     label: "Approvals",
     route: ROUTES.SALES_MANAGER.APPROVALS,
     icon: ClipboardCheck,
+    // `badgeKey` names the notification module whose outstanding work
+    // this screen answers (see the backend's notification.modules.js).
+    badgeKey: "approvals",
   },
   {
     // Lead list + pipeline board + follow-ups.
@@ -49,18 +52,21 @@ export const salesManagerNavigation = [
     route: ROUTES.SALES_MANAGER.LEADS,
     icon: PhoneCall,
     permission: PERMISSIONS.LEADS_READ,
+    badgeKey: "leads",
   },
   {
     label: "Quotations",
     route: ROUTES.SALES_MANAGER.QUOTATIONS,
     icon: FileText,
     permission: PERMISSIONS.QUOTATIONS_READ,
+    badgeKey: "quotations",
   },
   {
     // Mine + my team.
     label: "DSRs",
     route: ROUTES.SALES_MANAGER.DSRS,
     icon: ClipboardList,
+    badgeKey: "dsr",
   },
   {
     label: "Product Recommendations",
@@ -85,21 +91,25 @@ export const salesManagerNavigation = [
     label: "Billing",
     route: ROUTES.SALES_MANAGER.BILLING,
     icon: Receipt,
+    badgeKey: "billing",
   },
   {
     label: "Attendance",
     route: ROUTES.SALES_MANAGER.ATTENDANCE,
     icon: Clock,
+    badgeKey: "attendance",
   },
   {
     label: "Leaves",
     route: ROUTES.SALES_MANAGER.LEAVES,
     icon: CalendarRange,
+    badgeKey: "leaves",
   },
   {
     label: "Reports",
     route: ROUTES.SALES_MANAGER.REPORTS,
     icon: ClipboardSignature,
+    badgeKey: "reports",
   },
   {
     // Your own profile and payslips — the two "My ..." entries, merged.

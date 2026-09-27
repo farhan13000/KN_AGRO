@@ -24,6 +24,9 @@ export const employeeNavigation = [
     route: ROUTES.EMPLOYEE.LEADS,
     icon: PhoneCall,
     permission: PERMISSIONS.LEADS_READ,
+    // `badgeKey` names the notification module whose outstanding work
+    // this screen answers (see the backend's notification.modules.js).
+    badgeKey: "leads",
   },
   {
     // Anyone reporting to you. At the bottom of the chain this is empty
@@ -44,6 +47,7 @@ export const employeeNavigation = [
     route: ROUTES.EMPLOYEE.QUOTATIONS,
     icon: FileText,
     permission: PERMISSIONS.QUOTATIONS_READ,
+    badgeKey: "quotations",
   },
   // Prompt 59: Employee genuinely holds customers/orders/invoices/payments
   // .read (verified against seedRoles.js) — read-only, no create/mutate
@@ -68,6 +72,7 @@ export const employeeNavigation = [
     label: "Billing",
     route: ROUTES.EMPLOYEE.BILLING,
     icon: Receipt,
+    badgeKey: "billing",
   },
   {
     // Profile, attendance, DSRs, leave, reports and payslips: everything
@@ -75,5 +80,8 @@ export const employeeNavigation = [
     label: "My Workspace",
     route: ROUTES.EMPLOYEE.MY_WORKSPACE,
     icon: UserCircle,
+    // One entry standing in for four screens, so its badge speaks for
+    // all of them.
+    badgeKey: ["dsr", "reports", "leaves", "attendance"],
   },
 ];
