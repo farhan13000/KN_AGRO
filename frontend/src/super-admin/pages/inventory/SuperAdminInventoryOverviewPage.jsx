@@ -18,10 +18,28 @@ import {
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
+/**
+ * Field names here must match InventoryService.getSummary exactly.
+ *
+ * They did not. Three of these read `lowStockItems`, `outOfStockItems`
+ * and a `totalAvailableStock` the server never sent, so `?? 0` quietly
+ * turned every missing field into a confident zero — the page showed
+ * "Out Of Stock 0" above a table of nothing but out-of-stock rows, with
+ * no error anywhere to suggest the number was made up. Only "Tracked
+ * Items" survived, and only because it happened to carry a fallback to
+ * the real field name.
+ *
+ * The `?? 0` guards stay so a summary that fails to load renders zeros
+ * instead of "undefined", but the names below are now the server's own.
+ * If you add a card, copy the key from getSummary rather than guessing
+ * it — a wrong key here fails silently, which is how this survived.
+ */
 const getSummaryCards = (summary = {}) => [
-  { label: "Tracked Items", value: summary.totalItems ?? summary.totalProducts ?? 0 },
-  { label: "Low Stock", value: summary.lowStockItems ?? 0 },
-  { label: "Out Of Stock", value: summary.outOfStockItems ?? 0 },
+  { label: "Tracked Items", value: summary.totalProducts ?? 0 },
+  { label: "Low Stock", value: summary.lowStockProducts ?? 0 },
+  { label: "Out Of Stock", value: summary.outOfStockProducts ?? 0 },
+  // Sellable units, not total units on hand — the two differ the moment
+  // anything is reserved against a pending order.
   { label: "Available Units", value: summary.totalAvailableStock ?? 0 },
 ];
 
