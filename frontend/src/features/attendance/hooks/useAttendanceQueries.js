@@ -40,6 +40,42 @@ export const useAllAttendanceList = (query = {}, options) => {
   return { ...state, records: state.data?.attendance || [], pagination: state.data?.pagination || {} };
 };
 
+/**
+ * The daily report. Polls every two minutes: this screen is left open on
+ * a desk all morning while people check in, and a list that silently goes
+ * stale is worse than no list. Two minutes is slow enough to cost
+ * nothing and fast enough that the counts can be trusted at a glance.
+ */
+export const useAttendanceDailyReport = (date, options) => {
+  const request = useCallback(() => attendanceApi.getDailyReport(date), [date]);
+  const state = useAsyncResource(["attendance", "daily-report", date || "today"], request, {
+    refetchInterval: 120000,
+    ...options,
+  });
+
+  return {
+    ...state,
+    report: state.data || null,
+    checkedIn: state.data?.checkedIn || [],
+    notCheckedIn: state.data?.notCheckedIn || [],
+    summary: state.data?.summary || null,
+  };
+};
+
+export const useEmployeeMonthlyAttendance = (employeeId, month, year, options) => {
+  const request = useCallback(
+    () => attendanceApi.getEmployeeMonthly(employeeId, month, year),
+    [employeeId, month, year],
+  );
+  const state = useAsyncResource(
+    ["attendance", "employee-monthly", employeeId, month, year],
+    request,
+    { enabled: Boolean(employeeId), ...options },
+  );
+
+  return { ...state, report: state.data || null, days: state.data?.days || [] };
+};
+
 export const useAttendanceActions = ({ onSuccess } = {}) => ({
   checkIn: useAsyncMutation(attendanceApi.checkIn, { onSuccess }),
   checkOut: useAsyncMutation(attendanceApi.checkOut, { onSuccess }),

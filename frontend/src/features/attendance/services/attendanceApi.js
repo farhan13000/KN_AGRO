@@ -54,6 +54,22 @@ export const attendanceApi = {
     return unwrapApiData(response);
   },
 
+  /** One day, everyone in scope: who checked in and who has not. */
+  async getDailyReport(date) {
+    const response = await apiClient.get(API_ENDPOINTS.ATTENDANCE.DAILY_REPORT, {
+      params: cleanQuery({ date }),
+    });
+    return unwrapApiData(response);
+  },
+
+  /** One employee's whole month, every day of it, for the calendar. */
+  async getEmployeeMonthly(employeeId, month, year) {
+    const response = await apiClient.get(API_ENDPOINTS.ATTENDANCE.EMPLOYEE_MONTHLY(employeeId), {
+      params: { month, year },
+    });
+    return unwrapApiData(response);
+  },
+
   async listAll(query) {
     const response = await apiClient.get(API_ENDPOINTS.ATTENDANCE.BASE, { params: cleanQuery(query) });
     return unwrapApiData(response);

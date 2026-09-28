@@ -1,3 +1,4 @@
+import { AttendanceDailyReportView } from "../../../features/attendance";
 import { PERMISSIONS } from "../../../shared/constants";
 import TabbedWorkspace from "../../../shared/components/TabbedWorkspace";
 import SalesManagerMyAttendancePage from "./SalesManagerMyAttendancePage";
@@ -10,6 +11,13 @@ const TABS = [
     permission: PERMISSIONS.ATTENDANCE_READ_SELF,
     blurb: "Check in/out and view your own attendance history.",
     render: () => <SalesManagerMyAttendancePage showHeading={false} />,
+  },
+  {
+    id: "daily",
+    label: "Daily report",
+    permission: PERMISSIONS.ATTENDANCE_READ_TEAM,
+    blurb: "Your whole downline for one day — who has checked in and who has not. Open anybody's month from their row.",
+    render: () => <AttendanceDailyReportView />,
   },
   {
     id: "team",

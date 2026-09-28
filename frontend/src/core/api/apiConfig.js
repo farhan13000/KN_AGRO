@@ -303,6 +303,8 @@ export const API_ENDPOINTS = Object.freeze({
     ME: "/attendance/me",
     TEAM_SUMMARY: "/attendance/team/summary",
     TEAM: "/attendance/team",
+    DAILY_REPORT: "/attendance/daily-report",
+    EMPLOYEE_MONTHLY: (employeeId) => `/attendance/employee/${employeeId}/monthly`,
     CORRECT: (attendanceId) => `/attendance/${attendanceId}/correct`,
     REVIEW_REQUEST: (attendanceId) => `/attendance/${attendanceId}/review-request`,
     REVIEW: (attendanceId) => `/attendance/${attendanceId}/review`,

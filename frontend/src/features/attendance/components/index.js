@@ -1,5 +1,7 @@
 export { default as AllAttendanceListView } from "./AllAttendanceListView";
 export { default as AttendanceCalendar } from "./AttendanceCalendar";
+export { default as AttendanceDailyReportView } from "./AttendanceDailyReportView";
+export { default as EmployeeMonthlyAttendanceDialog } from "./EmployeeMonthlyAttendanceDialog";
 export { default as EmployeeAttendanceCalendarSection } from "./EmployeeAttendanceCalendarSection";
 export { default as MyAttendanceCalendarSection } from "./MyAttendanceCalendarSection";
 export { default as AttendanceMarkDialog } from "./AttendanceMarkDialog";

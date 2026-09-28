@@ -14,7 +14,7 @@ import { FilterPanel } from "../../../shared/components";
 
 const getQueryValue = (searchParams, key, fallback = "") => searchParams.get(key) || fallback;
 
-export default function AllAttendanceListView({ description, portalLabel }) {
+export default function AllAttendanceListView({ description }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const { hasPermission } = useAuth();
   const canCorrect = hasPermission(PERMISSIONS.ATTENDANCE_CORRECT);
@@ -39,11 +39,7 @@ export default function AllAttendanceListView({ description, portalLabel }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-agriculture">{portalLabel}</p>
-        <h1 className="mt-2 text-3xl font-black text-ink">Company-Wide Attendance</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
-      </div>
+      {description ? <p className="max-w-2xl text-sm leading-6 text-muted">{description}</p> : null}
 
       <FilterPanel>
         <div className="grid gap-3 sm:grid-cols-2">
