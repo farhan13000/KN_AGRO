@@ -147,6 +147,12 @@ function LocationStatus({ state, onRetry }) {
  * every 30 seconds while open, so a dialog left open across 9:30 updates.
  */
 export default function AttendanceMarkDialog({
+  // This morning's check-in instant — only used on check-out, to say how
+  // long the day has run and whether it is about to count as a half one.
+  checkIn = null,
+  // { required, submitted } for today's DSR — only consulted on check-out,
+  // where a missing report is the one thing that can stop it.
+  dsr = null,
   isOpen,
   minMeterReading = null,
   mode = "in",
@@ -203,7 +209,7 @@ export default function AttendanceMarkDialog({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
-  const timing = isCheckOut ? describeCheckOut(now, policy) : describeCheckIn(now, policy);
+  const timing = isCheckOut ? describeCheckOut(now, policy, dsr, checkIn) : describeCheckIn(now, policy);
 
   const readingNumber = meterReading === "" ? null : Number(meterReading);
   const readingProblem = !requireMeter

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { LogIn, LogOut, MessageCircle } from "lucide-react";
+import { ClipboardList, LogIn, LogOut, MessageCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 import Card from "../../../shared/components/Card";
 import { useAttendanceActions, useMyAttendanceToday } from "../hooks";
 import {
@@ -11,7 +12,7 @@ import {
 } from "../utils/attendancePolicy";
 import AttendanceDayDetails from "./AttendanceDayDetails";
 import AttendanceMarkDialog from "./AttendanceMarkDialog";
-import { useAuth } from "../../../core/auth";
+import { getPortalRoutesForRole, useAuth } from "../../../core/auth";
 import { requiresMeterReading } from "../utils/attendanceRoles";
 import { AttendanceReviewRequestDialog } from "./AttendanceReviewDialogs";
 
@@ -32,7 +33,8 @@ export default function AttendanceTodayWidget() {
   const [now, setNow] = useState(() => new Date());
   const actions = useAttendanceActions({ onSuccess: () => todayState.refetch() });
 
-  // Keep the warning line honest if the card is left open across 9:30 or 6:00.
+  // Keep the line honest if the card is left open — across 9:30 in the
+  // morning, and across the moment the day reaches nine hours.
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 60000);
     return () => clearInterval(timer);
@@ -43,10 +45,18 @@ export default function AttendanceTodayWidget() {
   const hasCheckedIn = Boolean(today?.checkIn);
   const hasCheckedOut = Boolean(today?.checkOut);
 
+  // The one thing that can now block a check-out. The server refuses it
+  // either way; knowing here means the button can say so, instead of
+  // sending someone off to take two photos for a request that was always
+  // going to be turned down.
+  const dsr = today?.dsr || null;
+  const dsrBlocking = Boolean(hasCheckedIn && !hasCheckedOut && dsr?.required && !dsr.submitted);
+  const dsrSubmitPath = getPortalRoutesForRole(role)?.DSR_SUBMIT || null;
+
   const liveHint = !hasCheckedIn
     ? describeCheckIn(now, policy)
     : !hasCheckedOut
-      ? describeCheckOut(now, policy)
+      ? describeCheckOut(now, policy, dsr, today?.checkIn)
       : null;
 
   // The dialog owns the photos and surfaces its own errors, so a failure
@@ -78,8 +88,10 @@ export default function AttendanceTodayWidget() {
           </button>
           <button
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-bold text-forest ring-1 ring-forest/15 transition hover:bg-mint disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={!hasCheckedIn || hasCheckedOut || actions.checkOut.isLoading}
+            data-check-out
+            disabled={!hasCheckedIn || hasCheckedOut || dsrBlocking || actions.checkOut.isLoading}
             onClick={() => setMarking("out")}
+            title={dsrBlocking ? "Submit today's DSR first" : undefined}
             type="button"
           >
             <LogOut className="h-4 w-4" />
@@ -92,6 +104,19 @@ export default function AttendanceTodayWidget() {
         <p className={`mt-4 rounded-lg border px-3 py-2 text-sm font-semibold ${TONE_CLASSES[liveHint.tone]}`}>
           {liveHint.message}
         </p>
+      ) : null}
+
+      {/* A disabled button with no way forward is a dead end, so the way
+          forward sits right beside it. */}
+      {dsrBlocking && dsrSubmitPath ? (
+        <Link
+          className="mt-3 inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-mustard px-5 py-2.5 text-sm font-bold text-ink transition hover:bg-[#f1b842]"
+          data-submit-dsr
+          to={dsrSubmitPath}
+        >
+          <ClipboardList className="h-4 w-4" />
+          Submit today&apos;s DSR
+        </Link>
       ) : null}
 
       {today?.marked ? (
@@ -115,6 +140,8 @@ export default function AttendanceTodayWidget() {
       ) : null}
 
       <AttendanceMarkDialog
+        checkIn={today?.checkIn || null}
+        dsr={dsr}
         isOpen={Boolean(marking)}
         minMeterReading={marking === "out" ? today?.checkInMeterReading ?? null : null}
         requireMeter={requiresMeterReading(role)}
