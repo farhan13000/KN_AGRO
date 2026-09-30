@@ -1,3 +1,4 @@
+import { PushSettingsCard } from "../../../features/push";
 import { PERMISSIONS } from "../../../shared/constants";
 import TabbedWorkspace from "../../../shared/components/TabbedWorkspace";
 import SuperAdminMyProfilePage from "../profile/SuperAdminMyProfilePage";
@@ -23,12 +24,18 @@ const TABS = [
     blurb: "Your own payslips, newest first.",
     render: () => <SuperAdminMyPayrollPage showHeading={false} />,
   },
+  {
+    id: "notifications",
+    label: "Notifications",
+    blurb: "Get told on your phone when something needs you.",
+    render: () => <PushSettingsCard />,
+  },
 ];
 
 export default function SuperAdminMyWorkspacePage() {
   return (
     <TabbedWorkspace
-      description="Your profile and your payslips."
+      description="Your profile, your payslips and your notification settings."
       emptyDescription="You do not have permission to view your own records."
       emptyTitle="Nothing here"
       eyebrow="My Workspace"

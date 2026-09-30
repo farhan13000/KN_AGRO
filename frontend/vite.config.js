@@ -40,6 +40,12 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,svg,png,ico,woff2}"],
         navigateFallbackDenylist: [/^\/api\//],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+        // The push listeners, added to the generated worker instead of
+        // replacing it. Switching to injectManifest would hand us the
+        // precaching and update logic above to maintain by hand; this
+        // adds two event listeners and leaves all of that alone. See
+        // public/push-sw.js.
+        importScripts: ["push-sw.js"],
       },
       devOptions: {
         // ON in dev, because with it off the dev server never injects the

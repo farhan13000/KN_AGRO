@@ -282,6 +282,14 @@ export const API_ENDPOINTS = Object.freeze({
     READ: (conversationId) => `/conversations/${conversationId}/read`,
     MESSAGES: (conversationId) => `/conversations/${conversationId}/messages`,
   },
+  PUSH: {
+    PUBLIC_KEY: "/push/public-key",
+    SUBSCRIBE: "/push/subscribe",
+    UNSUBSCRIBE: "/push/unsubscribe",
+    PREFERENCES: "/push/preferences",
+    DEVICES: "/push/devices",
+    TEST: "/push/test",
+  },
   NOTIFICATIONS: {
     BASE: "/notifications",
     UNREAD_COUNT: "/notifications/unread-count",

@@ -1,3 +1,4 @@
+import { PushSettingsCard } from "../../../features/push";
 import { PERMISSIONS } from "../../../shared/constants";
 import TabbedWorkspace from "../../../shared/components/TabbedWorkspace";
 import EmployeeProfilePage from "../profile/EmployeeProfilePage";
@@ -56,6 +57,12 @@ const TABS = [
     permission: PERMISSIONS.PAYROLL_READ_SELF,
     blurb: "Your own payslips, newest first.",
     render: () => <EmployeeMyPayrollPage showHeading={false} />,
+  },
+  {
+    id: "notifications",
+    label: "Notifications",
+    blurb: "Get told on your phone when something needs you.",
+    render: () => <PushSettingsCard />,
   },
 ];
 

@@ -6,6 +6,7 @@ import { useAuth } from "../../core/auth";
 import Avatar from "../components/Avatar";
 import BackButton from "../components/BackButton";
 import { NotificationBell, useNotificationBadges } from "../../features/notifications";
+import { PushClickRouter } from "../../features/push";
 import { PERMISSIONS, ROLE_LABELS, ROUTES, normalizeRoleName } from "../constants";
 import InstallInstructionsDialog from "../components/InstallInstructionsDialog";
 import { useInstallPrompt } from "../hooks";
@@ -228,6 +229,11 @@ export default function InternalAppLayout({ navigationItems, portalLabel }) {
 
   return (
     <div className="min-h-screen bg-ivory text-ink">
+      {/* Renders nothing. Mounted here because it must be inside the
+          router and alive on every signed-in screen — a notification can
+          be tapped while the person is anywhere in the app. */}
+      <PushClickRouter />
+
       {/* Outside the sidebar: its translate transform would otherwise trap
           the dialog's fixed overlay inside the sidebar. */}
       <InstallInstructionsDialog
