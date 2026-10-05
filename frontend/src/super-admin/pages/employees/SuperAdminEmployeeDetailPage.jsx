@@ -15,6 +15,7 @@ import {
   EmployeePerformanceCard,
   EmployeeLifecycleDialog,
   EmployeeRejectionDialog,
+  LoginAccessCard,
   ManagerAssignmentDialog,
   TransferEmployeeDialog,
   TransferHistoryList,
@@ -87,6 +88,11 @@ export default function SuperAdminEmployeeDetailPage() {
           {message}
         </p>
       ) : null}
+
+      {/* Above the profile sections on purpose: "they cannot sign in" is
+          the question this page gets opened for most often, and the
+          answer was otherwise six sections down the scroll. */}
+      <LoginAccessCard employee={employee} onChanged={employeeState.refetch} />
 
       <EmployeeDetailSections employee={employee} />
 

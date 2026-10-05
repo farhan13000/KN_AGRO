@@ -23,6 +23,28 @@ export const useTeamDSRList =(query = {}, options) => {
   return { ...state, dsrs: state.data?.dsrs || [], pagination: state.data?.pagination || {} };
 };
 
+/**
+ * Polled like the attendance daily report, and for the same reason: this
+ * screen is left open on a desk through the evening while reports come
+ * in, and a list that needs a manual refresh to show them is a list
+ * somebody stops trusting.
+ */
+export const useDSRDailyReport = (date, options) => {
+  const request = useCallback(() => dsrApi.getDailyReport(date), [date]);
+  const state = useAsyncResource(["dsr", "daily-report", date || "today"], request, {
+    refetchInterval: 120000,
+    ...options,
+  });
+
+  return {
+    ...state,
+    report: state.data || null,
+    submitted: state.data?.submitted || [],
+    notSubmitted: state.data?.notSubmitted || [],
+    summary: state.data?.summary || null,
+  };
+};
+
 export const useAllDSRList = (query = {}, options) => {
   const requestQuery = useMemo(() => withDefaultQuery(query), [query]);
   const request = useCallback(() => dsrApi.listAllDSRs(requestQuery), [requestQuery]);

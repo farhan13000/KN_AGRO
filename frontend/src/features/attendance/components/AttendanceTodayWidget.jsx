@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ClipboardList, LogIn, LogOut, MessageCircle } from "lucide-react";
+import { ClipboardList, LogIn, LogOut, MessageCircle, Palmtree } from "lucide-react";
 import { Link } from "react-router-dom";
 import Card from "../../../shared/components/Card";
 import { useAttendanceActions, useMyAttendanceToday } from "../hooks";
@@ -53,11 +53,24 @@ export default function AttendanceTodayWidget() {
   const dsrBlocking = Boolean(hasCheckedIn && !hasCheckedOut && dsr?.required && !dsr.submitted);
   const dsrSubmitPath = getPortalRoutesForRole(role)?.DSR_SUBMIT || null;
 
-  const liveHint = !hasCheckedIn
-    ? describeCheckIn(now, policy)
-    : !hasCheckedOut
-      ? describeCheckOut(now, policy, dsr, today?.checkIn)
-      : null;
+  // AN APPROVED LEAVE DAY HAS NOTHING TO MARK. The server refuses a
+  // check-in on one (AttendanceService._assertNotOnApprovedLeave), so
+  // the buttons are not merely disabled here — the whole marking half of
+  // the card is replaced by the reason. A greyed-out button with no
+  // explanation is how someone ends up pressing it five times.
+  //
+  // The backend only reports this while the day is unmarked, so somebody
+  // who checked in before the leave was approved still gets their normal
+  // card and can close their day.
+  const onLeave = Boolean(today?.leave?.onLeave) && !hasCheckedIn;
+
+  const liveHint = onLeave
+    ? null
+    : !hasCheckedIn
+      ? describeCheckIn(now, policy)
+      : !hasCheckedOut
+        ? describeCheckOut(now, policy, dsr, today?.checkIn)
+        : null;
 
   // The dialog owns the photos and surfaces its own errors, so a failure
   // here is rethrown for it rather than swallowed into this card.
@@ -74,8 +87,11 @@ export default function AttendanceTodayWidget() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-black text-ink">Attendance Today</h2>
-          <p className="mt-1 text-xs font-semibold text-muted">{describePolicy(policy)}</p>
+          {onLeave ? null : (
+            <p className="mt-1 text-xs font-semibold text-muted">{describePolicy(policy)}</p>
+          )}
         </div>
+        {onLeave ? null : (
         <div className="flex gap-3">
           <button
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-forest px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-agriculture disabled:cursor-not-allowed disabled:opacity-50"
@@ -98,7 +114,24 @@ export default function AttendanceTodayWidget() {
             Check Out
           </button>
         </div>
+        )}
       </div>
+
+      {onLeave ? (
+        <div
+          className="mt-4 flex gap-3 rounded-lg border border-forest/15 bg-mint/40 px-4 py-3"
+          data-attendance-on-leave
+        >
+          <Palmtree aria-hidden className="mt-0.5 h-5 w-5 shrink-0 text-forest" />
+          <div>
+            <p className="text-sm font-black text-ink">You are on leave today</p>
+            <p className="mt-1 text-sm leading-6 text-muted">
+              {today.leave.description}. There is nothing to mark on a leave day. If you are working after all, ask
+              your manager to cancel the leave first.
+            </p>
+          </div>
+        </div>
+      ) : null}
 
       {liveHint && !todayState.isLoading ? (
         <p className={`mt-4 rounded-lg border px-3 py-2 text-sm font-semibold ${TONE_CLASSES[liveHint.tone]}`}>

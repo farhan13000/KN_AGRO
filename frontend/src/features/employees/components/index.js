@@ -26,3 +26,6 @@ export { default as TeamMemberPerformanceCard } from "./TeamMemberPerformanceCar
 export { default as TeamMemberWorkspace } from "./TeamMemberWorkspace";
 export { default as EmployeeRoleBadge } from "./EmployeeRoleBadge";
 export { default as TeamHierarchyTable } from "./TeamHierarchyTable";
+export { default as CopyableValue } from "./CopyableValue";
+export { default as LoginAccessCard } from "./LoginAccessCard";
+export { default as ResetPasswordDialog } from "./ResetPasswordDialog";

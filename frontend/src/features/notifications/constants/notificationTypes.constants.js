@@ -81,9 +81,12 @@ export const NOTIFICATION_TYPE = Object.freeze({
   ATTENDANCE_CORRECTED: "ATTENDANCE_CORRECTED",
   ATTENDANCE_REVIEW_REQUESTED: "ATTENDANCE_REVIEW_REQUESTED",
   ATTENDANCE_REVIEW_RESOLVED: "ATTENDANCE_REVIEW_RESOLVED",
+  ATTENDANCE_CHECK_IN_REMINDER: "ATTENDANCE_CHECK_IN_REMINDER",
+  ATTENDANCE_CHECK_OUT_REMINDER: "ATTENDANCE_CHECK_OUT_REMINDER",
 
   DSR_SUBMITTED: "DSR_SUBMITTED",
   DSR_REQUESTED: "DSR_REQUESTED",
+  DSR_SUBMISSION_REMINDER: "DSR_SUBMISSION_REMINDER",
   REPORT_SUBMITTED: "REPORT_SUBMITTED",
   REPORT_REVIEWED: "REPORT_REVIEWED",
   REPORT_REJECTED: "REPORT_REJECTED",
@@ -175,9 +178,14 @@ export const NOTIFICATION_TYPE_META = Object.freeze({
   [NOTIFICATION_TYPE.ATTENDANCE_CORRECTED]: { icon: ClipboardEdit, label: "Attendance corrected" },
   [NOTIFICATION_TYPE.ATTENDANCE_REVIEW_REQUESTED]: { icon: MessageCircle, label: "Attendance review requested" },
   [NOTIFICATION_TYPE.ATTENDANCE_REVIEW_RESOLVED]: { icon: CalendarCheck, label: "Attendance review decided" },
+  // AlarmClock for all three reminders, so a nudge is recognisable as a
+  // nudge at a glance rather than looking like the event itself.
+  [NOTIFICATION_TYPE.ATTENDANCE_CHECK_IN_REMINDER]: { icon: AlarmClock, label: "Check-in reminder" },
+  [NOTIFICATION_TYPE.ATTENDANCE_CHECK_OUT_REMINDER]: { icon: AlarmClock, label: "Check-out reminder" },
 
   [NOTIFICATION_TYPE.DSR_SUBMITTED]: { icon: ClipboardCheck, label: "DSR submitted" },
   [NOTIFICATION_TYPE.DSR_REQUESTED]: { icon: ClipboardList, label: "Daily report requested" },
+  [NOTIFICATION_TYPE.DSR_SUBMISSION_REMINDER]: { icon: AlarmClock, label: "DSR reminder" },
   [NOTIFICATION_TYPE.REPORT_SUBMITTED]: { icon: FileCheck, label: "Report submitted" },
   [NOTIFICATION_TYPE.REPORT_REVIEWED]: { icon: FileCheck, label: "Report reviewed" },
   [NOTIFICATION_TYPE.REPORT_REJECTED]: { icon: FileX, label: "Report rejected" },

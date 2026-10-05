@@ -188,7 +188,10 @@ export default function SuperAdminEmployeeListPage() {
       ) : null}
       {!employeesState.isLoading && !employeesState.isError && employees.length ? (
         <>
-          <EmployeeTable employees={employees} />
+          {/* showLoginAccess: the Super Admin is the person who gets
+              asked "I cannot sign in". These two columns answer it at a
+              glance, and the row's View opens the full Login Details. */}
+          <EmployeeTable employees={employees} showLoginAccess />
           <Pagination
             page={pagination.page || query.page}
             totalPages={pagination.pages || 1}

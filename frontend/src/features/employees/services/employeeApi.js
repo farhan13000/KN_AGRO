@@ -73,6 +73,17 @@ export const employeeApi = {
     return patch(API_ENDPOINTS.EMPLOYEES.REACTIVATE(employeeId));
   },
 
+  /**
+   * Sets a new login password and returns it ONCE, in the response —
+   * `{ employee, password, generated }`. There is no second call that
+   * can read it back, so a caller that drops this response has lost the
+   * password and must reset again. Pass `{}` to let the server pick one,
+   * which is the recommended path.
+   */
+  async resetEmployeePassword(employeeId, payload = {}) {
+    return post(API_ENDPOINTS.EMPLOYEES.RESET_PASSWORD(employeeId), payload);
+  },
+
   async resignEmployee(employeeId) {
     return patch(API_ENDPOINTS.EMPLOYEES.RESIGN(employeeId));
   },

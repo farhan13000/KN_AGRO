@@ -1,9 +1,21 @@
-import { PERMISSIONS } from "../../../shared/constants";
+import { PERMISSIONS, ROUTES } from "../../../shared/constants";
 import TabbedWorkspace from "../../../shared/components/TabbedWorkspace";
 import SalesManagerMyDSRListPage from "./SalesManagerMyDSRListPage";
 import SalesManagerTeamDSRListPage from "./SalesManagerTeamDSRListPage";
+import { DSRDailyReportView } from "../../../features/dsr";
 
 const TABS = [
+  // First, because chasing the gap is the evening job. "Mine" is what a
+  // manager opens once a day; this is what they open to find out who to
+  // ring.
+  {
+    id: "daily",
+    label: "Daily report",
+    permission: PERMISSIONS.DSR_READ_TEAM,
+    blurb:
+      "Everyone in your team who owes a daily report, for one day — who has filed and who has not, with the day's check-in beside each name.",
+    render: () => <DSRDailyReportView detailPath={(dsrId) => ROUTES.SALES_MANAGER.DSR_PRINT.replace(":dsrId", dsrId)} />,
+  },
   {
     id: "me",
     label: "Mine",

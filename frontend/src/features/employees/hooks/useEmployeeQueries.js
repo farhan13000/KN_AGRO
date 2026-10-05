@@ -78,6 +78,7 @@ export const useEmployeeActions = ({ onSuccess } = {}) => ({
   assignManager: useEmployeeMutation(employeeApi.assignManager, { onSuccess }),
   deactivateEmployee: useEmployeeMutation(employeeApi.deactivateEmployee, { onSuccess }),
   reactivateEmployee: useEmployeeMutation(employeeApi.reactivateEmployee, { onSuccess }),
+  resetEmployeePassword: useEmployeeMutation(employeeApi.resetEmployeePassword, { onSuccess }),
   resignEmployee: useEmployeeMutation(employeeApi.resignEmployee, { onSuccess }),
   terminateEmployee: useEmployeeMutation(employeeApi.terminateEmployee, { onSuccess }),
   transferEmployee: useEmployeeMutation(employeeApi.transferEmployee, { onSuccess }),

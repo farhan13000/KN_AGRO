@@ -4,6 +4,11 @@ export const PERMISSIONS = Object.freeze({
   USERS_READ: "users.read",
   USERS_CREATE: "users.create",
   USERS_UPDATE: "users.update",
+  // Setting a NEW password on somebody else's account. Super Admin only
+  // — it is not an edit, it is the ability to sign in as them. The
+  // backend holds the same split (see constants/permissions.js), so a
+  // screen gated on this never shows a button the API would refuse.
+  USERS_RESET_PASSWORD: "users.reset_password",
   EMPLOYEES_READ: "employees.read",
   EMPLOYEES_CREATE: "employees.create",
   EMPLOYEES_UPDATE: "employees.update",

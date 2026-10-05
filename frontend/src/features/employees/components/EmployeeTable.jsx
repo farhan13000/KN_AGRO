@@ -4,6 +4,8 @@ import { useAuth } from "../../../core/auth";
 import { DataTable, rowIconActionClass } from "../../../shared/components";
 import { PERMISSIONS, ROUTES } from "../../../shared/constants";
 import {
+  describeLastLogin,
+  describePassword,
   formatEmploymentType,
   getEmployeeDisplayName,
   getEmployeeEmail,
@@ -31,7 +33,24 @@ const formatCoverage = (coverage) => {
   return states.join(", ");
 };
 
-export default function EmployeeTable({ employees = [], onApprove, onReject, showApprovalActions = false }) {
+/**
+ * `showLoginAccess` adds two columns about signing in: when the person
+ * last got in, and whether they are still on the password they were
+ * handed. Opt-in rather than always on, because this table is also the
+ * manager-facing team list, and "has never signed in" is an admin
+ * concern, not something a Sales Manager needs beside every teammate.
+ *
+ * There is no password column, in this table or anywhere else — a stored
+ * password is a bcrypt hash and cannot be read back. See
+ * LoginAccessCard for the full explanation and the reset action.
+ */
+export default function EmployeeTable({
+  employees = [],
+  onApprove,
+  onReject,
+  showApprovalActions = false,
+  showLoginAccess = false,
+}) {
   const { hasPermission } = useAuth();
   const canUpdate = hasPermission(PERMISSIONS.EMPLOYEES_UPDATE);
   const canApprove = hasPermission(PERMISSIONS.EMPLOYEES_APPROVE);
@@ -119,6 +138,39 @@ export default function EmployeeTable({ employees = [], onApprove, onReject, sho
       role: "badge",
       cell: (employee) => <UserAccountStatusBadge status={employee.user?.status} />,
     },
+    // ONE column, not two. This table already carries thirteen, and a
+    // separate "Last Signed In" and "Password" pushed the right-hand end
+    // off the screen on a 1600px display. Both facts answer the same
+    // question anyway — "can this person get in, and does anyone else
+    // know their password" — so they are stacked in one cell.
+    ...(showLoginAccess
+      ? [
+          {
+            key: "loginAccess",
+            header: "Sign-in",
+            cell: (employee) => {
+              const lastLogin = describeLastLogin(employee.user);
+              const password = describePassword(employee.user);
+              return (
+                <span className="block whitespace-nowrap">
+                  <span
+                    className={`block ${lastLogin.tone === "warn" ? "font-bold text-amber-800" : "text-muted"}`}
+                  >
+                    {lastLogin.text}
+                  </span>
+                  <span
+                    className={`mt-0.5 block text-xs ${
+                      password.tone === "warn" ? "font-bold text-amber-800" : "text-muted"
+                    }`}
+                  >
+                    {password.short}
+                  </span>
+                </span>
+              );
+            },
+          },
+        ]
+      : []),
     {
       key: "manager",
       header: "Manager",
@@ -183,5 +235,5 @@ export default function EmployeeTable({ employees = [], onApprove, onReject, sho
     },
   ];
 
-  return <DataTable columns={columns} minWidth="980px" rows={employees} />;
+  return <DataTable columns={columns} minWidth={showLoginAccess ? "1100px" : "980px"} rows={employees} />;
 }

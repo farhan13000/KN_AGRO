@@ -101,6 +101,19 @@ const ACTION_ROUTE_BUILDERS = Object.freeze({
   // escalate to) submits a DSR — goes to the company-wide DSR list, the
   // only portal (Super Admin) either of those roles ever lands in.
   VIEW_ALL_DSR: (routes) => routes.DSR || null,
+  // The three reminder nudges. Each one exists to get somebody to the
+  // screen that clears it, so tapping the notification has to land on
+  // the button itself, not near it.
+  //
+  // CHECK_IN/CHECK_OUT both go to the attendance widget, which is the
+  // same place in every portal — it sits on My Attendance for field
+  // staff and on the combined attendance screen for head office, and
+  // MY_WORKSPACE is the last resort for a portal with neither.
+  CHECK_IN: (routes) => routes.ATTENDANCE_ME || routes.ATTENDANCE || routes.MY_WORKSPACE || null,
+  CHECK_OUT: (routes) => routes.ATTENDANCE_ME || routes.ATTENDANCE || routes.MY_WORKSPACE || null,
+  // Straight to the empty form, not to the list of reports already
+  // filed — the one thing the recipient has to do is fill it in.
+  SUBMIT_DSR: (routes) => routes.DSR_SUBMIT || routes.DSR_ME || null,
 });
 
 /**

@@ -15,4 +15,5 @@ export {
 export { EMPLOYEE_LIFECYCLE_ACTIONS, canShowEmployeeLifecycleAction } from "./lifecycleActions";
 export { toDateInputValue, updateNestedValue } from "./formValues";
 export { cleanEmployeeQuery } from "./queryParams";
+export { describeLastLogin, describePassword } from "./loginAccess";
 export { buildOrgIndex, buildRollups, conversionRateOf, emptyRollup } from "./orgRollup";

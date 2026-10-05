@@ -22,6 +22,13 @@ export const dsrApi = {
     return unwrapApiData(response);
   },
 
+  // One day's submissions: who filed and who has not. `date` is a plain
+  // yyyy-mm-dd business day; omitted, the backend answers for today.
+  async getDailyReport(date) {
+    const response = await apiClient.get(API_ENDPOINTS.DSR.DAILY_REPORT, { params: cleanQuery({ date }) });
+    return unwrapApiData(response);
+  },
+
   async getDSR(dsrId) {
     const response = await apiClient.get(API_ENDPOINTS.DSR.DETAIL(dsrId));
     return unwrapApiData(response);
