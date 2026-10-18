@@ -8,6 +8,7 @@ import { useToast } from "../../../../shared/feedback/ToastContext";
 import { accountApi } from "../api/accountApi";
 import { useCustomerAuth } from "../context/CustomerAuthContext";
 import AddressFields, { emptyAddress, validateAddress } from "../components/AddressFields";
+import { describeLinePackSize } from "../../../../features/products/utils/productFormatters";
 
 const TABS = [
   { id: "enquiries", label: "My Enquiries" },
@@ -208,6 +209,11 @@ export default function MyAccountPage() {
                         {(order.items || []).map((item, index) => (
                           <li key={`${order._id}-${index}`}>
                             {item.productName} — {item.quantity} {item.unit} @ {formatMoney(item.rate)}
+                            {describeLinePackSize(item.packSize, item.quantity) ? (
+                              <span className="block text-xs text-muted">
+                                {describeLinePackSize(item.packSize, item.quantity)}
+                              </span>
+                            ) : null}
                           </li>
                         ))}
                       </ul>

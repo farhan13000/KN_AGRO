@@ -1,7 +1,7 @@
 import DocumentLetterhead from "../../../shared/components/DocumentLetterhead";
 import PrintWatermark from "../../../shared/components/PrintWatermark";
-import { formatBusinessDateTime } from "../../../shared/utils";
-import { formatOrderAmount } from "../utils";
+import LinePackSize from "../../products/components/LinePackSize";
+import { formatBusinessDateTime, formatDocumentMoney } from "../../../shared/utils";
 import OrderStatusBadge from "./OrderStatusBadge";
 
 // Prompt 54: unlike Quotations/Invoices, there is no dedicated
@@ -39,16 +39,23 @@ export default function OrderPrintView({ order }) {
         </p>
       </div>
 
-      <table className="doc-table mt-6 w-full border-collapse text-sm">
+      {/* `doc-items` (index.css) caps Description and keeps every amount
+          on one line, so a long description cannot squeeze the numbers. */}
+      <table className="doc-table doc-items mt-6 w-full border-collapse text-sm">
+        <colgroup>
+          <col className="doc-col-product" />
+          <col className="doc-col-desc" />
+          <col span={5} />
+        </colgroup>
         <thead>
           <tr className="border-b-2 border-ink/80 text-left text-xs font-black uppercase">
             <th className="py-2 pr-2">Product</th>
             <th className="py-2 pr-2">Description</th>
-            <th className="py-2 pr-2 text-right">Qty</th>
-            <th className="py-2 pr-2 text-right">Rate</th>
-            <th className="py-2 pr-2 text-right">Discount</th>
-            <th className="py-2 pr-2 text-right">Tax</th>
-            <th className="py-2 text-right">Total</th>
+            <th className="doc-num py-2 pr-2 text-right">Qty</th>
+            <th className="doc-num py-2 pr-2 text-right">Rate</th>
+            <th className="doc-num py-2 pr-2 text-right">Discount</th>
+            <th className="doc-num py-2 pr-2 text-right">Tax</th>
+            <th className="doc-num py-2 text-right">Total</th>
           </tr>
         </thead>
         <tbody>
@@ -58,31 +65,34 @@ export default function OrderPrintView({ order }) {
                 <p className="font-bold">{item.productName || "Unnamed Product"}</p>
                 <p className="text-xs text-muted">{item.productCode}</p>
               </td>
-              <td className="py-2 pr-2 text-muted">
+              <td className="doc-desc py-2 pr-2 text-muted">
                 <span className="doc-label">Description</span>
                 {item.description || "-"}
               </td>
-              <td className="py-2 pr-2 text-right">
+              <td className="doc-num py-2 pr-2 text-right">
                 <span className="doc-label">Qty</span>
+                {/* One wrapper, so the pack-size lines stack under the
+                    quantity in the phone card layout too. */}
                 <span>
                   {item.quantity} {item.unit}
+                  <LinePackSize packSize={item.packSize} quantity={item.quantity} />
                 </span>
               </td>
-              <td className="py-2 pr-2 text-right">
+              <td className="doc-num py-2 pr-2 text-right">
                 <span className="doc-label">Rate</span>
-                {formatOrderAmount(item.rate)}
+                {formatDocumentMoney(item.rate)}
               </td>
-              <td className="py-2 pr-2 text-right">
+              <td className="doc-num py-2 pr-2 text-right">
                 <span className="doc-label">Discount</span>
-                {formatOrderAmount(item.discountAmount)}
+                {formatDocumentMoney(item.discountAmount)}
               </td>
-              <td className="py-2 pr-2 text-right">
+              <td className="doc-num py-2 pr-2 text-right">
                 <span className="doc-label">Tax</span>
                 {item.taxRate ? `${item.taxRate}%` : "-"}
               </td>
-              <td className="py-2 text-right font-bold">
+              <td className="doc-num py-2 text-right font-bold">
                 <span className="doc-label">Total</span>
-                {formatOrderAmount(item.lineTotal)}
+                {formatDocumentMoney(item.lineTotal)}
               </td>
             </tr>
           ))}
@@ -93,33 +103,33 @@ export default function OrderPrintView({ order }) {
         <div className="w-full max-w-xs divide-y divide-forest/10">
           <div className="flex items-center justify-between py-1.5 text-sm">
             <span>Subtotal</span>
-            <span>{formatOrderAmount(order.subtotal)}</span>
+            <span>{formatDocumentMoney(order.subtotal)}</span>
           </div>
           {Number(order.discountTotal) > 0 && (
             <div className="flex items-center justify-between py-1.5 text-sm text-muted">
               <span>Discount</span>
-              <span>- {formatOrderAmount(order.discountTotal)}</span>
+              <span>- {formatDocumentMoney(order.discountTotal)}</span>
             </div>
           )}
           <div className="flex items-center justify-between py-1.5 text-sm">
             <span>Tax</span>
-            <span>{formatOrderAmount(order.taxTotal)}</span>
+            <span>{formatDocumentMoney(order.taxTotal)}</span>
           </div>
           {Number(order.shippingCharge) > 0 && (
             <div className="flex items-center justify-between py-1.5 text-sm text-muted">
               <span>Shipping Charge</span>
-              <span>{formatOrderAmount(order.shippingCharge)}</span>
+              <span>{formatDocumentMoney(order.shippingCharge)}</span>
             </div>
           )}
           {Number(order.otherCharges) > 0 && (
             <div className="flex items-center justify-between py-1.5 text-sm text-muted">
               <span>Other Charges</span>
-              <span>{formatOrderAmount(order.otherCharges)}</span>
+              <span>{formatDocumentMoney(order.otherCharges)}</span>
             </div>
           )}
           <div className="flex items-center justify-between py-1.5 text-base font-black">
             <span>Grand Total</span>
-            <span>{formatOrderAmount(order.grandTotal)}</span>
+            <span>{formatDocumentMoney(order.grandTotal)}</span>
           </div>
         </div>
       </div>

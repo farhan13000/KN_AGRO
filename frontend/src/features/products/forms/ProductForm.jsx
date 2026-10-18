@@ -4,10 +4,42 @@ import Select from "../../../shared/forms/Select";
 import TextInput from "../../../shared/forms/TextInput";
 import Textarea from "../../../shared/forms/Textarea";
 import { ROUTES } from "../../../shared/constants";
+import { useLanguage } from "../../../i18n/LanguageContext";
 import ProductImagesField from "../components/ProductImagesField";
-import { PRODUCT_UNIT_LABELS } from "../constants";
+import { MEASURE_UNITS, PACK_SIZE_UNIT_LABELS, PACK_UNITS, PRODUCT_UNIT, PRODUCT_UNIT_LABELS } from "../constants";
+import { formatPackSize } from "../utils/productFormatters";
 
-const unitOptions = Object.entries(PRODUCT_UNIT_LABELS).map(([value, label]) => ({ label, value }));
+const packSizeUnitOptions = Object.entries(PACK_SIZE_UNIT_LABELS).map(([value, label]) => ({ label, value }));
+
+const isBlank = (value) => String(value ?? "").trim() === "";
+
+/**
+ * The Selling Unit choices, grouped so the list reads as two kinds of
+ * product rather than eleven words: things sold in a pack, and things
+ * weighed out loose.
+ *
+ * Once a pack size is filled in, only the pack group is offered — "per
+ * Kilogram" with a 50 Kg pack is the combination that billed a bag's
+ * price for every kilogram, so it is not shown rather than shown and then
+ * refused. A unit already saved on the product always stays in the list,
+ * even when the filter would hide it, so the box never claims a value the
+ * product does not have; the form's validation then asks for it to be
+ * changed.
+ */
+const sellingUnitGroups = (hasPackSize, currentUnit) => {
+  const groups = hasPackSize
+    ? [{ label: "Sold by the pack", units: [...PACK_UNITS, PRODUCT_UNIT.OTHER] }]
+    : [
+        { label: "Sold by the pack", units: PACK_UNITS },
+        { label: "Sold loose (by weight or volume)", units: MEASURE_UNITS },
+        { label: "Other", units: [PRODUCT_UNIT.OTHER] },
+      ];
+  const offered = groups.flatMap((group) => group.units);
+  if (currentUnit && !offered.includes(currentUnit)) {
+    groups.push({ label: "Current unit (please change)", units: [currentUnit] });
+  }
+  return groups;
+};
 
 export default function ProductForm({
   categoryOptions = [],
@@ -18,6 +50,21 @@ export default function ProductForm({
   submitLabel = "Save Product",
   values,
 }) {
+  const { t } = useLanguage();
+  const hasPackSize = !isBlank(values.packSize?.value);
+  const unitGroups = sellingUnitGroups(hasPackSize, values.unit);
+
+  // Typing a pack size while the unit is still a weight (Kilogram) moves
+  // the unit to Bag in the same step, since Kilogram is no longer offered.
+  // It is visible — the box now reads "Bag" and the note under it says
+  // what prices are per — and can be changed to Packet or Bottle.
+  const handlePackSizeChange = (event) => {
+    onChange(event);
+    if (!isBlank(event.target.value) && MEASURE_UNITS.includes(values.unit)) {
+      onChange({ target: { name: "unit", value: PRODUCT_UNIT.BAG } });
+    }
+  };
+
   return (
     <form className="space-y-7" onSubmit={onSubmit}>
       <section>
@@ -51,16 +98,81 @@ export default function ProductForm({
             onChange={onChange}
             value={values.brand}
           />
-          <Select
-            error={errors.unit}
-            id="product-unit"
-            label="Unit"
-            name="unit"
-            onChange={onChange}
-            options={unitOptions}
-            required
-            value={values.unit}
-          />
+          {/* "Selling Unit", not "Unit": every price below is per one of
+              these (a bag, a bottle), not per kilogram. How much a pack
+              holds is the separate field beside it. */}
+          <div>
+            <label className="form-label" htmlFor="product-unit">
+              {t("Selling Unit")} <span className="text-red-700">*</span>
+            </label>
+            <select
+              aria-describedby={errors.unit ? "product-unit-error" : hasPackSize ? "product-unit-note" : undefined}
+              aria-invalid={Boolean(errors.unit)}
+              className="form-field"
+              id="product-unit"
+              name="unit"
+              onChange={onChange}
+              required
+              value={values.unit}
+            >
+              {unitGroups.map((group) => (
+                <optgroup key={group.label} label={t(group.label)}>
+                  {group.units.map((unit) => (
+                    <option key={unit} value={unit}>
+                      {t(PRODUCT_UNIT_LABELS[unit] || unit)}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+            {errors.unit ? (
+              <p className="form-error" id="product-unit-error">
+                {t(errors.unit)}
+              </p>
+            ) : hasPackSize && !MEASURE_UNITS.includes(values.unit) ? (
+              <p className="mt-1 text-xs font-semibold text-muted" id="product-unit-note">
+                Prices below are per {PRODUCT_UNIT_LABELS[values.unit] || values.unit} ({formatPackSize(values.packSize)}).
+              </p>
+            ) : null}
+          </div>
+          <div>
+            <label className="form-label" htmlFor="product-pack-size">
+              Weight / Pack Size
+            </label>
+            <div className="flex gap-2">
+              <input
+                aria-describedby={errors["packSize.value"] ? "product-pack-size-error" : undefined}
+                aria-invalid={Boolean(errors["packSize.value"])}
+                className="form-field min-w-0 flex-1"
+                id="product-pack-size"
+                min="0"
+                name="packSize.value"
+                onChange={handlePackSizeChange}
+                placeholder="e.g. 50"
+                step="any"
+                type="number"
+                value={values.packSize?.value ?? ""}
+              />
+              <select
+                aria-label="Pack size unit"
+                className="form-field w-28 shrink-0"
+                name="packSize.unit"
+                onChange={onChange}
+                value={values.packSize?.unit ?? ""}
+              >
+                {packSizeUnitOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {errors["packSize.value"] ? (
+              <p className="form-error" id="product-pack-size-error">
+                {errors["packSize.value"]}
+              </p>
+            ) : null}
+          </div>
         </div>
       </section>
 
@@ -115,7 +227,19 @@ export default function ProductForm({
 
       <section>
         <h2 className="text-lg font-black text-ink">Pricing And Reorder Policy</h2>
-        <div className="mt-4 grid gap-5 sm:grid-cols-3">
+        <div className="mt-4 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+          <TextInput
+            error={errors.mrp}
+            id="product-mrp"
+            label="MRP"
+            min="0"
+            name="mrp"
+            onChange={onChange}
+            placeholder="Printed on the pack"
+            step="0.01"
+            type="number"
+            value={values.mrp ?? ""}
+          />
           <TextInput
             error={errors.sellingPrice}
             id="product-selling-price"

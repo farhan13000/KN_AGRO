@@ -4,7 +4,7 @@ import { useAuth } from "../../../core/auth";
 import { DataTable, rowIconActionClass } from "../../../shared/components";
 import { PERMISSIONS, ROUTES } from "../../../shared/constants";
 import StockStatusBadge from "../../inventory/components/StockStatusBadge";
-import { formatProductPrice, getProductUnitLabel } from "../utils";
+import { formatOptionalPrice, formatPackSize, formatProductPrice, getProductUnitLabel } from "../utils";
 import ProductStatusBadge from "./ProductStatusBadge";
 
 const getImageUrl = (product) =>
@@ -67,10 +67,22 @@ export default function ProductTable({ onStatusAction, products = [] }) {
       cell: (product) => getProductUnitLabel(product.unit),
     },
     {
+      key: "packSize",
+      header: "Pack Size",
+      cellClassName: "text-muted",
+      cell: (product) => formatPackSize(product.packSize),
+    },
+    {
       key: "sellingPrice",
       header: "Selling Price",
       cellClassName: "font-bold text-ink",
       cell: (product) => formatProductPrice(product.sellingPrice),
+    },
+    {
+      key: "mrp",
+      header: "MRP",
+      cellClassName: "text-muted",
+      cell: (product) => formatOptionalPrice(product.mrp),
     },
     {
       key: "minimumStock",

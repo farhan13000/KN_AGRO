@@ -61,7 +61,14 @@ const valueOf = (column, row) => (column.cell ? column.cell(row) : row[column.ke
 function TableView({ caption, columns, minWidth, rowKey, rows, theadClassName }) {
   return (
     <div className="hidden overflow-hidden rounded-lg border border-forest/10 bg-white shadow-sm md:block">
-      <div className="overflow-x-auto">
+      {/* `relative` is load-bearing. Row actions hide their label with
+          `md:sr-only`, which is `position: absolute`; with no positioned
+          ancestor those labels escaped this scroll box and sat at the
+          table's far right edge, so a table wider than its box (a window
+          of 1280px or less, or a zoomed browser) stretched the WHOLE page
+          and slid everything under the sidebar. Making this box their
+          containing block keeps them inside it, scrolling with the table. */}
+      <div className="relative overflow-x-auto">
         <table
           className="w-full divide-y divide-forest/10 text-left text-sm"
           style={minWidth ? { minWidth } : undefined}

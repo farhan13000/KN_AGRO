@@ -17,7 +17,9 @@ export const LEAD_TYPES = Object.freeze(Object.values(LEAD_TYPE));
 export const LEAD_TYPE_LABELS = Object.freeze({
   [LEAD_TYPE.SUPER_STOCK]: "Super Stock (SS)",
   [LEAD_TYPE.DISTRIBUTOR]: "Distributor",
-  [LEAD_TYPE.DEALER]: "Dealer",
+  // Dealer and retailer are the same buyer here; the rate list calls
+  // them retailers. Label only: the stored value stays DEALER.
+  [LEAD_TYPE.DEALER]: "Dealer / Retailer",
 });
 
 // Dealer is the dearest of the three, so a lead nobody typed a type for

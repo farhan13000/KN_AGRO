@@ -1,4 +1,8 @@
-import { PRODUCT_UNIT } from "../constants/index.js";
+import { MEASURE_UNITS, PACK_SIZE_UNIT, PRODUCT_UNIT } from "../constants/index.js";
+
+const LEAD_TYPE_TIERS = ["SUPER_STOCK", "DISTRIBUTOR", "DEALER"];
+
+const isBlank = (value) => String(value ?? "").trim() === "";
 
 const MAX_IMAGES = 10;
 
@@ -55,12 +59,17 @@ export const initialProductFormValues = {
   brand: "",
   shortDescription: "",
   description: "",
-  unit: PRODUCT_UNIT.KG,
+  // Bag, not Kilogram: most of this catalogue is sold by the bag, and a
+  // Kilogram default is how a 50 Kg bag's price once got billed per kg.
+  unit: PRODUCT_UNIT.BAG,
   sellingPrice: "",
   // One price per kind of buyer. Blank means "no special price" — the
   // standard selling price above applies — which is a different thing
   // from 0, and why these start empty rather than at zero.
   leadTypePrices: { SUPER_STOCK: "", DISTRIBUTOR: "", DEALER: "" },
+  // Optional, and blank rather than 0 for the same reason as the tiers.
+  mrp: "",
+  packSize: { value: "", unit: PACK_SIZE_UNIT.KG },
   taxRate: "0",
   minimumStock: "0",
   images: [],
@@ -79,6 +88,11 @@ export const productToFormValues = (product) => ({
     SUPER_STOCK: product?.leadTypePrices?.SUPER_STOCK == null ? "" : String(product.leadTypePrices.SUPER_STOCK),
     DISTRIBUTOR: product?.leadTypePrices?.DISTRIBUTOR == null ? "" : String(product.leadTypePrices.DISTRIBUTOR),
     DEALER: product?.leadTypePrices?.DEALER == null ? "" : String(product.leadTypePrices.DEALER),
+  },
+  mrp: product?.mrp == null ? "" : String(product.mrp),
+  packSize: {
+    value: product?.packSize?.value == null ? "" : String(product.packSize.value),
+    unit: product?.packSize?.unit || PACK_SIZE_UNIT.KG,
   },
   taxRate: String(product?.taxRate ?? 0),
   minimumStock: String(product?.minimumStock ?? 0),
@@ -120,6 +134,37 @@ export const validateProductForm = (values) => {
     if (String(amount).trim() === "") continue;
     if (!hasAtMostTwoDecimals(amount) || Number(amount) < 0) {
       errors[`leadTypePrices.${tier}`] = "Enter a price of 0 or more, with at most 2 decimal places.";
+    }
+  }
+  if (!isBlank(values.mrp)) {
+    if (!hasAtMostTwoDecimals(values.mrp) || Number(values.mrp) < 0) {
+      errors.mrp = "MRP must be 0 or greater with at most 2 decimal places.";
+    } else {
+      // Mirrors the server's rule, so the mistake shows on the box that
+      // has it instead of as one message after submitting.
+      const mrp = Number(values.mrp);
+      if (!errors.sellingPrice && Number(values.sellingPrice) > mrp) {
+        errors.sellingPrice = "Selling price cannot be more than the MRP.";
+      }
+      for (const tier of LEAD_TYPE_TIERS) {
+        const amount = values.leadTypePrices?.[tier];
+        if (!isBlank(amount) && !errors[`leadTypePrices.${tier}`] && Number(amount) > mrp) {
+          errors[`leadTypePrices.${tier}`] = "Cannot be more than the MRP.";
+        }
+      }
+    }
+  }
+  if (!isBlank(values.packSize?.value)) {
+    const packValue = Number(values.packSize.value);
+    if (!Number.isFinite(packValue) || packValue <= 0 || packValue > 100000) {
+      errors["packSize.value"] = "Pack size must be a number greater than 0.";
+    } else if (!Object.values(PACK_SIZE_UNIT).includes(values.packSize.unit)) {
+      errors["packSize.value"] = "Select a unit for the pack size.";
+    } else if (!errors.unit && MEASURE_UNITS.includes(values.unit)) {
+      // Prices are per selling unit, so "per Kilogram" with a 50 Kg pack
+      // would bill the bag's price for every kilogram. Shown on the
+      // Selling Unit box, since that is the one to change.
+      errors.unit = "With a pack size, choose Bag, Packet, Bottle, Box or Piece — prices are per this unit.";
     }
   }
   if (!Number.isFinite(Number(values.taxRate)) || Number(values.taxRate) < 0 || Number(values.taxRate) > 100) {
@@ -172,8 +217,14 @@ export const pickProductPayload = (values) => {
     // Always sent, every tier, so emptying a box actually clears that
     // tier back to the standard price instead of leaving the old one
     // behind — `null` is what the API reads as "no special price".
+    // Both always sent, like the tiers, so emptying the box on an edit
+    // clears the stored value instead of leaving the old one behind.
+    mrp: isBlank(values.mrp) ? null : Number(values.mrp),
+    packSize: isBlank(values.packSize?.value)
+      ? { value: null, unit: null }
+      : { value: Number(values.packSize.value), unit: values.packSize.unit },
     leadTypePrices: Object.fromEntries(
-      ["SUPER_STOCK", "DISTRIBUTOR", "DEALER"].map((tier) => [
+      LEAD_TYPE_TIERS.map((tier) => [
         tier,
         String(values.leadTypePrices?.[tier] ?? "").trim() === ""
           ? null

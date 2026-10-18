@@ -5,5 +5,5 @@ export {
   getFollowUpPresentationState,
   parseDate,
 } from "./dateTime.js";
-export { formatMoney } from "./money.js";
+export { formatDocumentMoney, formatMoney } from "./money.js";
 

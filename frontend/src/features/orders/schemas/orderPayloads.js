@@ -34,8 +34,11 @@ const numberOrUndefined = (value) => {
  * productCode/productName/unit and EVERY total are resolved and computed
  * by the backend (see createDirectOrderSchema / resolveDirectOrderItems),
  * so there is deliberately no field here for a price total to travel in.
- * `rate` is an override of the product's own selling price and is sent
- * only when the user actually changed it.
+ * `rate` is an override of the product's own price.
+ *
+ * A discount travels as its two inputs (type + value), exactly like a
+ * quotation item's; the server turns them into the stored discount
+ * amount. Sent only for a line that has one.
  */
 export const pickCreateDirectOrderPayload = (values = {}) =>
   cleanPayload({
@@ -46,6 +49,8 @@ export const pickCreateDirectOrderPayload = (values = {}) =>
         quantity: Number(item.quantity),
         rate: numberOrUndefined(item.rate),
         taxRate: numberOrUndefined(item.taxRate),
+        discountType: item.discountType || undefined,
+        discountValue: item.discountType ? numberOrUndefined(item.discountValue) : undefined,
         description: trimOrUndefined(item.description),
       }),
     ),

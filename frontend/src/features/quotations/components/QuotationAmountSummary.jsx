@@ -14,7 +14,9 @@ const AmountRow = ({ label, value, emphasis, muted }) => (
 // record. This component never computes anything itself — pass a locally
 // previewed quotation-shaped object during builder UX if needed, but the
 // saved/detail view must always pass the real backend response here.
-export default function QuotationAmountSummary({ quotation, className = "" }) {
+// `formatAmount` lets the print view show paise (₹1,800.00); every other
+// caller keeps the screen format by default.
+export default function QuotationAmountSummary({ quotation, className = "", formatAmount = formatQuotationAmount }) {
   const q = quotation || {};
   const globalDiscount = q.globalDiscount;
   const globalDiscountLabel =
@@ -24,21 +26,21 @@ export default function QuotationAmountSummary({ quotation, className = "" }) {
 
   return (
     <div className={`divide-y divide-forest/10 ${className}`}>
-      <AmountRow label="Subtotal" value={formatQuotationAmount(q.subtotal)} />
+      <AmountRow label="Subtotal" value={formatAmount(q.subtotal)} />
       {Number(q.itemDiscountTotal) > 0 && (
-        <AmountRow label="Item Discounts" muted value={`- ${formatQuotationAmount(q.itemDiscountTotal)}`} />
+        <AmountRow label="Item Discounts" muted value={`- ${formatAmount(q.itemDiscountTotal)}`} />
       )}
       {Number(globalDiscount?.amount) > 0 && (
-        <AmountRow label={globalDiscountLabel} muted value={`- ${formatQuotationAmount(globalDiscount.amount)}`} />
+        <AmountRow label={globalDiscountLabel} muted value={`- ${formatAmount(globalDiscount.amount)}`} />
       )}
-      <AmountRow label="Tax" value={formatQuotationAmount(q.taxTotal)} />
+      <AmountRow label="Tax" value={formatAmount(q.taxTotal)} />
       {Number(q.shippingCharge) > 0 && (
-        <AmountRow label="Shipping Charge" muted value={formatQuotationAmount(q.shippingCharge)} />
+        <AmountRow label="Shipping Charge" muted value={formatAmount(q.shippingCharge)} />
       )}
       {Number(q.otherCharges) > 0 && (
-        <AmountRow label="Other Charges" muted value={formatQuotationAmount(q.otherCharges)} />
+        <AmountRow label="Other Charges" muted value={formatAmount(q.otherCharges)} />
       )}
-      <AmountRow emphasis label="Grand Total" value={formatQuotationAmount(q.grandTotal)} />
+      <AmountRow emphasis label="Grand Total" value={formatAmount(q.grandTotal)} />
     </div>
   );
 }

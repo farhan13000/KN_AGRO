@@ -1,4 +1,7 @@
 export {
+  describeLinePackSize,
+  formatOptionalPrice,
+  formatPackSize,
   formatProductPrice,
   formatSpecifications,
   getProductStatusLabel,

@@ -159,6 +159,54 @@ select:focus-visible {
   }
 
   /**
+   * The ITEM table on a quotation, order or invoice, when it is a real
+   * table — on paper, and on a screen wide enough to show one.
+   *
+   * Left to itself the browser handed a long description most of the row
+   * and squeezed Qty/Rate/Discount/Tax/Total into whatever was left, with
+   * 8px between them, so they read as one run of figures. Description is
+   * capped instead, wraps inside its own column, and every amount stays
+   * on one line; the number columns then size to their figures, so even
+   * ₹1,23,456.00 fits.
+   *
+   * Not applied below `md` on screen: there the rows are cards (above),
+   * and none of this means anything.
+   */
+  @media print, screen and (min-width: 768px) {
+    .doc-items .doc-col-product {
+      width: 22%;
+    }
+
+    .doc-items .doc-col-desc {
+      width: 28%;
+    }
+
+    /* A clear gap between columns: the cells already carry 8px on the
+       right, this adds 12px on the left, so two amounts side by side
+       ("₹1,120.00  ₹1,344.00") never read as one figure. */
+    .doc-items th + th,
+    .doc-items td + td {
+      padding-left: 0.75rem;
+    }
+
+    .doc-items .doc-num {
+      white-space: nowrap;
+    }
+
+    .doc-items .doc-desc {
+      font-size: 0.75rem;
+      line-height: 1.25rem;
+      overflow-wrap: anywhere;
+    }
+
+    /* A very long product name or code wraps rather than widening its
+       column into the description. */
+    .doc-items .doc-cell-title {
+      overflow-wrap: anywhere;
+    }
+  }
+
+  /**
    * An EDITABLE item grid — the rows of a quotation or an order while it
    * is being built. It stays a real table on a desktop screen, where the
    * columns line the inputs up, and reflows into one card per item below

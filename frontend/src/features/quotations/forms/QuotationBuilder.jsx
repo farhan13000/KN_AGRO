@@ -461,7 +461,11 @@ export default function QuotationBuilder({
           {items.length ? (
             // Real table on a desktop screen; one card per item on a
             // phone — see `.item-grid` in index.css.
-            <div className="md:overflow-x-auto md:rounded-lg md:border md:border-forest/10 md:bg-white">
+            // `relative`: the rows' Remove button hides its label with
+            // `md:sr-only` (absolutely positioned); without a positioned
+            // scroll box that label escapes it and widens the whole page
+            // (see DataTable).
+            <div className="relative md:overflow-x-auto md:rounded-lg md:border md:border-forest/10 md:bg-white">
               <table className="item-grid w-full text-left text-sm md:min-w-[880px] md:divide-y md:divide-forest/10">
                 <thead className="bg-mint/70 text-xs font-black uppercase text-forest">
                   <tr>

@@ -1,23 +1,29 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { History, Pencil, RefreshCw } from "lucide-react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { History, Pencil, RefreshCw, Trash2 } from "lucide-react";
 import { getApiErrorMessage } from "../../../core/api";
 import Button from "../../../shared/components/Button";
 import Card from "../../../shared/components/Card";
+import ConfirmDialog from "../../../shared/components/ConfirmDialog";
 import EmptyState from "../../../shared/components/EmptyState";
 import ErrorState from "../../../shared/components/ErrorState";
 import Modal from "../../../shared/components/Modal";
 import PageLoader from "../../../shared/components/PageLoader";
-import { PERMISSIONS, ROUTES } from "../../../shared/constants";
+import { LEAD_TYPE_OPTIONS, PERMISSIONS, ROUTES } from "../../../shared/constants";
 import { useAuth } from "../../../core/auth";
 import StockStatusBadge from "../../../features/inventory/components/StockStatusBadge";
+import { inventoryQueryKeys } from "../../../features/inventory/hooks/inventoryQueryKeys";
 import {
   PRODUCT_STATUS,
   ProductImageDisplay,
   ProductStatusBadge,
   SpecificationsDisplay,
+  formatOptionalPrice,
+  formatPackSize,
   formatProductPrice,
   getProductUnitLabel,
+  productQueryKeys,
   useProductActions,
   useProductDetail,
 } from "../../../features/products";
@@ -70,6 +76,37 @@ export default function SuperAdminProductDetailPage() {
     }
   };
 
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+  // Its own mutation, not useProductActions: that one's onSuccess
+  // refetches THIS product, which no longer exists after a delete.
+  const deleteAction = useProductActions().deleteProduct;
+
+  const openDeleteDialog = () => {
+    setDeleteError("");
+    setIsDeleteOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!product) return;
+    try {
+      await deleteAction.mutate(product._id);
+    } catch (error) {
+      // A product in use is refused with a message saying where, and to
+      // discontinue it instead — shown as-is in the dialog.
+      setDeleteError(getApiErrorMessage(error));
+      return;
+    }
+    // Lists are cached for 30s; without this the deleted product would
+    // still be sitting in the catalogue and inventory tables we land on.
+    queryClient.removeQueries({ queryKey: productQueryKeys.detail(product._id) });
+    queryClient.invalidateQueries({ queryKey: productQueryKeys.all });
+    queryClient.invalidateQueries({ queryKey: inventoryQueryKeys.all });
+    navigate(ROUTES.SUPER_ADMIN.PRODUCTS, { replace: true });
+  };
+
   if (productState.isLoading) return <PageLoader message="Loading product..." />;
   if (productState.isError) {
     return <ErrorState message={productState.errorMessage} title="Unable to load product" />;
@@ -118,6 +155,16 @@ export default function SuperAdminProductDetailPage() {
               Edit Product
             </Link>
           ) : null}
+          {canManage ? (
+            <button
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-bold text-red-700 ring-1 ring-red-200 transition hover:bg-red-50"
+              onClick={openDeleteDialog}
+              type="button"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -139,8 +186,23 @@ export default function SuperAdminProductDetailPage() {
             <DetailRow label="Slug" value={product.slug || "Not Set"} />
             <DetailRow label="Category" value={product.category?.name || "Not Set"} />
             <DetailRow label="Brand" value={product.brand || "Not Set"} />
-            <DetailRow label="Unit" value={getProductUnitLabel(product.unit)} />
+            <DetailRow label="Selling Unit" value={getProductUnitLabel(product.unit)} />
+            <DetailRow label="Pack Size" value={formatPackSize(product.packSize)} />
+            <DetailRow label="MRP" value={formatOptionalPrice(product.mrp)} />
             <DetailRow label="Selling Price" value={formatProductPrice(product.sellingPrice)} />
+            {/* An unset tier is charged the selling price, so say that
+                rather than "Not Set", which reads like a missing price. */}
+            {LEAD_TYPE_OPTIONS.map((option) => (
+              <DetailRow
+                key={option.value}
+                label={`${option.label} Price`}
+                value={
+                  product.leadTypePrices?.[option.value] == null
+                    ? "Same as selling price"
+                    : formatProductPrice(product.leadTypePrices[option.value])
+                }
+              />
+            ))}
             <DetailRow label="Purchase Price" value={formatProductPrice(product.purchasePrice)} />
             <DetailRow label="Tax Rate" value={`${product.taxRate ?? 0}%`} />
             <DetailRow label="Minimum Stock" value={product.minimumStock ?? 0} />
@@ -191,6 +253,24 @@ export default function SuperAdminProductDetailPage() {
           </div>
         </div>
       </Modal>
+
+      <ConfirmDialog
+        cancelLabel="Keep Product"
+        confirmDisabled={deleteAction.isLoading}
+        confirmLabel={deleteAction.isLoading ? "Deleting..." : "Yes, Delete"}
+        description={`Delete ${product.name} (${product.productCode}) permanently? This cannot be undone. A product that has already been used in an order, quotation, invoice, lead or stock movement cannot be deleted — mark it Discontinued instead.`}
+        isOpen={isDeleteOpen}
+        onCancel={() => setIsDeleteOpen(false)}
+        onConfirm={confirmDelete}
+        title="Delete product?"
+        tone="danger"
+      >
+        {deleteError ? (
+          <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold leading-6 text-red-700">
+            {deleteError}
+          </p>
+        ) : null}
+      </ConfirmDialog>
     </div>
   );
 }

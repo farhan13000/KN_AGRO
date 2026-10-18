@@ -3,7 +3,11 @@ import { useState } from "react";
 import Button from "../../../shared/components/Button";
 import Card from "../../../shared/components/Card";
 import TextInput from "../../../shared/forms/TextInput";
+import { DEFAULT_LEAD_TYPE, getLeadTypeLabel, priceForLeadType } from "../../../shared/constants";
 import { formatMoney } from "../../../shared/utils";
+// Same discount vocabulary as a quotation, so an order's discount means
+// exactly what a quotation's does and converts between the two cleanly.
+import { QUOTATION_DISCOUNT_TYPE, QUOTATION_DISCOUNT_TYPE_LABELS } from "../../quotations/constants";
 // The product picker is genuinely generic — "choose an active product" —
 // so it is reused rather than copied. The lead picker is not: see
 // OrderLeadSelector's own note on why an order accepts any active lead.
@@ -24,8 +28,30 @@ const toNumber = (value) => {
  */
 const previewLine = (item) => {
   const lineSubtotal = toNumber(item.quantity) * toNumber(item.rate);
-  const taxAmount = (lineSubtotal * toNumber(item.taxRate)) / 100;
-  return { lineSubtotal, taxAmount, lineTotal: lineSubtotal + taxAmount };
+  // Same order of operations as the server's calculateQuotationItem: the
+  // discount comes off the line first, never more than the line itself,
+  // and tax is charged on what is left. A FIXED discount is for the whole
+  // line, not per unit.
+  let discountAmount = 0;
+  if (item.discountType === QUOTATION_DISCOUNT_TYPE.PERCENTAGE) {
+    discountAmount = (lineSubtotal * toNumber(item.discountValue)) / 100;
+  } else if (item.discountType === QUOTATION_DISCOUNT_TYPE.FIXED) {
+    discountAmount = toNumber(item.discountValue);
+  }
+  discountAmount = Math.max(0, Math.min(discountAmount, lineSubtotal));
+  const taxableAmount = lineSubtotal - discountAmount;
+  const taxAmount = (taxableAmount * toNumber(item.taxRate)) / 100;
+  return { lineSubtotal, discountAmount, taxAmount, lineTotal: taxableAmount + taxAmount };
+};
+
+// Mirrors the backend's directOrderItemInputSchema: a discount type needs
+// a value of 0 or more, and a percentage cannot exceed 100.
+const isValidDiscount = (type, value) => {
+  if (!type) return true;
+  const text = String(value ?? "").trim();
+  if (!text || !Number.isFinite(Number(text)) || Number(text) < 0) return false;
+  if (type === QUOTATION_DISCOUNT_TYPE.PERCENTAGE && Number(text) > 100) return false;
+  return true;
 };
 
 /**
@@ -33,7 +59,8 @@ const previewLine = (item) => {
  * quotation behind it.
  *
  * Kept deliberately smaller than QuotationBuilder: no validity dates, no
- * terms and conditions, no global discount, no revision handling. A field
+ * terms and conditions, no global (whole-order) discount, no revision
+ * handling — a discount is per line only. A field
  * officer standing with a customer needs "who, what, how many" and
  * nothing else; every field beyond that is one more thing to get wrong on
  * a phone screen.
@@ -52,29 +79,58 @@ export default function OrderBuilder({
   const [notes, setNotes] = useState("");
   const [errors, setErrors] = useState({});
 
+  // The rate starts at what THIS kind of buyer pays — a distributor's
+  // price for a distributor — exactly as a quotation does, rather than
+  // the plain selling price for everyone.
   const handleAddProduct = (product) => {
     setItems((current) => [
       ...current,
       {
         product,
         quantity: "1",
-        rate: String(product.sellingPrice ?? 0),
+        rate: String(priceForLeadType(product, lead?.leadType)),
+        rateEdited: false,
         taxRate: String(product.taxRate ?? 0),
+        discountType: null,
+        discountValue: "",
         description: "",
       },
     ]);
     setErrors((current) => ({ ...current, items: "" }));
   };
 
+  // Picking a different customer re-prices every line at THEIR rate —
+  // except a rate somebody typed by hand, which is a decision and stays.
+  const handleLeadChange = (nextLead) => {
+    setLead(nextLead);
+    setItems((current) =>
+      current.map((item) =>
+        item.rateEdited ? item : { ...item, rate: String(priceForLeadType(item.product, nextLead?.leadType)) }
+      )
+    );
+  };
+
   const updateItem = (index, field, value) =>
-    setItems((current) => current.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
+    setItems((current) =>
+      current.map((item, i) =>
+        i === index ? { ...item, [field]: value, ...(field === "rate" ? { rateEdited: true } : {}) } : item
+      )
+    );
+
+  // Changing the type clears the value: 10 means something different as
+  // a percentage than as rupees.
+  const updateDiscountType = (index, discountType) =>
+    setItems((current) =>
+      current.map((item, i) => (i === index ? { ...item, discountType: discountType || null, discountValue: "" } : item))
+    );
 
   const removeItem = (index) => setItems((current) => current.filter((_, i) => i !== index));
 
   const itemsPreview = items.map(previewLine);
   const subtotal = itemsPreview.reduce((sum, line) => sum + line.lineSubtotal, 0);
+  const discountTotal = itemsPreview.reduce((sum, line) => sum + line.discountAmount, 0);
   const taxTotal = itemsPreview.reduce((sum, line) => sum + line.taxAmount, 0);
-  const grandTotal = subtotal + taxTotal + toNumber(shippingCharge) + toNumber(otherCharges);
+  const grandTotal = subtotal - discountTotal + taxTotal + toNumber(shippingCharge) + toNumber(otherCharges);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -84,6 +140,8 @@ export default function OrderBuilder({
     if (!items.length) nextErrors.items = "Add at least one product.";
     if (items.some((item) => toNumber(item.quantity) <= 0)) {
       nextErrors.items = "Every line needs a quantity greater than zero.";
+    } else if (items.some((item) => !isValidDiscount(item.discountType, item.discountValue))) {
+      nextErrors.items = "Enter a discount of 0 or more on every discounted line (a percentage can be at most 100).";
     }
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
@@ -103,13 +161,22 @@ export default function OrderBuilder({
       <Card className="p-5">
         <h2 className="text-lg font-black text-ink">Customer</h2>
         <div className="mt-4">
-          <OrderLeadSelector locked={Boolean(initialLead)} onSelect={setLead} selectedLead={lead} />
+          <OrderLeadSelector locked={Boolean(initialLead)} onSelect={handleLeadChange} selectedLead={lead} />
         </div>
         {errors.lead ? <p className="mt-2 text-sm font-semibold text-red-700">{errors.lead}</p> : null}
       </Card>
 
       <Card className="p-5">
         <h2 className="text-lg font-black text-ink">Items</h2>
+        {/* Says which price list the rates came from, so a distributor's
+            rate is never mistaken for a mistake (or the other way round).
+            With no customer, or one with no type, that is the default
+            list — the same one priceForLeadType falls back to. */}
+        <p className="mt-1 text-sm font-semibold text-muted">
+          Rates are filled at the{" "}
+          <span className="text-ink">{getLeadTypeLabel(lead?.leadType || DEFAULT_LEAD_TYPE)}</span> price
+          {lead ? "" : " until you choose the customer"}. You can still change any rate or add a discount.
+        </p>
 
         <div className="mt-4">
           <QuotationProductSelector
@@ -123,13 +190,17 @@ export default function OrderBuilder({
         {items.length ? (
           // Real table on a desktop screen; one card per item on a
           // phone — see `.item-grid` in index.css.
-          <div className="mt-4 md:overflow-x-auto">
-            <table className="item-grid w-full text-sm md:min-w-[46rem]">
+          // `relative`: the Remove button's `md:sr-only` label is
+          // absolutely positioned, and without a positioned scroll box it
+          // escapes it and widens the whole page (see DataTable).
+          <div className="relative mt-4 md:overflow-x-auto">
+            <table className="item-grid w-full text-sm md:min-w-[58rem]">
               <thead>
                 <tr className="border-b border-forest/10 text-left text-xs font-black uppercase tracking-wide text-muted">
                   <th className="py-2 pr-3">Product</th>
                   <th className="py-2 pr-3 w-28">Qty</th>
                   <th className="py-2 pr-3 w-32">Rate</th>
+                  <th className="py-2 pr-3 w-56">Discount</th>
                   <th className="py-2 pr-3 w-24">Tax %</th>
                   <th className="py-2 pr-3 w-32 text-right">Line Total</th>
                   <th className="py-2 w-10" />
@@ -169,6 +240,39 @@ export default function OrderBuilder({
                         type="number"
                         value={item.rate}
                       />
+                    </td>
+                    <td className="py-2.5 md:pr-3">
+                      <span className="item-grid-label">Discount</span>
+                      <div className="flex gap-2">
+                        <select
+                          aria-label={`Discount type for ${item.product.name}`}
+                          className="form-field"
+                          name={`discountType-${index}`}
+                          onChange={(event) => updateDiscountType(index, event.target.value)}
+                          value={item.discountType || ""}
+                        >
+                          <option value="">No discount</option>
+                          {Object.values(QUOTATION_DISCOUNT_TYPE).map((type) => (
+                            <option key={type} value={type}>
+                              {QUOTATION_DISCOUNT_TYPE_LABELS[type]}
+                            </option>
+                          ))}
+                        </select>
+                        {item.discountType ? (
+                          <input
+                            aria-label={`Discount value for ${item.product.name}`}
+                            className="form-field"
+                            max={item.discountType === QUOTATION_DISCOUNT_TYPE.PERCENTAGE ? "100" : undefined}
+                            min="0"
+                            name={`discountValue-${index}`}
+                            onChange={(event) => updateItem(index, "discountValue", event.target.value)}
+                            placeholder={item.discountType === QUOTATION_DISCOUNT_TYPE.PERCENTAGE ? "%" : "₹ for the line"}
+                            step="any"
+                            type="number"
+                            value={item.discountValue}
+                          />
+                        ) : null}
+                      </div>
                     </td>
                     <td className="py-2.5 md:pr-3">
                       <span className="item-grid-label">Tax %</span>
@@ -264,6 +368,12 @@ export default function OrderBuilder({
               <dt className="text-muted">Subtotal</dt>
               <dd className="font-semibold tabular-nums text-ink">{formatMoney(subtotal)}</dd>
             </div>
+            {discountTotal > 0 ? (
+              <div className="flex justify-between gap-8">
+                <dt className="text-muted">Discount</dt>
+                <dd className="font-semibold tabular-nums text-ink">- {formatMoney(discountTotal)}</dd>
+              </div>
+            ) : null}
             <div className="flex justify-between gap-8">
               <dt className="text-muted">Tax</dt>
               <dd className="font-semibold tabular-nums text-ink">{formatMoney(taxTotal)}</dd>

@@ -1,4 +1,5 @@
 import { DataTable } from "../../../shared/components";
+import LinePackSize from "../../products/components/LinePackSize";
 import { formatOrderAmount } from "../utils";
 
 // Read-only, historical rendering: every cell comes from the item's own
@@ -42,7 +43,12 @@ export default function OrderItemTable({ items = [] }) {
       header: "Quantity",
       align: "right",
       cellClassName: "text-ink",
-      cell: (item) => item.quantity ?? 0,
+      cell: (item) => (
+        <>
+          {item.quantity ?? 0}
+          <LinePackSize packSize={item.packSize} quantity={item.quantity} />
+        </>
+      ),
     },
     {
       key: "rate",

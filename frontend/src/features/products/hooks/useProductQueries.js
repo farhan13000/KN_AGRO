@@ -28,4 +28,5 @@ export const useProductActions = ({ onSuccess } = {}) => ({
   createProduct: useAsyncMutation(productApi.createProduct, { onSuccess }),
   updateProduct: useAsyncMutation(productApi.updateProduct, { onSuccess }),
   changeProductStatus: useAsyncMutation(productApi.changeProductStatus, { onSuccess }),
+  deleteProduct: useAsyncMutation(productApi.deleteProduct, { onSuccess }),
 });

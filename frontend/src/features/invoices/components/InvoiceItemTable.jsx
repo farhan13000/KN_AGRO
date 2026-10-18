@@ -1,4 +1,5 @@
 import { DataTable } from "../../../shared/components";
+import LinePackSize from "../../products/components/LinePackSize";
 import { formatInvoiceAmount } from "../utils";
 
 // Prompt 40: read-only, historical rendering only — every cell comes from
@@ -41,7 +42,12 @@ export default function InvoiceItemTable({ items = [] }) {
       header: "Quantity",
       align: "right",
       cellClassName: "text-ink",
-      cell: (item) => item.quantity ?? 0,
+      cell: (item) => (
+        <>
+          {item.quantity ?? 0}
+          <LinePackSize packSize={item.packSize} quantity={item.quantity} />
+        </>
+      ),
     },
     {
       key: "rate",

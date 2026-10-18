@@ -42,4 +42,10 @@ export const productApi = {
       typeof statusOrPayload === "string" ? { status: statusOrPayload } : statusOrPayload;
     return patch(API_ENDPOINTS.PRODUCTS.STATUS(productId), payload);
   },
+
+  // Refused by the server (409) for any product already used anywhere.
+  async deleteProduct(productId) {
+    const response = await apiClient.delete(API_ENDPOINTS.PRODUCTS.DETAIL(productId));
+    return unwrapApiData(response);
+  },
 };
